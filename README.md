@@ -1,0 +1,151 @@
+# ADMIN OS Dashboard
+
+A modern, dark-themed administrative dashboard built with Next.js 16+, Tailwind CSS, and shadcn/ui components.
+
+## Features
+
+- 🎨 **Dark Theme UI** - Futuristic dark interface with neon accents
+- 📊 **Interactive Charts** - Data visualization using Recharts
+- 📱 **Fully Responsive** - Works seamlessly on desktop and mobile devices
+- 🗂️ **Multiple Pages**:
+  - Dashboard with KPIs and analytics
+  - Poll Management
+  - Create Poll
+  - Email List (Subscriber Matrix)
+  - Content Manager
+  - Product Store
+- 🎯 **Static JSON Data** - All data is loaded from static JSON files
+
+## Tech Stack
+
+- **Framework**: Next.js 16+ (JavaScript)
+- **Styling**: Tailwind CSS
+- **UI Components**: shadcn/ui
+- **Charts**: Recharts
+- **Icons**: Lucide React
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js 18+ installed
+- npm or yarn package manager
+
+### Installation
+
+1. Navigate to the project directory:
+
+```bash
+cd admin-os-dashboard
+```
+
+2. Install dependencies:
+
+```bash
+npm install
+```
+
+3. Run the development server:
+
+```bash
+npm run dev
+```
+
+4. Open [http://localhost:3000](http://localhost:3000) in your browser
+
+### Build for Production
+
+```bash
+npm run build
+npm start
+```
+
+## Project Structure
+
+```
+admin-os-dashboard/
+├── src/
+│   ├── app/                    # Next.js App Router pages
+│   │   ├── page.js            # Dashboard page
+│   │   ├── polls/             # Poll Management
+│   │   ├── create-poll/       # Create Poll page
+│   │   ├── emails/            # Email List page
+│   │   ├── content/           # Content Manager page
+│   │   ├── products/          # Product Store page
+│   │   ├── layout.js          # Root layout
+│   │   └── globals.css        # Global styles
+│   ├── components/
+│   │   ├── layout/            # Layout components (Sidebar, Header)
+│   │   └── ui/                # shadcn/ui components
+│   ├── data/                  # Static JSON data files
+│   └── lib/                   # Utility functions
+├── public/                    # Static assets
+├── package.json
+├── tailwind.config.js
+├── next.config.js
+└── jsconfig.json
+```
+
+## Pages Overview
+
+### Dashboard (`/`)
+
+- Key Performance Indicators (KPIs)
+- Social media metrics
+- Daily signal traffic chart
+- Demographics pie chart
+- Session metrics
+- Top referral nodes
+
+### Poll Management (`/polls`)
+
+- Active protocols table
+- Poll status and votes
+- Action buttons (view, edit, delete)
+
+### Create Poll (`/create-poll`)
+
+- Query text input
+- Consensus paths (poll options)
+- Premium pass restriction toggle
+
+### Email List (`/emails`)
+
+- Subscriber matrix
+- Summary cards (total, active, unsubscribe rate)
+- Subscriber table with status badges
+
+### Content Manager (`/content`)
+
+- Page index sidebar
+- Landing page editor
+- Content form fields
+
+### Product Store (`/products`)
+
+- Artifact details form
+- Blueprint upload
+- Stock parameters
+
+## Customization
+
+### Data
+
+All data is stored in JSON files in the `src/data/` directory. You can modify these files to update the dashboard content.
+
+### Styling
+
+The project uses Tailwind CSS with custom dark theme colors. Modify `src/app/globals.css` and `tailwind.config.js` to customize the theme.
+
+## Scripts
+
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm start` - Start production server
+- `npm run lint` - Run ESLint
+- `npm run format` - Format code with Prettier
+- `npm run format:check` - Check code formatting
+
+## License
+
+MIT

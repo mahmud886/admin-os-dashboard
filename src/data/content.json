@@ -1,0 +1,30 @@
+{
+  "pages": [
+    {
+      "id": "landing",
+      "name": "LANDING PAGE",
+      "status": "LIVE"
+    },
+    {
+      "id": "spore-database",
+      "name": "SPORE DATABASE",
+      "status": "DRAFT"
+    },
+    {
+      "id": "artifact-shop",
+      "name": "ARTIFACT SHOP",
+      "status": "LIVE"
+    },
+    {
+      "id": "consensus-archive",
+      "name": "CONSENSUS ARCHIVE",
+      "status": "LIVE"
+    }
+  ],
+  "landingPage": {
+    "revision": "GLOBAL PROTOCOL REV 1.4",
+    "heroHeadline": "SHAPE THE EVOLUTION",
+    "heroSubtext": "A neuro-generative story ecosystem where your choices dictate the fate of the first digital sentient species.",
+    "ctaLink": "/spore"
+  }
+}

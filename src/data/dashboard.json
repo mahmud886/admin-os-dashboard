@@ -1,0 +1,94 @@
+{
+  "kpis": [
+    {
+      "title": "DAILY VISITORS",
+      "value": "2,800",
+      "change": "+12%",
+      "changeType": "positive"
+    },
+    {
+      "title": "NEWSLETTER SUBS",
+      "value": "892",
+      "change": "+5%",
+      "changeType": "positive"
+    },
+    {
+      "title": "BOUNCE RATE",
+      "value": "24.2%",
+      "change": "-2%",
+      "changeType": "positive"
+    },
+    {
+      "title": "AVG COMPLETION",
+      "value": "85%",
+      "change": "+3%",
+      "changeType": "positive"
+    }
+  ],
+  "socialMedia": [
+    {
+      "platform": "FACEBOOK",
+      "shares": "840",
+      "engagement": "4.2%"
+    },
+    {
+      "platform": "INSTAGRAM",
+      "shares": "1200",
+      "engagement": "8.1%"
+    },
+    {
+      "platform": "X",
+      "shares": "3200",
+      "engagement": "12.5%"
+    },
+    {
+      "platform": "YOUTUBE",
+      "shares": "450",
+      "engagement": "15.2%"
+    }
+  ],
+  "trafficData": [
+    { "day": "Mon", "value": 1300 },
+    { "day": "Tue", "value": 1000 },
+    { "day": "Wed", "value": 1400 },
+    { "day": "Thu", "value": 1200 },
+    { "day": "Fri", "value": 2000 },
+    { "day": "Sat", "value": 2600 },
+    { "day": "Sun", "value": 2500 }
+  ],
+  "demographics": [
+    { "label": "NORTH AMERICA", "value": 40, "color": "#3b82f6" },
+    { "label": "EUROPE", "value": 30, "color": "#ec4899" },
+    { "label": "ASIA", "value": 20, "color": "#fbbf24" },
+    { "label": "OTHER", "value": 10, "color": "#ffffff" }
+  ],
+  "metrics": [
+    {
+      "title": "AVG SESSION",
+      "value": "5m 42s",
+      "description": "HUMAN ENGAGEMENT"
+    },
+    {
+      "title": "BOUNCE RATE",
+      "value": "24.2%",
+      "description": "IMMEDIATE DISCONNECT"
+    },
+    {
+      "title": "PAGES/SESSION",
+      "value": "4.8",
+      "description": "NAVIGATION DEPTH"
+    }
+  ],
+  "referrals": [
+    { "source": "CYBERPUNK.NET", "visits": "1.2k", "change": "+5%", "changeType": "positive" },
+    { "source": "GOOGLE.COM", "visits": "840", "change": "-2%", "changeType": "negative" },
+    { "source": "REDDIT.COM/R/SPORE", "visits": "520", "change": "+15%", "changeType": "positive" },
+    { "source": "DIRECT", "visits": "2.4k", "change": "+8%", "changeType": "positive" }
+  ],
+  "sourceDistribution": [
+    { "label": "DIRECT", "value": 45, "color": "#3b82f6" },
+    { "label": "SEARCH", "value": 30, "color": "#ec4899" },
+    { "label": "REFERRAL", "value": 20, "color": "#ffffff" },
+    { "label": "SOCIAL", "value": 5, "color": "#fbbf24" }
+  ]
+}

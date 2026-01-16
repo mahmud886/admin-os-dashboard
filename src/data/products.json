@@ -1,0 +1,7 @@
+{
+  "categories": ["APPAREL", "ACCESSORIES", "DIGITAL", "PHYSICAL"],
+  "stockStatus": {
+    "inventoryTracking": "ACTIVE",
+    "currentStock": "UNLIM. (POD)"
+  }
+}

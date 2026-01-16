@@ -1,0 +1,37 @@
+{
+  "summary": {
+    "totalSubscribers": "4,892",
+    "activeThisWeek": "+124",
+    "unsubscribeRate": "0.8%"
+  },
+  "subscribers": [
+    {
+      "email": "agent.zero@matrix.io",
+      "status": "VERIFIED",
+      "segment": "EARLY ADOPTER",
+      "firstSignal": "2024-05-12",
+      "auth": false
+    },
+    {
+      "email": "neon.vane@cyber.net",
+      "status": "VERIFIED",
+      "segment": "VOTER",
+      "firstSignal": "2024-05-15",
+      "auth": false
+    },
+    {
+      "email": "shadow_runner@flux.com",
+      "status": "PENDING",
+      "segment": "STANDARD",
+      "firstSignal": "2024-05-20",
+      "auth": false
+    },
+    {
+      "email": "rebel_ai@protocol.org",
+      "status": "BLACKLISTED",
+      "segment": "BOT",
+      "firstSignal": "2024-05-10",
+      "auth": false
+    }
+  ]
+}

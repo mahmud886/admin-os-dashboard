@@ -1,0 +1,59 @@
+{
+  "episodes": [
+    {
+      "id": "EP-S01-E001",
+      "episodeNumber": "01",
+      "title": "GENESIS",
+      "status": "AVAILABLE",
+      "synopsis": "The first contact with the Sporefall phenomena sends the factions into a frenzy. Commander Valerius makes a discovery that changes everything.",
+      "runtime": "42:15",
+      "thumbnail": "https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=800&q=80",
+      "clearanceLevel": null,
+      "releaseDate": "2024-12-01T12:00:00Z"
+    },
+    {
+      "id": "EP-S01-E002",
+      "episodeNumber": "02",
+      "title": "INCURSION",
+      "status": "UPCOMING",
+      "synopsis": "Tensions rise as the Lionara Protocol is initiated. A signal from deep space interrupts the peace talks.",
+      "runtime": "45:00",
+      "thumbnail": "https://images.unsplash.com/photo-1534447677768-be436bb09401?w=800&q=80",
+      "releaseDate": "2024-12-25T12:00:00Z",
+      "clearanceLevel": null
+    },
+    {
+      "id": "EP-S01-E003",
+      "episodeNumber": "03",
+      "title": "CLASSIFIED",
+      "status": "LOCKED",
+      "synopsis": "",
+      "runtime": null,
+      "thumbnail": "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800&q=80",
+      "clearanceLevel": 5,
+      "releaseDate": null
+    },
+    {
+      "id": "EP-S01-E004",
+      "episodeNumber": "04",
+      "title": "REVELATIONS",
+      "status": "AVAILABLE",
+      "synopsis": "The truth behind the Sporefall emerges. Ancient secrets are uncovered in the depths of the archive.",
+      "runtime": "48:30",
+      "thumbnail": "https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=800&q=80",
+      "clearanceLevel": null,
+      "releaseDate": "2024-11-15T10:00:00Z"
+    },
+    {
+      "id": "EP-S01-E005",
+      "episodeNumber": "05",
+      "title": "ALLIANCE",
+      "status": "DRAFT",
+      "synopsis": "Factions unite against a common threat. New alliances are formed in the shadow of war.",
+      "runtime": "50:00",
+      "thumbnail": "https://images.unsplash.com/photo-1534447677768-be436bb09401?w=800&q=80",
+      "clearanceLevel": null,
+      "releaseDate": null
+    }
+  ]
+}
