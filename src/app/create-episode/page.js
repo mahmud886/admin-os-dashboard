@@ -110,13 +110,13 @@ export default function CreateEpisodePage() {
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="episode-number" className="text-gray-300">
-                    EPISODE #
+                    EPISODE
                   </Label>
                   <Input id="episode-number" type="number" placeholder="001" className="bg-[#0a0a0a] border-border" />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="season-number" className="text-gray-300">
-                    SEASON #
+                    SEASON
                   </Label>
                   <Input id="season-number" type="number" placeholder="1" className="bg-[#0a0a0a] border-border" />
                 </div>

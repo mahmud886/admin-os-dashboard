@@ -1,23 +1,23 @@
 'use client';
 
-import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
+import {
+  BarChart3,
+  Book,
+  BookOpen,
+  FileText,
+  Home,
+  LayoutDashboard,
+  Menu,
+  Package,
+  PlusCircle,
+  Users,
+  X,
+} from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import {
-  LayoutDashboard,
-  PlusCircle,
-  BarChart3,
-  Users,
-  FileText,
-  Package,
-  Home,
-  Menu,
-  X,
-  BookOpen,
-  Book,
-} from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
+import { useState } from 'react';
 
 const navigation = [
   { name: 'DASHBOARD', href: '/', icon: LayoutDashboard },
@@ -40,10 +40,10 @@ export function Sidebar() {
       <Button
         variant="ghost"
         size="icon"
-        className="fixed top-4 left-4 z-50 lg:hidden"
+        className="fixed z-50 top-4 left-4 lg:hidden"
         onClick={() => setIsOpen(!isOpen)}
       >
-        {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+        {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
       </Button>
 
       {/* Sidebar */}
@@ -56,7 +56,7 @@ export function Sidebar() {
       >
         <div className="p-6 border-b border-border">
           <h1 className="text-2xl font-bold">
-            <span className="text-white">ADMIN</span> <span className="text-yellow-400">OS</span>
+            <span className="text-white">SPORE</span> <span className="text-yellow-400">FALL</span>
           </h1>
         </div>
         <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
@@ -85,16 +85,16 @@ export function Sidebar() {
           <Link
             href="/"
             onClick={() => setIsOpen(false)}
-            className="flex items-center gap-3 px-4 py-3 rounded-md text-sm font-medium text-gray-400 hover:bg-accent hover:text-accent-foreground"
+            className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-400 rounded-md hover:bg-accent hover:text-accent-foreground"
           >
-            <Home className="h-5 w-5 text-gray-400" />
+            <Home className="w-5 h-5 text-gray-400" />
             <span>BACK TO SITE</span>
           </Link>
         </div>
       </div>
 
       {/* Overlay for mobile */}
-      {isOpen && <div className="fixed inset-0 bg-black/50 z-30 lg:hidden" onClick={() => setIsOpen(false)} />}
+      {isOpen && <div className="fixed inset-0 z-30 bg-black/50 lg:hidden" onClick={() => setIsOpen(false)} />}
     </>
   );
 }
