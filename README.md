@@ -1,4 +1,4 @@
-# ADMIN OS Dashboard
+# SPORE FALL Dashboard
 
 A modern, dark-themed administrative dashboard built with Next.js 16+, Tailwind CSS, and shadcn/ui components.
 
@@ -8,9 +8,12 @@ A modern, dark-themed administrative dashboard built with Next.js 16+, Tailwind 
 - 📊 **Interactive Charts** - Data visualization using Recharts
 - 📱 **Fully Responsive** - Works seamlessly on desktop and mobile devices
 - 🗂️ **Multiple Pages**:
+  - Login page with authentication
   - Dashboard with KPIs and analytics
   - Poll Management
   - Create Poll
+  - Episode Management
+  - Create Episode (comprehensive episode editor)
   - Email List (Subscriber Matrix)
   - Content Manager
   - Product Store
@@ -66,9 +69,12 @@ npm start
 admin-os-dashboard/
 ├── src/
 │   ├── app/                    # Next.js App Router pages
-│   │   ├── page.js            # Dashboard page
+│   │   ├── page.js            # Login page (root route)
+│   │   ├── dashboard/         # Dashboard page
 │   │   ├── polls/             # Poll Management
 │   │   ├── create-poll/       # Create Poll page
+│   │   ├── episodes/          # Episode Management
+│   │   ├── create-episode/    # Create Episode page
 │   │   ├── emails/            # Email List page
 │   │   ├── content/           # Content Manager page
 │   │   ├── products/          # Product Store page
@@ -88,7 +94,17 @@ admin-os-dashboard/
 
 ## Pages Overview
 
-### Dashboard (`/`)
+### Login (`/`)
+
+- Default landing page and authentication
+- Username/email and password fields
+- Remember me checkbox
+- Forgot password link
+- Secure login form with loading states
+- Standalone layout (no sidebar/header)
+- Redirects to `/dashboard` after successful login
+
+### Dashboard (`/dashboard`)
 
 - Key Performance Indicators (KPIs)
 - Social media metrics
@@ -96,36 +112,66 @@ admin-os-dashboard/
 - Demographics pie chart
 - Session metrics
 - Top referral nodes
+- Accessible after login
 
 ### Poll Management (`/polls`)
 
 - Active protocols table
 - Poll status and votes
 - Action buttons (view, edit, delete)
+- Filter and search functionality
 
 ### Create Poll (`/create-poll`)
 
 - Query text input
 - Consensus paths (poll options)
 - Premium pass restriction toggle
+- Poll configuration form
+
+### Episode Management (`/episodes`)
+
+- Episode listing table
+- Status badges (Available, Upcoming, Locked, Draft)
+- View episode details dialog
+- Edit episode functionality
+- Delete episode with confirmation
+- Filter by status and search
+
+### Create Episode (`/create-episode`)
+
+- Comprehensive episode editor with multiple sections:
+  - Episode metadata (title, number, type, runtime)
+  - Publishing & visibility settings
+  - Narrative content (synopsis, full text, quotes)
+  - Characters and locations management
+  - Interactive choices & consequences
+  - Unlock conditions & prerequisites
+  - Media assets (thumbnails, banners, videos, audio)
+  - Tags & categories
+  - Additional metadata
+- Dynamic form fields for arrays
+- Save draft and deploy live actions
 
 ### Email List (`/emails`)
 
 - Subscriber matrix
 - Summary cards (total, active, unsubscribe rate)
 - Subscriber table with status badges
+- Email management interface
 
 ### Content Manager (`/content`)
 
 - Page index sidebar
 - Landing page editor
 - Content form fields
+- Page status management (Live, Draft)
 
 ### Product Store (`/products`)
 
 - Artifact details form
 - Blueprint upload
 - Stock parameters
+- Product management interface
 
 ## Customization
 

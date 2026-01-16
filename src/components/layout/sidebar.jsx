@@ -20,7 +20,7 @@ import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 
 const navigation = [
-  { name: 'DASHBOARD', href: '/', icon: LayoutDashboard },
+  { name: 'DASHBOARD', href: '/dashboard', icon: LayoutDashboard },
   { name: 'CREATE POLL', href: '/create-poll', icon: PlusCircle },
   { name: 'CREATE EPISODE', href: '/create-episode', icon: BookOpen },
   { name: 'EPISODE MANAGEMENT', href: '/episodes', icon: Book },

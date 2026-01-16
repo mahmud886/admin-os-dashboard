@@ -1,7 +1,7 @@
 import './globals.css';
 
 export const metadata = {
-  title: 'ADMIN OS - System Console',
+  title: 'SPORE FALL - Admin Console',
   description: 'Administrative dashboard for system management',
 };
 

@@ -1,194 +1,121 @@
 'use client';
 
-import { MainLayout } from '@/components/layout/main-layout';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import dashboardData from '@/data/dashboard.json';
-import { Clock, ExternalLink, Plane } from 'lucide-react';
-import { Area, AreaChart, Cell, Pie, PieChart, ResponsiveContainer, XAxis, YAxis } from 'recharts';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Lock, Shield, User } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
-export default function DashboardPage() {
+export default function LoginPage() {
+  const router = useRouter();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    // Simulate login process
+    setTimeout(() => {
+      setIsLoading(false);
+      // Redirect to dashboard after successful login
+      router.push('/dashboard');
+    }, 1000);
+  };
+
   return (
-    <MainLayout breadcrumb="SYSTEM CONSOLE / DASHBOARD">
-      <div className="space-y-6">
-        {/* KPIs */}
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {dashboardData.kpis.map((kpi, index) => (
-            <Card key={index} className="bg-[#111111] border-border">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-gray-400">{kpi.title}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center justify-between">
-                  <div className="text-3xl font-bold text-teal-400">{kpi.value}</div>
-                  <div className="flex items-center gap-2">
-                    <Badge
-                      variant={kpi.changeType === 'positive' ? 'default' : 'destructive'}
-                      className={
-                        kpi.changeType === 'positive'
-                          ? 'border-green-500 bg-green-500/50 text-green-400 hover:bg-green-500'
-                          : 'border-red-500 bg-red-500/50 text-red-400 hover:bg-red-500'
-                      }
-                    >
-                      {kpi.change}
-                    </Badge>
-                    <ExternalLink className="w-4 h-4 text-gray-400" />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-
-        {/* Social Media */}
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {dashboardData.socialMedia.map((social, index) => (
-            <Card key={index} className="bg-[#111111] border-border">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-teal-400">{social.platform}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  <div className="text-2xl font-bold text-teal-400">SHARES {social.shares}</div>
-                  <div className="text-sm text-gray-400">ENGAGEMENT {social.engagement}</div>
-                  <ExternalLink className="w-4 h-4 text-muted-foreground" />
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-
-        {/* Charts Row */}
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-          {/* Daily Signal Traffic */}
-          <Card className="bg-[#111111] border-border">
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle className="text-teal-400">DAILY SIGNAL TRAFFIC</CardTitle>
-                  <p className="mt-1 text-sm text-gray-400">VOLUME OF UNIQUE NEURAL IDENTIFIERS PER DAY</p>
-                </div>
-                <Button variant="ghost" size="sm">
-                  DETAILED INSIGHTS
-                  <ExternalLink className="w-4 h-4 ml-2" />
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <AreaChart data={dashboardData.trafficData}>
-                  <defs>
-                    <linearGradient id="colorTraffic" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#14b8a6" stopOpacity={0.8} />
-                      <stop offset="95%" stopColor="#14b8a6" stopOpacity={0} />
-                    </linearGradient>
-                  </defs>
-                  <XAxis dataKey="day" stroke="#888" />
-                  <YAxis stroke="#888" />
-                  <Area type="monotone" dataKey="value" stroke="#14b8a6" fillOpacity={1} fill="url(#colorTraffic)" />
-                </AreaChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-
-          {/* Demographics */}
-          <Card className="bg-[#111111] border-border">
-            <CardHeader>
-              <CardTitle className="text-teal-400">DEMOGRAPHICS</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center justify-center">
-                <ResponsiveContainer width="100%" height={300}>
-                  <PieChart>
-                    <Pie
-                      data={dashboardData.demographics}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={60}
-                      outerRadius={100}
-                      paddingAngle={5}
-                      dataKey="value"
-                    >
-                      {dashboardData.demographics.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
-                      ))}
-                    </Pie>
-                  </PieChart>
-                </ResponsiveContainer>
-              </div>
-              <div className="grid grid-cols-2 gap-4 mt-4">
-                {dashboardData.demographics.map((demo, index) => (
-                  <div key={index} className="flex items-center gap-2">
-                    <div className="w-4 h-4 rounded" style={{ backgroundColor: demo.color }}></div>
-                    <span className="text-sm text-gray-400">PERCENTAGE</span>
-                  </div>
-                ))}
-              </div>
-              <div className="mt-4">
-                <div className="mb-2 text-sm text-gray-400">TOP REGION</div>
-                <div className="flex items-center gap-2">
-                  <div className="text-lg font-bold text-teal-400">NORTH AMERICA (40%)</div>
-                  <div className="flex-1 h-2 overflow-hidden rounded-full bg-muted">
-                    <div className="h-full bg-primary" style={{ width: '40%' }}></div>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Metrics and Referrals */}
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-          {/* Metrics */}
-          <div className="grid grid-cols-1 gap-4 lg:col-span-2 sm:grid-cols-3">
-            {dashboardData.metrics.map((metric, index) => (
-              <Card key={index} className="bg-[#111111] border-border">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium text-teal-400">{metric.title}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="mb-2 text-3xl font-bold text-teal-400">{metric.value}</div>
-                  <div className="flex items-center gap-2 text-sm text-gray-400">
-                    {index === 0 && <Clock className="w-4 h-4" />}
-                    {(index === 1 || index === 2) && <Plane className="w-4 h-4" />}
-                    {metric.description}
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+    <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center p-4">
+      <div className="w-full max-w-md">
+        {/* Logo/Header */}
+        <div className="mb-8 text-center">
+          <div className="inline-flex items-center justify-center w-16 h-16 mb-4 border rounded-lg bg-teal-900/30 border-teal-400/50">
+            <Shield className="w-8 h-8 text-teal-400" />
           </div>
+          <h1 className="mb-2 text-3xl font-bold text-teal-400">SPORE FALL ADMIN CONSOLE</h1>
+          <p className="text-sm text-gray-400">Admin Console Access</p>
+        </div>
 
-          {/* Top Referral Nodes */}
-          <Card className="bg-[#111111] border-border">
-            <CardHeader>
-              <CardTitle className="text-teal-400">TOP REFERRAL NODES</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {dashboardData.referrals.map((ref, index) => (
-                  <div key={index} className="flex items-center justify-between">
-                    <div>
-                      <div className="font-medium text-teal-400">{ref.source}</div>
-                      <div className="text-sm text-gray-400">{ref.visits} Visits</div>
-                    </div>
-                    <Badge
-                      variant={ref.changeType === 'positive' ? 'default' : 'destructive'}
-                      className={
-                        ref.changeType === 'positive'
-                          ? 'border-green-500 bg-green-500/50 text-green-400 hover:bg-green-500'
-                          : 'border-red-500 bg-red-500/50 text-red-400 hover:bg-red-500'
-                      }
-                    >
-                      {ref.change}
-                    </Badge>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+        {/* Login Card */}
+        <div className="bg-[#111111] border border-border rounded-lg p-8 shadow-lg">
+          <h2 className="mb-6 text-2xl font-semibold text-center text-gray-200">AUTHENTICATION REQUIRED</h2>
+
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Email/Username Field */}
+            <div className="space-y-2">
+              <Label htmlFor="email" className="flex items-center gap-2 text-gray-300">
+                <User className="w-4 h-4" />
+                USERNAME / EMAIL
+              </Label>
+              <Input
+                id="email"
+                type="text"
+                placeholder="Enter your username or email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="bg-[#0a0a0a] border-border text-gray-200 placeholder:text-gray-500"
+                required
+              />
+            </div>
+
+            {/* Password Field */}
+            <div className="space-y-2">
+              <Label htmlFor="password" className="flex items-center gap-2 text-gray-300">
+                <Lock className="w-4 h-4" />
+                PASSWORD
+              </Label>
+              <Input
+                id="password"
+                type="password"
+                placeholder="Enter your password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="bg-[#0a0a0a] border-border text-gray-200 placeholder:text-gray-500"
+                required
+              />
+            </div>
+
+            {/* Remember Me & Forgot Password */}
+            <div className="flex items-center justify-between text-sm">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  className="w-4 h-4 rounded border-border bg-[#0a0a0a] text-teal-400 focus:ring-teal-400 focus:ring-offset-0 focus:ring-2"
+                />
+                <span className="text-gray-400">Remember me</span>
+              </label>
+              <button type="button" className="text-teal-400 transition-colors hover:text-teal-300 hover:underline">
+                Forgot password?
+              </button>
+            </div>
+
+            {/* Submit Button */}
+            <Button type="submit" className="w-full text-base font-semibold h-11" disabled={isLoading}>
+              {isLoading ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-teal-400 rounded-full border-t-transparent animate-spin"></div>
+                  AUTHENTICATING...
+                </>
+              ) : (
+                'SECURE LOGIN'
+              )}
+            </Button>
+          </form>
+
+          {/* Additional Info */}
+          <div className="pt-6 mt-6 border-t border-border">
+            <p className="text-xs text-center text-gray-500">
+              Protected system console. Unauthorized access is prohibited.
+            </p>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="mt-6 text-center">
+          <p className="text-xs text-gray-600">© 2024 SPORE FALL. All rights reserved.</p>
         </div>
       </div>
-    </MainLayout>
+    </div>
   );
 }
