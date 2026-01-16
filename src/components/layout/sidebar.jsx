@@ -16,6 +16,7 @@ import {
   X,
 } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 
@@ -55,9 +56,20 @@ export function Sidebar() {
         )}
       >
         <div className="p-6 border-b border-border">
-          <h1 className="text-2xl font-bold">
-            <span className="text-white">SPORE</span> <span className="text-yellow-400">FALL</span>
-          </h1>
+          <div className="flex items-center gap-3">
+            <div className="relative w-10 h-10 flex-shrink-0">
+              <Image
+                src="/assets/images/sporefall.jpeg"
+                alt="Spore Fall Logo"
+                fill
+                className="object-contain rounded"
+                priority
+              />
+            </div>
+            <h1 className="text-2xl font-bold">
+              <span className="text-white">SPORE</span> <span className="text-yellow-400">FALL</span>
+            </h1>
+          </div>
         </div>
         <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
           {navigation.map((item) => {

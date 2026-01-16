@@ -3,7 +3,8 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Lock, Shield, User } from 'lucide-react';
+import { Lock, User } from 'lucide-react';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
@@ -30,8 +31,15 @@ export default function LoginPage() {
       <div className="w-full max-w-md">
         {/* Logo/Header */}
         <div className="mb-8 text-center">
-          <div className="inline-flex items-center justify-center w-16 h-16 mb-4 border rounded-lg bg-teal-900/30 border-teal-400/50">
-            <Shield className="w-8 h-8 text-teal-400" />
+          <div className="relative inline-flex items-center justify-center w-20 h-20 mb-4 rounded-lg bg-[#0a0a0a] border border-teal-400/50 overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-teal-900/20 via-transparent to-transparent"></div>
+            <Image
+              src="/assets/images/sporefall.jpeg"
+              alt="Spore Fall Logo"
+              fill
+              className="object-contain rounded mix-blend-lighten"
+              priority
+            />
           </div>
           <h1 className="mb-2 text-3xl font-bold text-teal-400">SPORE FALL ADMIN CONSOLE</h1>
           <p className="text-sm text-gray-400">Admin Console Access</p>
@@ -113,7 +121,7 @@ export default function LoginPage() {
 
         {/* Footer */}
         <div className="mt-6 text-center">
-          <p className="text-xs text-gray-600">© 2024 SPORE FALL. All rights reserved.</p>
+          <p className="text-xs text-gray-600">© 2026 SPORE FALL. All rights reserved.</p>
         </div>
       </div>
     </div>
