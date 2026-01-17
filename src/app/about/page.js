@@ -1,7 +1,21 @@
+'use client';
+
+import { Button } from '@/components/ui/button';
+import { ArrowLeft } from 'lucide-react';
+import Link from 'next/link';
+
 export default function AboutPage() {
   return (
     <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center p-4">
       <div className="w-full max-w-4xl">
+        <div className="mb-4">
+          <Link href="/">
+            <Button variant="ghost" size="sm" className="text-gray-400 hover:text-teal-400">
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              BACK TO HOME
+            </Button>
+          </Link>
+        </div>
         <div className="bg-[#111111] border border-border rounded-lg p-8 shadow-lg">
           <h1 className="mb-6 text-4xl font-bold text-center text-teal-400">About SPORE FALL</h1>
           <div className="space-y-4 text-gray-300">

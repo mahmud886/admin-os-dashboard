@@ -8,10 +8,12 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import episodesData from '@/data/episodes.json';
-import { Plus, Save, Send, Trash2 } from 'lucide-react';
+import { ArrowLeft, Plus, Save, Send, Trash2 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 export default function CreatePollPage() {
+  const router = useRouter();
   const [episodeName, setEpisodeName] = useState('');
   const [pollTitle, setPollTitle] = useState('');
   const [pollDescription, setPollDescription] = useState('');
@@ -52,6 +54,12 @@ export default function CreatePollPage() {
   return (
     <MainLayout breadcrumb="SYSTEM CONSOLE / CREATE-POLL">
       <div className="space-y-6">
+        <div className="flex items-center gap-4 mb-2">
+          <Button variant="ghost" size="sm" onClick={() => router.push('/polls')} className="text-gray-400 hover:text-teal-400">
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            BACK TO POLLS
+          </Button>
+        </div>
         <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
           <h1 className="text-2xl font-bold text-teal-400 sm:text-3xl lg:text-4xl">FORGE NEW PROTOCOL</h1>
           <div className="flex items-center w-full gap-2 sm:w-auto">
