@@ -8,58 +8,35 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
-import { MapPin, Plus, Save, Send, Trash2, Upload, Users } from 'lucide-react';
+import { Plus, Save, Send, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 
 export default function CreateEpisodePage() {
-  const [status, setStatus] = useState('');
-  const [characters, setCharacters] = useState(['']);
-  const [locations, setLocations] = useState(['']);
-  const [choices, setChoices] = useState([{ text: '', consequence: '' }]);
+  // Basic Episode Information
+  const [episodeTitle, setEpisodeTitle] = useState('');
+  const [episodeDescription, setEpisodeDescription] = useState('');
+  const [episodeNumber, setEpisodeNumber] = useState('');
+  const [episodeSeason, setEpisodeSeason] = useState('');
+  const [episodeRuntime, setEpisodeRuntime] = useState('');
+  const [notify, setNotify] = useState(false);
+  const [uniqueEpisodeId, setUniqueEpisodeId] = useState('');
+
+  // Visibility & Access
+  const [visibility, setVisibility] = useState('');
+  const [accessLevel, setAccessLevel] = useState('');
+  const [releaseDateTime, setReleaseDateTime] = useState('');
+  const [clearanceLevel, setClearanceLevel] = useState('');
+  const [ageRestricted, setAgeRestricted] = useState(false);
+
+  // Media Assets
+  const [thumbImageUrl, setThumbImageUrl] = useState('');
+  const [bannerImageUrl, setBannerImageUrl] = useState('');
+  const [videoUrl, setVideoUrl] = useState('');
+  const [audioUrl, setAudioUrl] = useState('');
+  const [additionalBackgroundImageUrl, setAdditionalBackgroundImageUrl] = useState('');
+
+  // Dynamic Lists
   const [tags, setTags] = useState(['']);
-  const [mediaFiles, setMediaFiles] = useState([]);
-
-  const addCharacter = () => {
-    setCharacters([...characters, '']);
-  };
-
-  const removeCharacter = (index) => {
-    setCharacters(characters.filter((_, i) => i !== index));
-  };
-
-  const updateCharacter = (index, value) => {
-    const newCharacters = [...characters];
-    newCharacters[index] = value;
-    setCharacters(newCharacters);
-  };
-
-  const addLocation = () => {
-    setLocations([...locations, '']);
-  };
-
-  const removeLocation = (index) => {
-    setLocations(locations.filter((_, i) => i !== index));
-  };
-
-  const updateLocation = (index, value) => {
-    const newLocations = [...locations];
-    newLocations[index] = value;
-    setLocations(newLocations);
-  };
-
-  const addChoice = () => {
-    setChoices([...choices, { text: '', consequence: '' }]);
-  };
-
-  const removeChoice = (index) => {
-    setChoices(choices.filter((_, i) => i !== index));
-  };
-
-  const updateChoice = (index, field, value) => {
-    const newChoices = [...choices];
-    newChoices[index][field] = value;
-    setChoices(newChoices);
-  };
 
   const addTag = () => {
     setTags([...tags, '']);
@@ -75,18 +52,43 @@ export default function CreateEpisodePage() {
     setTags(newTags);
   };
 
+  const handleSubmit = (isDraft = false) => {
+    // TODO: Implement form submission
+    console.log('Episode Data:', {
+      episodeTitle,
+      episodeDescription,
+      episodeNumber,
+      episodeSeason,
+      episodeRuntime,
+      notify,
+      uniqueEpisodeId,
+      visibility,
+      accessLevel,
+      releaseDateTime,
+      clearanceLevel,
+      ageRestricted,
+      thumbImageUrl,
+      bannerImageUrl,
+      videoUrl,
+      audioUrl,
+      additionalBackgroundImageUrl,
+      tags,
+      isDraft,
+    });
+  };
+
   return (
     <MainLayout breadcrumb="SYSTEM CONSOLE / CREATE-EPISODE">
       <div className="space-y-6">
         <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
           <h1 className="text-2xl font-bold text-teal-400 sm:text-3xl lg:text-4xl">FORGE NEW EPISODE</h1>
           <div className="flex items-center w-full gap-2 sm:w-auto">
-            <Button variant="outline" disabled className="flex-1 sm:flex-initial">
+            <Button variant="outline" onClick={() => handleSubmit(true)} className="flex-1 sm:flex-initial">
               <Save className="w-4 h-4 mr-2" />
               <span className="hidden sm:inline">SAVE DRAFT</span>
               <span className="sm:hidden">SAVE</span>
             </Button>
-            <Button className="flex-1 sm:flex-initial">
+            <Button onClick={() => handleSubmit(false)} className="flex-1 sm:flex-initial">
               <Send className="w-4 h-4 mr-2" />
               <span className="hidden sm:inline">DEPLOY LIVE</span>
               <span className="sm:hidden">DEPLOY</span>
@@ -105,52 +107,78 @@ export default function CreateEpisodePage() {
                 <Label htmlFor="episode-title" className="text-gray-300">
                   EPISODE TITLE
                 </Label>
-                <Input id="episode-title" placeholder="Enter episode title..." className="bg-[#0a0a0a] border-border" />
+                <Input
+                  id="episode-title"
+                  placeholder="Enter episode title..."
+                  value={episodeTitle}
+                  onChange={(e) => setEpisodeTitle(e.target.value)}
+                  className="bg-[#0a0a0a] border-border"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="episode-description" className="text-gray-300">
+                  EPISODE DESCRIPTION
+                </Label>
+                <Textarea
+                  id="episode-description"
+                  placeholder="Enter episode description..."
+                  value={episodeDescription}
+                  onChange={(e) => setEpisodeDescription(e.target.value)}
+                  className="min-h-[100px] bg-[#0a0a0a] border-border resize-none"
+                />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="episode-number" className="text-gray-300">
-                    EPISODE
+                    EPISODE NUMBER
                   </Label>
-                  <Input id="episode-number" type="number" placeholder="001" className="bg-[#0a0a0a] border-border" />
+                  <Input
+                    id="episode-number"
+                    type="number"
+                    placeholder="001"
+                    value={episodeNumber}
+                    onChange={(e) => setEpisodeNumber(e.target.value)}
+                    className="bg-[#0a0a0a] border-border"
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="season-number" className="text-gray-300">
-                    SEASON
+                    EPISODE SEASON
                   </Label>
-                  <Input id="season-number" type="number" placeholder="1" className="bg-[#0a0a0a] border-border" />
+                  <Input
+                    id="season-number"
+                    type="number"
+                    placeholder="1"
+                    value={episodeSeason}
+                    onChange={(e) => setEpisodeSeason(e.target.value)}
+                    className="bg-[#0a0a0a] border-border"
+                  />
                 </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="episode-runtime" className="text-gray-300">
+                  EPISODE RUNTIME (format: MM:SS or HH:MM:SS)
+                </Label>
+                <Input
+                  id="episode-runtime"
+                  placeholder="42:15"
+                  value={episodeRuntime}
+                  onChange={(e) => setEpisodeRuntime(e.target.value)}
+                  className="bg-[#0a0a0a] border-border"
+                />
+                <p className="text-xs text-gray-500">Example: 42:15 or 1:30:45</p>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="episode-id" className="text-gray-300">
                   UNIQUE EPISODE ID
                 </Label>
-                <Input id="episode-id" placeholder="EP-S01-E001" className="bg-[#0a0a0a] border-border" />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="episode-type" className="text-gray-300">
-                  EPISODE TYPE
-                </Label>
-                <Select>
-                  <SelectTrigger className="bg-[#0a0a0a] border-border">
-                    <SelectValue placeholder="Select episode type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="main">MAIN STORY</SelectItem>
-                    <SelectItem value="side">SIDE QUEST</SelectItem>
-                    <SelectItem value="prologue">PROLOGUE</SelectItem>
-                    <SelectItem value="epilogue">EPILOGUE</SelectItem>
-                    <SelectItem value="interlude">INTERLUDE</SelectItem>
-                    <SelectItem value="flashback">FLASHBACK</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="runtime" className="text-gray-300">
-                  RUNTIME (format: MM:SS or HH:MM:SS)
-                </Label>
-                <Input id="runtime" placeholder="42:15" className="bg-[#0a0a0a] border-border" />
-                <p className="text-xs text-gray-500">Example: 42:15 or 1:30:45</p>
+                <Input
+                  id="episode-id"
+                  placeholder="EP-S01-E001"
+                  value={uniqueEpisodeId}
+                  onChange={(e) => setUniqueEpisodeId(e.target.value)}
+                  className="bg-[#0a0a0a] border-border"
+                />
               </div>
             </CardContent>
           </Card>
@@ -161,12 +189,12 @@ export default function CreateEpisodePage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="status" className="text-gray-300">
-                  STATUS
+                <Label htmlFor="visibility" className="text-gray-300">
+                  VISIBILITY
                 </Label>
-                <Select value={status} onValueChange={setStatus}>
+                <Select value={visibility} onValueChange={setVisibility}>
                   <SelectTrigger className="bg-[#0a0a0a] border-border">
-                    <SelectValue placeholder="Select status" />
+                    <SelectValue placeholder="Select visibility" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="AVAILABLE">AVAILABLE</SelectItem>
@@ -177,33 +205,11 @@ export default function CreateEpisodePage() {
                   </SelectContent>
                 </Select>
               </div>
-              {status === 'UPCOMING' && (
-                <div className="space-y-2">
-                  <Label htmlFor="release-date-upcoming" className="text-gray-300">
-                    RELEASE DATE (for countdown timer)
-                  </Label>
-                  <Input id="release-date-upcoming" type="datetime-local" className="bg-[#0a0a0a] border-border" />
-                </div>
-              )}
-              {status === 'LOCKED' && (
-                <div className="space-y-2">
-                  <Label htmlFor="clearance-level" className="text-gray-300">
-                    CLEARANCE LEVEL REQUIRED
-                  </Label>
-                  <Input
-                    id="clearance-level"
-                    type="number"
-                    min="1"
-                    placeholder="5"
-                    className="bg-[#0a0a0a] border-border"
-                  />
-                </div>
-              )}
               <div className="space-y-2">
                 <Label htmlFor="access-level" className="text-gray-300">
                   ACCESS LEVEL
                 </Label>
-                <Select>
+                <Select value={accessLevel} onValueChange={setAccessLevel}>
                   <SelectTrigger className="bg-[#0a0a0a] border-border">
                     <SelectValue placeholder="Select access level" />
                   </SelectTrigger>
@@ -214,236 +220,47 @@ export default function CreateEpisodePage() {
                   </SelectContent>
                 </Select>
               </div>
-              <div className="flex items-center justify-between pt-2">
-                <Label htmlFor="restrict" className="text-base font-medium text-teal-400">
-                  RESTRICT TO PREMIUM PASS HOLDERS
+              <div className="space-y-2">
+                <Label htmlFor="release-datetime" className="text-gray-300">
+                  RELEASE DATE & TIME
                 </Label>
-                <Switch id="restrict" />
+                <Input
+                  id="release-datetime"
+                  type="datetime-local"
+                  value={releaseDateTime}
+                  onChange={(e) => setReleaseDateTime(e.target.value)}
+                  className="bg-[#0a0a0a] border-border"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="clearance-level" className="text-gray-300">
+                  CLEARANCE LEVEL
+                </Label>
+                <Input
+                  id="clearance-level"
+                  type="number"
+                  min="1"
+                  placeholder="Enter clearance level"
+                  value={clearanceLevel}
+                  onChange={(e) => setClearanceLevel(e.target.value)}
+                  className="bg-[#0a0a0a] border-border"
+                />
+              </div>
+              <div className="flex items-center justify-between pt-2">
+                <Label htmlFor="notify" className="text-base font-medium text-teal-400">
+                  NOTIFY USERS
+                </Label>
+                <Switch id="notify" checked={notify} onCheckedChange={setNotify} />
               </div>
               <div className="flex items-center justify-between">
                 <Label htmlFor="age-restriction" className="text-base font-medium text-teal-400">
-                  AGE RESTRICTED (18+)
+                  AGE RESTRICTED
                 </Label>
-                <Switch id="age-restriction" />
+                <Switch id="age-restriction" checked={ageRestricted} onCheckedChange={setAgeRestricted} />
               </div>
             </CardContent>
           </Card>
         </div>
-
-        {/* Narrative Content */}
-        <Card className="bg-[#111111] border-border">
-          <CardHeader>
-            <CardTitle className="text-teal-400">NARRATIVE CONTENT</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="synopsis" className="text-gray-300">
-                SYNOPSIS (Brief Summary)
-              </Label>
-              <Textarea
-                id="synopsis"
-                placeholder="Enter a brief synopsis of the episode..."
-                className="min-h-[100px] bg-[#0a0a0a] border-border resize-none"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="full-narrative" className="text-gray-300">
-                FULL NARRATIVE TEXT
-              </Label>
-              <Textarea
-                id="full-narrative"
-                placeholder="Enter the complete narrative content for this episode..."
-                className="min-h-[300px] bg-[#0a0a0a] border-border resize-none"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="opening-quote" className="text-gray-300">
-                OPENING QUOTE / TEASER
-              </Label>
-              <Textarea
-                id="opening-quote"
-                placeholder="Enter opening quote or teaser text..."
-                className="min-h-[80px] bg-[#0a0a0a] border-border resize-none"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="ending-notes" className="text-gray-300">
-                ENDING NOTES / CLOSING REMARKS
-              </Label>
-              <Textarea
-                id="ending-notes"
-                placeholder="Enter ending notes or closing remarks..."
-                className="min-h-[80px] bg-[#0a0a0a] border-border resize-none"
-              />
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Characters & Locations */}
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-          <Card className="bg-[#111111] border-border">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-teal-400">
-                <Users className="w-5 h-5" />
-                CHARACTERS
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {characters.map((character, index) => (
-                <div key={index} className="flex items-center gap-2">
-                  <Input
-                    placeholder={`Character ${index + 1} name`}
-                    value={character}
-                    onChange={(e) => updateCharacter(index, e.target.value)}
-                    className="bg-[#0a0a0a] border-border"
-                  />
-                  {characters.length > 1 && (
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => removeCharacter(index)}
-                      className="text-destructive hover:text-destructive"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                  )}
-                </div>
-              ))}
-              <Button variant="outline" onClick={addCharacter} className="w-full border-2 border-dashed">
-                <Plus className="w-4 h-4 mr-2" />
-                ADD CHARACTER
-              </Button>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-[#111111] border-border">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-teal-400">
-                <MapPin className="w-5 h-5" />
-                LOCATIONS / SETTINGS
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {locations.map((location, index) => (
-                <div key={index} className="flex items-center gap-2">
-                  <Input
-                    placeholder={`Location ${index + 1} name`}
-                    value={location}
-                    onChange={(e) => updateLocation(index, e.target.value)}
-                    className="bg-[#0a0a0a] border-border"
-                  />
-                  {locations.length > 1 && (
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => removeLocation(index)}
-                      className="text-destructive hover:text-destructive"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                  )}
-                </div>
-              ))}
-              <Button variant="outline" onClick={addLocation} className="w-full border-2 border-dashed">
-                <Plus className="w-4 h-4 mr-2" />
-                ADD LOCATION
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Choices & Consequences */}
-        <Card className="bg-[#111111] border-border">
-          <CardHeader>
-            <CardTitle className="text-teal-400">INTERACTIVE CHOICES & CONSEQUENCES</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {choices.map((choice, index) => (
-              <div key={index} className="space-y-3 p-4 border border-border rounded-md bg-[#0a0a0a]">
-                <div className="flex items-center justify-between mb-2">
-                  <Label className="text-teal-400">CHOICE {index + 1}</Label>
-                  {choices.length > 1 && (
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => removeChoice(index)}
-                      className="w-8 h-8 text-destructive hover:text-destructive"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                  )}
-                </div>
-                <div className="space-y-2">
-                  <Input
-                    placeholder="Choice text..."
-                    value={choice.text}
-                    onChange={(e) => updateChoice(index, 'text', e.target.value)}
-                    className="bg-[#111111] border-border"
-                  />
-                  <Textarea
-                    placeholder="Consequence or outcome description..."
-                    value={choice.consequence}
-                    onChange={(e) => updateChoice(index, 'consequence', e.target.value)}
-                    className="min-h-[80px] bg-[#111111] border-border resize-none"
-                  />
-                </div>
-              </div>
-            ))}
-            <Button variant="outline" onClick={addChoice} className="w-full border-2 border-dashed">
-              <Plus className="w-4 h-4 mr-2" />
-              ADD CHOICE BRANCH
-            </Button>
-          </CardContent>
-        </Card>
-
-        {/* Unlock Conditions & Prerequisites */}
-        <Card className="bg-[#111111] border-border">
-          <CardHeader>
-            <CardTitle className="text-teal-400">UNLOCK CONDITIONS & PREREQUISITES</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <div className="space-y-2">
-                <Label htmlFor="required-episodes" className="text-gray-300">
-                  REQUIRED PREVIOUS EPISODES (comma-separated IDs)
-                </Label>
-                <Input
-                  id="required-episodes"
-                  placeholder="EP-S01-E001, EP-S01-E002"
-                  className="bg-[#0a0a0a] border-border"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="minimum-level" className="text-gray-300">
-                  MINIMUM CHARACTER/PLAYER LEVEL
-                </Label>
-                <Input id="minimum-level" type="number" placeholder="1" className="bg-[#0a0a0a] border-border" />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="required-achievements" className="text-gray-300">
-                  REQUIRED ACHIEVEMENTS (comma-separated)
-                </Label>
-                <Input
-                  id="required-achievements"
-                  placeholder="ACH-001, ACH-005"
-                  className="bg-[#0a0a0a] border-border"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="required-items" className="text-gray-300">
-                  REQUIRED ITEMS / ARTIFACTS
-                </Label>
-                <Input id="required-items" placeholder="ITEM-001, ARTIFACT-A" className="bg-[#0a0a0a] border-border" />
-              </div>
-            </div>
-            <div className="flex items-center justify-between pt-2">
-              <Label htmlFor="unlock-automatic" className="text-base font-medium text-teal-400">
-                AUTO-UNLOCK WHEN CONDITIONS MET
-              </Label>
-              <Switch id="unlock-automatic" />
-            </div>
-          </CardContent>
-        </Card>
 
         {/* Media Assets */}
         <Card className="bg-[#111111] border-border">
@@ -452,64 +269,65 @@ export default function CreateEpisodePage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="thumbnail-url" className="text-gray-300">
-                THUMBNAIL IMAGE URL (Background image for episode card)
+              <Label htmlFor="thumb-image-url" className="text-gray-300">
+                THUMB IMAGE URL
               </Label>
               <Input
-                id="thumbnail-url"
+                id="thumb-image-url"
                 placeholder="https://example.com/thumbnail.jpg"
+                value={thumbImageUrl}
+                onChange={(e) => setThumbImageUrl(e.target.value)}
                 className="bg-[#0a0a0a] border-border"
               />
-              <p className="text-xs text-gray-500">
-                This image will be displayed as the background in the episode card
-              </p>
             </div>
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <div className="space-y-2">
-                <Label htmlFor="banner-url" className="text-gray-300">
-                  BANNER IMAGE URL (optional)
-                </Label>
-                <Input
-                  id="banner-url"
-                  placeholder="https://example.com/banner.jpg"
-                  className="bg-[#0a0a0a] border-border"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="background-image-url" className="text-gray-300">
-                  ADDITIONAL BACKGROUND URL (optional)
-                </Label>
-                <Input
-                  id="background-image-url"
-                  placeholder="https://example.com/background.jpg"
-                  className="bg-[#0a0a0a] border-border"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="video-url" className="text-gray-300">
-                  VIDEO / CINEMATIC URL (optional)
-                </Label>
-                <Input
-                  id="video-url"
-                  placeholder="https://example.com/video.mp4"
-                  className="bg-[#0a0a0a] border-border"
-                />
-              </div>
+            <div className="space-y-2">
+              <Label htmlFor="banner-image-url" className="text-gray-300">
+                BANNER IMAGE URL
+              </Label>
+              <Input
+                id="banner-image-url"
+                placeholder="https://example.com/banner.jpg"
+                value={bannerImageUrl}
+                onChange={(e) => setBannerImageUrl(e.target.value)}
+                className="bg-[#0a0a0a] border-border"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="video-url" className="text-gray-300">
+                VIDEO URL
+              </Label>
+              <Input
+                id="video-url"
+                placeholder="https://example.com/video.mp4"
+                value={videoUrl}
+                onChange={(e) => setVideoUrl(e.target.value)}
+                className="bg-[#0a0a0a] border-border"
+              />
             </div>
             <div className="space-y-2">
               <Label htmlFor="audio-url" className="text-gray-300">
-                AUDIO / SOUNDTRACK URL (optional)
+                AUDIO URL
               </Label>
               <Input
                 id="audio-url"
                 placeholder="https://example.com/audio.mp3"
+                value={audioUrl}
+                onChange={(e) => setAudioUrl(e.target.value)}
                 className="bg-[#0a0a0a] border-border"
               />
             </div>
-            <Button variant="outline" className="w-full border-2 border-dashed">
-              <Upload className="w-4 h-4 mr-2" />
-              UPLOAD MEDIA FILES
-            </Button>
+            <div className="space-y-2">
+              <Label htmlFor="additional-background-image-url" className="text-gray-300">
+                ADDITIONAL BACKGROUND IMAGE URL
+              </Label>
+              <Input
+                id="additional-background-image-url"
+                placeholder="https://example.com/background.jpg"
+                value={additionalBackgroundImageUrl}
+                onChange={(e) => setAdditionalBackgroundImageUrl(e.target.value)}
+                className="bg-[#0a0a0a] border-border"
+              />
+            </div>
           </CardContent>
         </Card>
 
@@ -587,56 +405,17 @@ export default function CreateEpisodePage() {
           </CardContent>
         </Card>
 
-        {/* Additional Metadata */}
-        <Card className="bg-[#111111] border-border">
-          <CardHeader>
-            <CardTitle className="text-teal-400">ADDITIONAL METADATA</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <div className="space-y-2">
-                <Label htmlFor="author" className="text-gray-300">
-                  AUTHOR / WRITER
-                </Label>
-                <Input id="author" placeholder="Author name" className="bg-[#0a0a0a] border-border" />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="editor" className="text-gray-300">
-                  EDITOR
-                </Label>
-                <Input id="editor" placeholder="Editor name" className="bg-[#0a0a0a] border-border" />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="word-count" className="text-gray-300">
-                  WORD COUNT
-                </Label>
-                <Input id="word-count" type="number" placeholder="0" className="bg-[#0a0a0a] border-border" />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="reading-time" className="text-gray-300">
-                  ESTIMATED READING TIME (minutes)
-                </Label>
-                <Input id="reading-time" type="number" placeholder="0" className="bg-[#0a0a0a] border-border" />
-              </div>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="notes" className="text-gray-300">
-                INTERNAL NOTES (not visible to users)
-              </Label>
-              <Textarea
-                id="notes"
-                placeholder="Add any internal notes or reminders..."
-                className="min-h-[100px] bg-[#0a0a0a] border-border resize-none"
-              />
-            </div>
-            <div className="flex items-center justify-between pt-2">
-              <Label htmlFor="featured" className="text-base font-medium text-teal-400">
-                FEATURED EPISODE
-              </Label>
-              <Switch id="featured" />
-            </div>
-          </CardContent>
-        </Card>
+        {/* Action Buttons Section */}
+        <div className="flex items-center justify-end gap-4 pt-4 border-t border-border">
+          <Button variant="outline" onClick={() => handleSubmit(true)} className="min-w-[140px]">
+            <Save className="w-4 h-4 mr-2" />
+            SAVE DRAFT
+          </Button>
+          <Button onClick={() => handleSubmit(false)} className="min-w-[140px]">
+            <Send className="w-4 h-4 mr-2" />
+            DEPLOY LIVE
+          </Button>
+        </div>
       </div>
     </MainLayout>
   );
