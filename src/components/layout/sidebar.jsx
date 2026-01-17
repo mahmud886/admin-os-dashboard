@@ -62,6 +62,7 @@ export function Sidebar() {
                 src="/assets/images/sporefall.jpeg"
                 alt="Spore Fall Logo"
                 fill
+                sizes="(max-width: 768px) 40px, 40px"
                 className="object-contain rounded"
                 priority
               />
