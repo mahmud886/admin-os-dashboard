@@ -55,7 +55,12 @@ export default function CreatePollPage() {
     <MainLayout breadcrumb="SYSTEM CONSOLE / CREATE-POLL">
       <div className="space-y-6">
         <div className="flex items-center gap-4 mb-2">
-          <Button variant="ghost" size="sm" onClick={() => router.push('/polls')} className="text-gray-400 hover:text-teal-400">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => router.push('/polls')}
+            className="text-gray-400 hover:text-teal-400"
+          >
             <ArrowLeft className="w-4 h-4 mr-2" />
             BACK TO POLLS
           </Button>

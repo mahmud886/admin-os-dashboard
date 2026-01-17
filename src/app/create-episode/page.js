@@ -84,7 +84,12 @@ export default function CreateEpisodePage() {
     <MainLayout breadcrumb="SYSTEM CONSOLE / CREATE-EPISODE">
       <div className="space-y-6">
         <div className="flex items-center gap-4 mb-2">
-          <Button variant="ghost" size="sm" onClick={() => router.push('/episodes')} className="text-gray-400 hover:text-teal-400">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => router.push('/episodes')}
+            className="text-gray-400 hover:text-teal-400"
+          >
             <ArrowLeft className="w-4 h-4 mr-2" />
             BACK TO EPISODES
           </Button>
