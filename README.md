@@ -91,6 +91,7 @@ supabase db execute --file supabase/migrations/create_tables.sql
 ```
 
 This creates the following tables:
+
 - `episodes` - Episode data with full metadata
 - `polls` - Poll data linked to episodes
 - `poll_options` - Dynamic poll options with vote counts
@@ -285,6 +286,7 @@ admin-os-dashboard/
 - `DELETE /api/episodes/[id]` - Delete episode (requires auth)
 
 **Query Parameters:**
+
 - `visibility` - Filter by visibility (AVAILABLE, UPCOMING, LOCKED, DRAFT, ARCHIVED)
 - `access_level` - Filter by access level (free, premium, vip)
 - `status` - Filter by status (DRAFT, PUBLISHED)
@@ -300,6 +302,7 @@ admin-os-dashboard/
 - `DELETE /api/polls/[id]` - Delete poll (requires auth)
 
 **Query Parameters:**
+
 - `episode_id` - Filter by episode UUID
 - `status` - Filter by status (DRAFT, LIVE, ENDED, ARCHIVED)
 - `limit` - Results per page (default: 100)
@@ -317,6 +320,7 @@ The application uses Supabase Authentication with a static user validation appro
 4. **Route Protection**: Middleware protects routes based on authentication status
 
 **Protected Routes:**
+
 - `/dashboard`
 - `/admin`
 - `/episodes`
@@ -325,6 +329,7 @@ The application uses Supabase Authentication with a static user validation appro
 - `/create-poll`
 
 **Public Routes:**
+
 - `/`
 - `/about`
 - `/login`
@@ -334,12 +339,14 @@ The application uses Supabase Authentication with a static user validation appro
 ### Dashboard Components
 
 Modular dashboard components for better maintainability:
+
 - **Statistics Cards**: `EpisodeStatsCard`, `PollStatsCard`
 - **Analytics**: `GoogleAnalyticsKPI`, `SocialMediaStats`, `ChartRow`, `MetricsReferrals`
 
 ### Shimmer Loaders
 
 Beautiful loading states for better UX:
+
 - All dashboard components have corresponding shimmer loaders
 - Table shimmer loaders for episodes and polls
 - Poll details page shimmer
@@ -347,6 +354,7 @@ Beautiful loading states for better UX:
 ### Toast Notifications
 
 Global toast notification system:
+
 - Success, error, warning, and info variants
 - Auto-dismiss with configurable duration
 - Accessible via `useToast()` hook
@@ -393,6 +401,7 @@ Global toast notification system:
 - `npm run lint` - Run ESLint
 - `npm run format` - Format code with Prettier
 - `npm run format:check` - Check code formatting
+- `npm run check:deployment` - Check project readiness for Vercel deployment
 
 ## 🚦 Development Workflow
 
@@ -422,6 +431,7 @@ SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
 - **API Documentation**: See `doc/API_DOCUMENTATION.md`
 - **Supabase Setup**: See `doc/SUPABASE_SETUP.md` (if available)
 - **Database Schema**: See `supabase/migrations/create_tables.sql`
+- **Vercel Deployment Guide**: See `doc/VERCEL_DEPLOYMENT_NOT_FOUND_GUIDE.md` (troubleshooting deployment errors)
 
 ## 🤝 Contributing
 
