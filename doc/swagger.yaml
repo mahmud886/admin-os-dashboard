@@ -1,0 +1,996 @@
+openapi: 3.0.3
+info:
+  title: Admin OS Dashboard API
+  description: |
+    Complete CRUD API for managing Episodes and Polls with Supabase integration.
+
+    ## Authentication
+    All POST, PUT, and DELETE endpoints require authentication via Supabase session.
+
+    ## Base URL
+    The API base URL depends on your deployment environment.
+
+  version: 1.0.0
+  contact:
+    name: API Support
+    email: support@example.com
+
+servers:
+  - url: http://localhost:3000/api
+    description: Local development server
+  - url: https://your-domain.com/api
+    description: Production server
+
+tags:
+  - name: Episodes
+    description: Episode management endpoints
+  - name: Polls
+    description: Poll management endpoints
+
+paths:
+  /episodes:
+    get:
+      tags:
+        - Episodes
+      summary: Get all episodes
+      description: |
+        Retrieve all episodes with optional filtering and pagination.
+        Supports filtering by visibility, access level, and status.
+      operationId: getEpisodes
+      parameters:
+        - name: visibility
+          in: query
+          description: Filter by visibility status
+          required: false
+          schema:
+            type: string
+            enum: [AVAILABLE, UPCOMING, LOCKED, DRAFT, ARCHIVED]
+        - name: access_level
+          in: query
+          description: Filter by access level
+          required: false
+          schema:
+            type: string
+            enum: [free, premium, vip]
+        - name: status
+          in: query
+          description: Filter by status
+          required: false
+          schema:
+            type: string
+            enum: [DRAFT, PUBLISHED]
+        - name: limit
+          in: query
+          description: Number of results per page
+          required: false
+          schema:
+            type: integer
+            default: 100
+            minimum: 1
+            maximum: 1000
+        - name: offset
+          in: query
+          description: Pagination offset
+          required: false
+          schema:
+            type: integer
+            default: 0
+            minimum: 0
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  episodes:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Episode'
+                  total:
+                    type: integer
+                    description: Total number of episodes
+                  limit:
+                    type: integer
+                    description: Number of results per page
+                  offset:
+                    type: integer
+                    description: Pagination offset
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    post:
+      tags:
+        - Episodes
+      summary: Create a new episode
+      description: Create a new episode with all metadata and media assets.
+      operationId: createEpisode
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EpisodeInput'
+            examples:
+              basic:
+                value:
+                  title: 'The Beginning'
+                  episode_number: 1
+                  season_number: 1
+                  unique_episode_id: 'EP-S01-E001'
+                  visibility: 'DRAFT'
+              complete:
+                value:
+                  title: 'The Beginning'
+                  description: 'The story begins...'
+                  episode_number: 1
+                  season_number: 1
+                  runtime: '42:15'
+                  unique_episode_id: 'EP-S01-E001'
+                  visibility: 'AVAILABLE'
+                  access_level: 'free'
+                  release_datetime: '2024-12-31T00:00:00Z'
+                  clearance_level: 1
+                  notify: false
+                  age_restricted: false
+                  thumb_image_url: 'https://example.com/thumb.jpg'
+                  banner_image_url: 'https://example.com/banner.jpg'
+                  video_url: 'https://example.com/video.mp4'
+                  audio_url: 'https://example.com/audio.mp3'
+                  additional_background_image_url: 'https://example.com/bg.jpg'
+                  tags: ['cyberpunk', 'sci-fi', 'action']
+                  primary_genre: 'cyberpunk'
+                  secondary_genre: 'sci-fi'
+                  status: 'DRAFT'
+                  isDraft: true
+      responses:
+        '201':
+          description: Episode created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Episode created successfully'
+                  episode:
+                    $ref: '#/components/schemas/Episode'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '409':
+          description: Conflict - Episode with unique ID already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /episodes/{id}:
+    get:
+      tags:
+        - Episodes
+      summary: Get episode by ID
+      description: Retrieve a single episode by its unique identifier.
+      operationId: getEpisodeById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Episode UUID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  episode:
+                    $ref: '#/components/schemas/Episode'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    put:
+      tags:
+        - Episodes
+      summary: Update episode
+      description: |
+        Update an existing episode. All fields are optional - only provided fields will be updated.
+        The unique_episode_id can only be updated if no other episode has that ID.
+      operationId: updateEpisode
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Episode UUID
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        description: All fields are optional - only provided fields will be updated
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EpisodeInput'
+      responses:
+        '200':
+          description: Episode updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Episode updated successfully'
+                  episode:
+                    $ref: '#/components/schemas/Episode'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: Conflict - Episode with unique ID already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    delete:
+      tags:
+        - Episodes
+      summary: Delete episode
+      description: |
+        Delete an episode by ID. This operation will cascade delete all related polls and poll options.
+        ⚠️ This action cannot be undone.
+      operationId: deleteEpisode
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Episode UUID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Episode deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Episode deleted successfully'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /polls:
+    get:
+      tags:
+        - Polls
+      summary: Get all polls
+      description: |
+        Retrieve all polls with optional filtering by episode and status.
+        Returns polls with their related episode information and all poll options.
+      operationId: getPolls
+      parameters:
+        - name: episode_id
+          in: query
+          description: Filter by episode ID
+          required: false
+          schema:
+            type: string
+            format: uuid
+        - name: status
+          in: query
+          description: Filter by poll status
+          required: false
+          schema:
+            type: string
+            enum: [DRAFT, LIVE, ENDED, ARCHIVED]
+        - name: limit
+          in: query
+          description: Number of results per page
+          required: false
+          schema:
+            type: integer
+            default: 100
+            minimum: 1
+            maximum: 1000
+        - name: offset
+          in: query
+          description: Pagination offset
+          required: false
+          schema:
+            type: integer
+            default: 0
+            minimum: 0
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  polls:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Poll'
+                  total:
+                    type: integer
+                    description: Total number of polls
+                  limit:
+                    type: integer
+                    description: Number of results per page
+                  offset:
+                    type: integer
+                    description: Pagination offset
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    post:
+      tags:
+        - Polls
+      summary: Create a new poll
+      description: |
+        Create a new poll with dynamic options. Polls must have at least 2 options.
+        The poll will be associated with an episode and can be created as DRAFT or LIVE.
+        If starts_at is not provided, it defaults to the current time.
+        If ends_at is not provided, it's calculated from starts_at + duration_days.
+      operationId: createPoll
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PollInput'
+            examples:
+              basic:
+                value:
+                  episode_id: '550e8400-e29b-41d4-a716-446655440000'
+                  title: 'What should happen next?'
+                  description: 'Vote for the next action in the story'
+                  duration_days: 7
+                  status: 'DRAFT'
+                  isDraft: true
+                  options:
+                    - name: 'Option A'
+                      description: 'Description for option A'
+                      count: 0
+                    - name: 'Option B'
+                      description: 'Description for option B'
+                      count: 0
+              live:
+                value:
+                  episode_id: '550e8400-e29b-41d4-a716-446655440000'
+                  title: 'Who should survive?'
+                  description: 'Choose which character survives'
+                  duration_days: 14
+                  status: 'LIVE'
+                  isDraft: false
+                  starts_at: '2024-12-31T00:00:00Z'
+                  ends_at: '2025-01-14T00:00:00Z'
+                  options:
+                    - name: 'Character A'
+                      description: 'The protagonist'
+                      count: 0
+                    - name: 'Character B'
+                      description: 'The antagonist'
+                      count: 0
+                    - name: 'Character C'
+                      description: 'The sidekick'
+                      count: 0
+      responses:
+        '201':
+          description: Poll created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Poll created successfully'
+                  poll:
+                    $ref: '#/components/schemas/Poll'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: Episode not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /polls/{id}:
+    get:
+      tags:
+        - Polls
+      summary: Get poll by ID
+      description: Retrieve a single poll by its unique identifier, including all poll options and episode information.
+      operationId: getPollById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Poll UUID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  poll:
+                    $ref: '#/components/schemas/Poll'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    put:
+      tags:
+        - Polls
+      summary: Update poll
+      description: |
+        Update an existing poll. All fields are optional.
+        To update poll options, provide a new options array which will replace all existing options.
+        If duration_days is updated without ends_at, the end date will be recalculated.
+      operationId: updatePoll
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Poll UUID
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        description: All fields are optional. Options array will replace existing options.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PollInput'
+      responses:
+        '200':
+          description: Poll updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Poll updated successfully'
+                  poll:
+                    $ref: '#/components/schemas/Poll'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    delete:
+      tags:
+        - Polls
+      summary: Delete poll
+      description: |
+        Delete a poll by ID. This operation will cascade delete all related poll options.
+        ⚠️ This action cannot be undone.
+      operationId: deletePoll
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Poll UUID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Poll deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Poll deleted successfully'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: |
+        Supabase JWT token. Include the token in the Authorization header.
+        Format: `Authorization: Bearer <token>`
+
+  schemas:
+    Episode:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique episode identifier
+        title:
+          type: string
+          description: Episode title
+        description:
+          type: string
+          nullable: true
+          description: Episode description
+        episode_number:
+          type: integer
+          description: Episode number within season
+        season_number:
+          type: integer
+          description: Season number
+        runtime:
+          type: string
+          nullable: true
+          description: Episode runtime (e.g., "42:15")
+        unique_episode_id:
+          type: string
+          description: Unique episode identifier string (must be unique)
+        visibility:
+          type: string
+          enum: [AVAILABLE, UPCOMING, LOCKED, DRAFT, ARCHIVED]
+          description: Episode visibility status
+        access_level:
+          type: string
+          enum: [free, premium, vip]
+          description: Access level required to view episode
+        release_datetime:
+          type: string
+          format: date-time
+          nullable: true
+          description: Scheduled release date and time
+        clearance_level:
+          type: integer
+          description: Clearance level required
+          default: 1
+        notify:
+          type: boolean
+          description: Whether to notify users on release
+        age_restricted:
+          type: boolean
+          description: Whether episode is age restricted
+        thumb_image_url:
+          type: string
+          nullable: true
+          description: Thumbnail image URL
+        banner_image_url:
+          type: string
+          nullable: true
+          description: Banner image URL
+        video_url:
+          type: string
+          nullable: true
+          description: Video file URL
+        audio_url:
+          type: string
+          nullable: true
+          description: Audio file URL
+        additional_background_image_url:
+          type: string
+          nullable: true
+          description: Additional background image URL
+        tags:
+          type: array
+          items:
+            type: string
+          description: Array of tag strings
+        primary_genre:
+          type: string
+          nullable: true
+          description: Primary genre
+        secondary_genre:
+          type: string
+          nullable: true
+          description: Secondary genre
+        status:
+          type: string
+          enum: [DRAFT, PUBLISHED]
+          description: Episode status
+        created_at:
+          type: string
+          format: date-time
+          description: Creation timestamp
+        updated_at:
+          type: string
+          format: date-time
+          description: Last update timestamp
+        created_by:
+          type: string
+          format: uuid
+          description: User ID who created the episode
+      required:
+        - id
+        - title
+        - episode_number
+        - season_number
+        - unique_episode_id
+
+    EpisodeInput:
+      type: object
+      properties:
+        title:
+          type: string
+          description: Episode title
+        description:
+          type: string
+          nullable: true
+          description: Episode description
+        episode_number:
+          type: integer
+          description: Episode number within season
+        season_number:
+          type: integer
+          description: Season number
+        runtime:
+          type: string
+          nullable: true
+          description: Episode runtime (e.g., "42:15")
+        unique_episode_id:
+          type: string
+          description: Unique episode identifier string (must be unique)
+        visibility:
+          type: string
+          enum: [AVAILABLE, UPCOMING, LOCKED, DRAFT, ARCHIVED]
+          default: DRAFT
+          description: Episode visibility status
+        access_level:
+          type: string
+          enum: [free, premium, vip]
+          default: free
+          description: Access level required to view episode
+        release_datetime:
+          type: string
+          format: date-time
+          nullable: true
+          description: Scheduled release date and time
+        clearance_level:
+          type: integer
+          default: 1
+          description: Clearance level required
+        notify:
+          type: boolean
+          default: false
+          description: Whether to notify users on release
+        age_restricted:
+          type: boolean
+          default: false
+          description: Whether episode is age restricted
+        thumb_image_url:
+          type: string
+          nullable: true
+          description: Thumbnail image URL
+        banner_image_url:
+          type: string
+          nullable: true
+          description: Banner image URL
+        video_url:
+          type: string
+          nullable: true
+          description: Video file URL
+        audio_url:
+          type: string
+          nullable: true
+          description: Audio file URL
+        additional_background_image_url:
+          type: string
+          nullable: true
+          description: Additional background image URL
+        tags:
+          type: array
+          items:
+            type: string
+          default: []
+          description: Array of tag strings
+        primary_genre:
+          type: string
+          nullable: true
+          description: Primary genre
+        secondary_genre:
+          type: string
+          nullable: true
+          description: Secondary genre
+        status:
+          type: string
+          enum: [DRAFT, PUBLISHED]
+          description: Episode status
+        isDraft:
+          type: boolean
+          description: Whether episode is a draft (alternative to status)
+      required:
+        - title
+        - episode_number
+        - season_number
+        - unique_episode_id
+
+    Poll:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique poll identifier
+        episode_id:
+          type: string
+          format: uuid
+          description: Associated episode ID
+        title:
+          type: string
+          description: Poll title/question
+        description:
+          type: string
+          nullable: true
+          description: Poll description
+        duration_days:
+          type: integer
+          default: 7
+          description: Poll duration in days
+        status:
+          type: string
+          enum: [DRAFT, LIVE, ENDED, ARCHIVED]
+          description: Poll status
+        starts_at:
+          type: string
+          format: date-time
+          description: Poll start date and time
+        ends_at:
+          type: string
+          format: date-time
+          description: Poll end date and time
+        created_at:
+          type: string
+          format: date-time
+          description: Creation timestamp
+        updated_at:
+          type: string
+          format: date-time
+          description: Last update timestamp
+        created_by:
+          type: string
+          format: uuid
+          description: User ID who created the poll
+        episodes:
+          type: object
+          nullable: true
+          properties:
+            id:
+              type: string
+              format: uuid
+            title:
+              type: string
+            episode_number:
+              type: integer
+            season_number:
+              type: integer
+          description: Related episode information
+        poll_options:
+          type: array
+          items:
+            $ref: '#/components/schemas/PollOption'
+          description: Array of poll options
+      required:
+        - id
+        - episode_id
+        - title
+
+    PollInput:
+      type: object
+      properties:
+        episode_id:
+          type: string
+          format: uuid
+          description: Associated episode ID (must exist)
+        title:
+          type: string
+          description: Poll title/question
+        description:
+          type: string
+          nullable: true
+          description: Poll description
+        duration_days:
+          type: integer
+          default: 7
+          description: Poll duration in days
+        status:
+          type: string
+          enum: [DRAFT, LIVE, ENDED, ARCHIVED]
+          description: Poll status
+        starts_at:
+          type: string
+          format: date-time
+          nullable: true
+          description: Poll start date and time (defaults to now if not provided)
+        ends_at:
+          type: string
+          format: date-time
+          nullable: true
+          description: Poll end date and time (calculated from starts_at + duration_days if not provided)
+        isDraft:
+          type: boolean
+          description: Whether poll is a draft (alternative to status)
+        options:
+          type: array
+          items:
+            $ref: '#/components/schemas/PollOptionInput'
+          minItems: 2
+          description: Array of poll options (minimum 2 required for creation)
+      required:
+        - episode_id
+        - title
+        - options
+
+    PollOption:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique option identifier
+        poll_id:
+          type: string
+          format: uuid
+          description: Associated poll ID
+        name:
+          type: string
+          description: Option name
+        description:
+          type: string
+          nullable: true
+          description: Option description
+        vote_count:
+          type: integer
+          default: 0
+          description: Number of votes for this option
+        display_order:
+          type: integer
+          default: 0
+          description: Display order (0-based index)
+        created_at:
+          type: string
+          format: date-time
+          description: Creation timestamp
+        updated_at:
+          type: string
+          format: date-time
+          description: Last update timestamp
+      required:
+        - id
+        - poll_id
+        - name
+
+    PollOptionInput:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          nullable: true
+          description: Option ID (for updates only, not required for creation)
+        name:
+          type: string
+          description: Option name
+        description:
+          type: string
+          nullable: true
+          description: Option description
+        count:
+          type: integer
+          default: 0
+          description: Initial vote count (alias for vote_count)
+        vote_count:
+          type: integer
+          default: 0
+          description: Initial vote count
+      required:
+        - name
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error message
+        details:
+          type: string
+          nullable: true
+          description: Additional error details
+      required:
+        - error
+
+  responses:
+    BadRequest:
+      description: Bad request - validation error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: 'Missing required fields: title, episode_number'
+            details: 'The following required fields are missing: title, episode_number'
+
+    Unauthorized:
+      description: Unauthorized - authentication required
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: 'Unauthorized'
+            details: 'Authentication required'
+
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: 'Episode not found'
+            details: 'Episode with ID 550e8400-e29b-41d4-a716-446655440000 does not exist'
+
+    InternalServerError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: 'Internal server error'
+            details: 'An unexpected error occurred'

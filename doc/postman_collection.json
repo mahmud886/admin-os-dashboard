@@ -1,0 +1,540 @@
+{
+  "info": {
+    "name": "Admin OS Dashboard API",
+    "description": "Complete CRUD API for managing Episodes and Polls with Supabase integration.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "admin-os-dashboard"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{supabase_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "Episodes",
+      "item": [
+        {
+          "name": "Get All Episodes",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/episodes?visibility=AVAILABLE&limit=100&offset=0",
+              "host": ["{{base_url}}"],
+              "path": ["episodes"],
+              "query": [
+                {
+                  "key": "visibility",
+                  "value": "AVAILABLE",
+                  "description": "Filter by visibility (AVAILABLE, UPCOMING, LOCKED, DRAFT, ARCHIVED)",
+                  "disabled": true
+                },
+                {
+                  "key": "access_level",
+                  "value": "free",
+                  "description": "Filter by access level (free, premium, vip)",
+                  "disabled": true
+                },
+                {
+                  "key": "status",
+                  "value": "PUBLISHED",
+                  "description": "Filter by status (DRAFT, PUBLISHED)",
+                  "disabled": true
+                },
+                {
+                  "key": "limit",
+                  "value": "100",
+                  "description": "Number of results per page"
+                },
+                {
+                  "key": "offset",
+                  "value": "0",
+                  "description": "Pagination offset"
+                }
+              ]
+            },
+            "description": "Retrieve all episodes with optional filtering and pagination."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Episode by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/episodes/:id",
+              "host": ["{{base_url}}"],
+              "path": ["episodes", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "",
+                  "description": "Episode UUID"
+                }
+              ]
+            },
+            "description": "Retrieve a single episode by its unique identifier."
+          },
+          "response": []
+        },
+        {
+          "name": "Create Episode",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{supabase_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"The Beginning\",\n  \"description\": \"The story begins with our hero...\",\n  \"episode_number\": 1,\n  \"season_number\": 1,\n  \"runtime\": \"42:15\",\n  \"unique_episode_id\": \"EP-S01-E001\",\n  \"visibility\": \"DRAFT\",\n  \"access_level\": \"free\",\n  \"release_datetime\": \"2024-12-31T00:00:00Z\",\n  \"clearance_level\": 1,\n  \"notify\": false,\n  \"age_restricted\": false,\n  \"thumb_image_url\": \"https://example.com/thumb.jpg\",\n  \"banner_image_url\": \"https://example.com/banner.jpg\",\n  \"video_url\": \"https://example.com/video.mp4\",\n  \"audio_url\": \"https://example.com/audio.mp3\",\n  \"additional_background_image_url\": \"https://example.com/bg.jpg\",\n  \"tags\": [\"cyberpunk\", \"sci-fi\", \"action\"],\n  \"primary_genre\": \"cyberpunk\",\n  \"secondary_genre\": \"sci-fi\",\n  \"status\": \"DRAFT\",\n  \"isDraft\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/episodes",
+              "host": ["{{base_url}}"],
+              "path": ["episodes"]
+            },
+            "description": "Create a new episode with all metadata and media assets. Requires authentication."
+          },
+          "response": []
+        },
+        {
+          "name": "Create Episode (Minimal)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{supabase_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"The Beginning\",\n  \"episode_number\": 1,\n  \"season_number\": 1,\n  \"unique_episode_id\": \"EP-S01-E001\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/episodes",
+              "host": ["{{base_url}}"],
+              "path": ["episodes"]
+            },
+            "description": "Create a new episode with only required fields."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Episode",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{supabase_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Updated Episode Title\",\n  \"visibility\": \"AVAILABLE\",\n  \"description\": \"Updated description\",\n  \"tags\": [\"updated\", \"tags\"]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/episodes/:id",
+              "host": ["{{base_url}}"],
+              "path": ["episodes", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "",
+                  "description": "Episode UUID"
+                }
+              ]
+            },
+            "description": "Update an existing episode. All fields are optional - only provided fields will be updated. Requires authentication."
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Episode",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{supabase_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/episodes/:id",
+              "host": ["{{base_url}}"],
+              "path": ["episodes", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "",
+                  "description": "Episode UUID"
+                }
+              ]
+            },
+            "description": "Delete an episode by ID. This will cascade delete all related polls and poll options. ⚠️ This action cannot be undone. Requires authentication."
+          },
+          "response": []
+        }
+      ],
+      "description": "Episode management endpoints"
+    },
+    {
+      "name": "Polls",
+      "item": [
+        {
+          "name": "Get All Polls",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/polls?episode_id=&status=LIVE&limit=100&offset=0",
+              "host": ["{{base_url}}"],
+              "path": ["polls"],
+              "query": [
+                {
+                  "key": "episode_id",
+                  "value": "",
+                  "description": "Filter by episode ID (UUID)",
+                  "disabled": true
+                },
+                {
+                  "key": "status",
+                  "value": "LIVE",
+                  "description": "Filter by status (DRAFT, LIVE, ENDED, ARCHIVED)",
+                  "disabled": true
+                },
+                {
+                  "key": "limit",
+                  "value": "100",
+                  "description": "Number of results per page"
+                },
+                {
+                  "key": "offset",
+                  "value": "0",
+                  "description": "Pagination offset"
+                }
+              ]
+            },
+            "description": "Retrieve all polls with optional filtering by episode and status."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Polls by Episode",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/polls?episode_id=:episode_id",
+              "host": ["{{base_url}}"],
+              "path": ["polls"],
+              "query": [
+                {
+                  "key": "episode_id",
+                  "value": ":episode_id",
+                  "description": "Episode UUID",
+                  "disabled": false
+                }
+              ]
+            },
+            "description": "Get all polls for a specific episode."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Poll by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/polls/:id",
+              "host": ["{{base_url}}"],
+              "path": ["polls", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "",
+                  "description": "Poll UUID"
+                }
+              ]
+            },
+            "description": "Retrieve a single poll by its unique identifier, including all poll options and episode information."
+          },
+          "response": []
+        },
+        {
+          "name": "Create Poll",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{supabase_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"episode_id\": \"550e8400-e29b-41d4-a716-446655440000\",\n  \"title\": \"What should happen next?\",\n  \"description\": \"Vote for the next action in the story\",\n  \"duration_days\": 7,\n  \"status\": \"DRAFT\",\n  \"starts_at\": \"2024-12-31T00:00:00Z\",\n  \"ends_at\": \"2025-01-07T00:00:00Z\",\n  \"isDraft\": true,\n  \"options\": [\n    {\n      \"name\": \"Option A\",\n      \"description\": \"Description for option A\",\n      \"count\": 0\n    },\n    {\n      \"name\": \"Option B\",\n      \"description\": \"Description for option B\",\n      \"count\": 0\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/polls",
+              "host": ["{{base_url}}"],
+              "path": ["polls"]
+            },
+            "description": "Create a new poll with dynamic options. Polls must have at least 2 options. Requires authentication."
+          },
+          "response": []
+        },
+        {
+          "name": "Create Live Poll",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{supabase_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"episode_id\": \"550e8400-e29b-41d4-a716-446655440000\",\n  \"title\": \"Who should survive?\",\n  \"description\": \"Choose which character survives\",\n  \"duration_days\": 14,\n  \"status\": \"LIVE\",\n  \"isDraft\": false,\n  \"starts_at\": \"2024-12-31T00:00:00Z\",\n  \"ends_at\": \"2025-01-14T00:00:00Z\",\n  \"options\": [\n    {\n      \"name\": \"Character A\",\n      \"description\": \"The protagonist\",\n      \"count\": 0\n    },\n    {\n      \"name\": \"Character B\",\n      \"description\": \"The antagonist\",\n      \"count\": 0\n    },\n    {\n      \"name\": \"Character C\",\n      \"description\": \"The sidekick\",\n      \"count\": 0\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/polls",
+              "host": ["{{base_url}}"],
+              "path": ["polls"]
+            },
+            "description": "Create a live poll that's immediately active."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Poll",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{supabase_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Updated Poll Title\",\n  \"description\": \"Updated description\",\n  \"duration_days\": 14,\n  \"status\": \"LIVE\",\n  \"options\": [\n    {\n      \"name\": \"Updated Option 1\",\n      \"description\": \"Updated description 1\",\n      \"count\": 10\n    },\n    {\n      \"name\": \"Updated Option 2\",\n      \"description\": \"Updated description 2\",\n      \"count\": 5\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/polls/:id",
+              "host": ["{{base_url}}"],
+              "path": ["polls", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "",
+                  "description": "Poll UUID"
+                }
+              ]
+            },
+            "description": "Update an existing poll. To update poll options, provide a new options array which will replace all existing options. Requires authentication."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Poll Options Only",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{supabase_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"options\": [\n    {\n      \"name\": \"Option 1\",\n      \"description\": \"Description 1\",\n      \"count\": 15\n    },\n    {\n      \"name\": \"Option 2\",\n      \"description\": \"Description 2\",\n      \"count\": 8\n    },\n    {\n      \"name\": \"Option 3\",\n      \"description\": \"Description 3\",\n      \"count\": 3\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/polls/:id",
+              "host": ["{{base_url}}"],
+              "path": ["polls", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "",
+                  "description": "Poll UUID"
+                }
+              ]
+            },
+            "description": "Update only the poll options while keeping other fields unchanged."
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Poll",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{supabase_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/polls/:id",
+              "host": ["{{base_url}}"],
+              "path": ["polls", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "",
+                  "description": "Poll UUID"
+                }
+              ]
+            },
+            "description": "Delete a poll by ID. This will cascade delete all related poll options. ⚠️ This action cannot be undone. Requires authentication."
+          },
+          "response": []
+        }
+      ],
+      "description": "Poll management endpoints"
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3000/api",
+      "type": "string"
+    },
+    {
+      "key": "supabase_token",
+      "value": "",
+      "type": "string",
+      "description": "Supabase JWT token for authentication"
+    }
+  ]
+}
