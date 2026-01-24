@@ -2,7 +2,7 @@
 
 /**
  * Deployment Readiness Checker
- * 
+ *
  * This script checks your project for common issues that might cause
  * Vercel deployment failures or DEPLOYMENT_NOT_FOUND errors.
  */
@@ -53,10 +53,10 @@ function checkPackageJson() {
 // Check 2: Required scripts in package.json
 function checkScripts(packageJson) {
   if (!packageJson) return;
-  
+
   const requiredScripts = ['build', 'dev'];
-  const missing = requiredScripts.filter(script => !packageJson.scripts?.[script]);
-  
+  const missing = requiredScripts.filter((script) => !packageJson.scripts?.[script]);
+
   if (missing.length === 0) {
     checks.push({ status: 'pass', message: 'Required scripts (build, dev) exist' });
   } else {
@@ -79,15 +79,10 @@ function checkEnvDocs() {
   const readmePath = path.join(process.cwd(), 'README.md');
   if (fs.existsSync(readmePath)) {
     const readme = fs.readFileSync(readmePath, 'utf8');
-    const requiredVars = [
-      'NEXT_PUBLIC_SUPABASE_URL',
-      'NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY',
-    ];
-    
-    const hasEnvDocs = requiredVars.some(varName => 
-      readme.includes(varName)
-    );
-    
+    const requiredVars = ['NEXT_PUBLIC_SUPABASE_URL', 'NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY'];
+
+    const hasEnvDocs = requiredVars.some((varName) => readme.includes(varName));
+
     if (hasEnvDocs) {
       checks.push({ status: 'pass', message: 'Environment variables documented in README' });
     } else {
@@ -112,7 +107,7 @@ function checkGitignore() {
 // Check 6: Check for common build issues
 function checkBuildIssues(packageJson) {
   if (!packageJson) return;
-  
+
   // Check for Next.js
   const hasNext = packageJson.dependencies?.next || packageJson.devDependencies?.next;
   if (hasNext) {
@@ -120,7 +115,7 @@ function checkBuildIssues(packageJson) {
   } else {
     errors.push('Next.js not found in dependencies');
   }
-  
+
   // Check Node.js version (if specified)
   if (packageJson.engines?.node) {
     checks.push({ status: 'pass', message: `Node.js version specified: ${packageJson.engines.node}` });
@@ -133,7 +128,7 @@ function checkBuildIssues(packageJson) {
 function checkTypeScript() {
   const tsConfigPath = path.join(process.cwd(), 'tsconfig.json');
   const hasTypeScript = fs.existsSync(tsConfigPath);
-  
+
   if (hasTypeScript) {
     checks.push({ status: 'pass', message: 'TypeScript configuration found' });
   }
@@ -144,7 +139,7 @@ function checkTypeScript() {
 function checkMiddleware() {
   const middlewarePath = path.join(process.cwd(), 'middleware.ts');
   const middlewareJsPath = path.join(process.cwd(), 'middleware.js');
-  
+
   if (fs.existsSync(middlewarePath) || fs.existsSync(middlewareJsPath)) {
     checks.push({ status: 'pass', message: 'Middleware file found' });
   }
@@ -155,13 +150,13 @@ function checkMiddleware() {
 function checkEnvExample() {
   const envExamplePath = path.join(process.cwd(), '.env.example');
   const envLocalPath = path.join(process.cwd(), '.env.local');
-  
+
   if (fs.existsSync(envExamplePath)) {
     checks.push({ status: 'pass', message: '.env.example found' });
   } else {
     warnings.push('.env.example not found (helpful for documentation)');
   }
-  
+
   if (fs.existsSync(envLocalPath)) {
     warnings.push('.env.local exists (make sure to set env vars in Vercel dashboard, not just locally)');
   }
@@ -171,7 +166,7 @@ function checkEnvExample() {
 function main() {
   log('\n🔍 Deployment Readiness Check\n', 'blue');
   log('Checking your project for common deployment issues...\n');
-  
+
   const packageJson = checkPackageJson();
   checkScripts(packageJson);
   checkNextConfig();
@@ -181,32 +176,34 @@ function main() {
   checkTypeScript();
   checkMiddleware();
   checkEnvExample();
-  
+
   // Print results
   log('\n✅ Passed Checks:', 'green');
-  checks.forEach(check => {
+  checks.forEach((check) => {
     log(`  ${checkmark()} ${check.message}`);
   });
-  
+
   if (warnings.length > 0) {
     log('\n⚠️  Warnings:', 'yellow');
-    warnings.forEach(warnMsg => {
+    warnings.forEach((warnMsg) => {
       log(`  ${warning()} ${warnMsg}`);
     });
   }
-  
+
   if (errors.length > 0) {
     log('\n❌ Errors:', 'red');
-    errors.forEach(error => {
+    errors.forEach((error) => {
       log(`  ${xmark()} ${error}`);
     });
   }
-  
+
   // Summary
   log('\n' + '='.repeat(50), 'blue');
-  log(`Summary: ${checks.length} passed, ${warnings.length} warnings, ${errors.length} errors`, 
-      errors.length > 0 ? 'red' : warnings.length > 0 ? 'yellow' : 'green');
-  
+  log(
+    `Summary: ${checks.length} passed, ${warnings.length} warnings, ${errors.length} errors`,
+    errors.length > 0 ? 'red' : warnings.length > 0 ? 'yellow' : 'green'
+  );
+
   if (errors.length > 0) {
     log('\n❌ Please fix the errors above before deploying.', 'red');
     process.exit(1);

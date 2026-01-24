@@ -53,10 +53,11 @@ export function validateRequiredFields(data, requiredFields) {
 
 /**
  * Calculate poll end date from duration
+ * Returns a Date object (not a string) for consistency
  */
 export function calculatePollEndDate(startDate, durationDays) {
   const start = startDate ? new Date(startDate) : new Date();
   const end = new Date(start);
   end.setDate(end.getDate() + parseInt(durationDays));
-  return end.toISOString();
+  return end; // Return Date object, not string
 }

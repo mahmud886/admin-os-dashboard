@@ -107,6 +107,11 @@ export async function POST(request) {
     const durationDays = parseInt(body.duration_days) || 7;
     const endsAt = body.ends_at ? new Date(body.ends_at) : calculatePollEndDate(startsAt, durationDays);
 
+    // Ensure endsAt is a Date object
+    if (!(endsAt instanceof Date) || isNaN(endsAt.getTime())) {
+      return createErrorResponse('Invalid end date calculation', 500, 'Failed to calculate poll end date');
+    }
+
     // Prepare poll data
     const pollData = {
       episode_id: body.episode_id,

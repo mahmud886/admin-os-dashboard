@@ -138,7 +138,8 @@ export async function PUT(request, { params }) {
       // Recalculate end date if duration changed
       if (!body.ends_at) {
         const startsAt = body.starts_at || existing.starts_at;
-        updateData.ends_at = calculatePollEndDate(startsAt, body.duration_days);
+        const calculatedEndDate = calculatePollEndDate(startsAt, body.duration_days);
+        updateData.ends_at = calculatedEndDate.toISOString();
       }
     }
     if (body.status !== undefined || body.isDraft !== undefined) {
