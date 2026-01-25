@@ -1,18 +1,44 @@
 'use client';
 
-import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import dashboardData from '@/data/dashboard.json';
-import { Clock, Plane } from 'lucide-react';
+import { Clock, Share2, TrendingUp } from 'lucide-react';
 
-export function MetricsReferrals() {
+const ICONS = [Clock, Share2, TrendingUp];
+
+export function MetricsReferrals({ analyticsData }) {
+  const overview = analyticsData?.overview ?? {};
+  const totalPolls = overview.totalPolls ?? 0;
+  const totalVotes = overview.totalVotes ?? 0;
+  const totalShares = overview.totalShares ?? 0;
+
+  const avgVotesPerPoll = totalPolls > 0 ? (totalVotes / totalPolls).toFixed(1) : '0';
+  const avgSharesPerPoll = totalPolls > 0 ? (totalShares / totalPolls).toFixed(1) : '0';
+  const engagementRate = totalPolls > 0 ? Math.round(((totalVotes + totalShares) / totalPolls) * 100) : 0;
+
+  const metrics = [
+    {
+      title: 'AVG VOTES / POLL',
+      value: avgVotesPerPoll,
+      description: 'HUMAN ENGAGEMENT',
+    },
+    {
+      title: 'AVG SHARES / POLL',
+      value: avgSharesPerPoll,
+      description: 'SOCIAL REACH',
+    },
+    {
+      title: 'ENGAGEMENT RATE',
+      value: `${Number(engagementRate).toLocaleString()}%`,
+      description: 'VOTES + SHARES PER POLL',
+    },
+  ];
+
   return (
     <>
-      {/* Metrics and Referrals */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        {/* Metrics */}
-        <div className="grid grid-cols-1 gap-4 lg:col-span-2 sm:grid-cols-3">
-          {dashboardData.metrics.map((metric, index) => (
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        {metrics.map((metric, index) => {
+          const Icon = ICONS[index];
+          return (
             <Card key={index} className="bg-[#111111] border-border">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-teal-400">{metric.title}</CardTitle>
@@ -20,43 +46,13 @@ export function MetricsReferrals() {
               <CardContent>
                 <div className="mb-2 text-3xl font-bold text-teal-400">{metric.value}</div>
                 <div className="flex items-center gap-2 text-sm text-gray-400">
-                  {index === 0 && <Clock className="w-4 h-4" />}
-                  {(index === 1 || index === 2) && <Plane className="w-4 h-4" />}
+                  {Icon && <Icon className="h-4 w-4 shrink-0" />}
                   {metric.description}
                 </div>
               </CardContent>
             </Card>
-          ))}
-        </div>
-
-        {/* Top Referral Nodes */}
-        <Card className="bg-[#111111] border-border">
-          <CardHeader>
-            <CardTitle className="text-teal-400">TOP REFERRAL NODES</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {dashboardData.referrals.map((ref, index) => (
-                <div key={index} className="flex items-center justify-between">
-                  <div>
-                    <div className="font-medium text-teal-400">{ref.source}</div>
-                    <div className="text-sm text-gray-400">{ref.visits} Visits</div>
-                  </div>
-                  <Badge
-                    variant={ref.changeType === 'positive' ? 'default' : 'destructive'}
-                    className={
-                      ref.changeType === 'positive'
-                        ? 'border-green-500 bg-green-500/50 text-green-400 hover:bg-green-500'
-                        : 'border-red-500 bg-red-500/50 text-red-400 hover:bg-red-500'
-                    }
-                  >
-                    {ref.change}
-                  </Badge>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+          );
+        })}
       </div>
     </>
   );

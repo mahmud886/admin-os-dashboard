@@ -3,6 +3,7 @@
 ## Problem
 
 When creating a poll, users encountered an "Internal server error" with the following stack trace:
+
 ```
 at handleSubmit (src/app/create-poll/page.js:125:15)
 ```
@@ -86,11 +87,13 @@ updateData.ends_at = calculatedEndDate.toISOString();
 ## What Was the Code Actually Doing vs. What It Needed to Do?
 
 **What it was doing:**
+
 - `calculatePollEndDate` returned an ISO string
 - Code tried to call `.toISOString()` on a string
 - This threw `TypeError: endsAt.toISOString is not a function`
 
 **What it needed to do:**
+
 - `calculatePollEndDate` should return a Date object
 - Code can safely call `.toISOString()` on the Date object
 - Convert to ISO string only when needed for database storage
@@ -119,7 +122,7 @@ function calculateEndDate(start, days) {
 
 // ✅ Good: Convert to ISO string when storing
 const pollData = {
-  ends_at: endDate.toISOString() // Convert when needed
+  ends_at: endDate.toISOString(), // Convert when needed
 };
 
 // ❌ Bad: Return string from helper
@@ -200,6 +203,7 @@ To prevent similar issues in the future:
 ## Summary
 
 The fix involved:
+
 - Changing `calculatePollEndDate` to return a Date object instead of a string
 - Adding validation to ensure dates are valid before use
 - Updating all usages to handle the Date object correctly
