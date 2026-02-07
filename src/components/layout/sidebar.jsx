@@ -6,6 +6,7 @@ import {
   BarChart3,
   Book,
   BookOpen,
+  CreditCard,
   FileText,
   Home,
   LayoutDashboard,
@@ -15,8 +16,8 @@ import {
   Users,
   X,
 } from 'lucide-react';
-import Link from 'next/link';
 import Image from 'next/image';
+import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 
@@ -27,6 +28,7 @@ const navigation = [
   { name: 'EPISODE MANAGEMENT', href: '/episodes', icon: Book },
   { name: 'POLL MANAGEMENT', href: '/polls', icon: BarChart3 },
   { name: 'E-MAIL LIST', href: '/emails', icon: Users },
+  { name: 'PAYMENTS', href: '/payments', icon: CreditCard },
   { name: 'CONTENT MANAGER', href: '/content', icon: FileText },
   { name: 'PRODUCT STORE', href: '/products', icon: Package },
 ];
@@ -41,7 +43,7 @@ export function Sidebar() {
       <Button
         variant="ghost"
         size="icon"
-        className="fixed z-50 top-4 left-4 lg:hidden"
+        className="fixed top-4 left-4 z-50 lg:hidden"
         onClick={() => setIsOpen(!isOpen)}
       >
         {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -56,8 +58,8 @@ export function Sidebar() {
         )}
       >
         <div className="p-6 border-b border-border">
-          <div className="flex items-center gap-3">
-            <div className="relative w-10 h-10 flex-shrink-0">
+          <div className="flex gap-3 items-center">
+            <div className="relative flex-shrink-0 w-10 h-10">
               <Image
                 src="/assets/images/sporefall.jpeg"
                 alt="Spore Fall Logo"
@@ -72,7 +74,7 @@ export function Sidebar() {
             </h1>
           </div>
         </div>
-        <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
+        <nav className="overflow-y-auto flex-1 p-4 space-y-2">
           {navigation.map((item) => {
             const Icon = item.icon;
             const isActive = pathname === item.href;
@@ -82,13 +84,13 @@ export function Sidebar() {
                 href={item.href}
                 onClick={() => setIsOpen(false)}
                 className={cn(
-                  'flex items-center gap-3 px-4 py-3 rounded-md text-sm font-medium transition-colors relative',
+                  'flex relative gap-3 items-center px-4 py-3 text-sm font-medium rounded-md transition-colors',
                   isActive
-                    ? 'bg-teal-900/30 text-teal-400 border-l-4 border-teal-400'
+                    ? 'text-teal-400 border-l-4 border-teal-400 bg-teal-900/30'
                     : 'text-gray-400 hover:bg-accent hover:text-accent-foreground'
                 )}
               >
-                <Icon className={cn('h-5 w-5', isActive ? 'text-teal-400' : 'text-gray-400')} />
+                <Icon className={cn('w-5 h-5', isActive ? 'text-teal-400' : 'text-gray-400')} />
                 <span>{item.name}</span>
               </Link>
             );
@@ -98,7 +100,7 @@ export function Sidebar() {
           <Link
             href="/"
             onClick={() => setIsOpen(false)}
-            className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-400 rounded-md hover:bg-accent hover:text-accent-foreground"
+            className="flex gap-3 items-center px-4 py-3 text-sm font-medium text-gray-400 rounded-md hover:bg-accent hover:text-accent-foreground"
           >
             <Home className="w-5 h-5 text-gray-400" />
             <span>BACK TO SITE</span>
