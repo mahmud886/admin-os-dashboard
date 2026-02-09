@@ -17,14 +17,30 @@ export function GoogleAnalyticsKPI({ gaData, analyticsData, onRefresh }) {
   const avgVotesPerPoll = totalPolls > 0 ? (totalVotes / totalPolls).toFixed(1) : '0';
   const gaConfigured = gaData?.configured === true;
   const activeUsers = gaData?.activeUsers ?? 0;
+  const totalVisits = gaData?.totalVisits ?? 0;
+  const totalUsersGA = gaData?.totalUsers ?? 0;
 
   const kpis = [
     {
-      title: 'DAILY VISITORS',
+      title: 'ACTIVE USERS',
       value: gaConfigured ? activeUsers.toLocaleString() : '—',
       change: 'Live',
       changeType: 'positive',
-      sub: gaConfigured ? 'GA4' : 'Not configured',
+      sub: gaConfigured ? 'GA4 realtime' : 'Not configured',
+    },
+    {
+      title: 'TOTAL VISITS',
+      value: gaConfigured ? totalVisits.toLocaleString() : '—',
+      change: '30 days',
+      changeType: 'positive',
+      sub: gaConfigured ? 'Sessions' : 'Not configured',
+    },
+    {
+      title: 'TOTAL USERS (30D)',
+      value: gaConfigured ? totalUsersGA.toLocaleString() : '—',
+      change: 'GA4',
+      changeType: 'positive',
+      sub: gaConfigured ? 'Users' : '—',
     },
     {
       title: 'TOTAL VOTES',
@@ -52,7 +68,7 @@ export function GoogleAnalyticsKPI({ gaData, analyticsData, onRefresh }) {
   return (
     <>
       <hr className="my-4 border-border" />
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
         {kpis.map((kpi, index) => (
           <Card key={index} className="bg-[#111111] border-border">
             <CardHeader className="pb-2">

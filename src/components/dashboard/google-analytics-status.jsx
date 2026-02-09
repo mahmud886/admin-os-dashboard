@@ -6,6 +6,11 @@ export function GoogleAnalyticsStatus({ gaData }) {
   if (!gaData) return null;
 
   if (gaData.configured) {
+    const hasMetrics =
+      typeof gaData.activeUsers === 'number' ||
+      typeof gaData.totalVisits === 'number' ||
+      (gaData.visitLocation && gaData.visitLocation.length > 0);
+
     return (
       <Card className="mb-6 rounded-xl border border-green-500/30 bg-gradient-to-r from-green-500/10 to-emerald-500/10 backdrop-blur-sm">
         <CardContent className="p-6">
@@ -15,14 +20,22 @@ export function GoogleAnalyticsStatus({ gaData }) {
             </div>
             <div className="flex-1">
               <h3 className="mb-2 text-lg font-bold text-white">Google Analytics Connected</h3>
-              <div className="grid grid-cols-1 gap-4 text-sm md:grid-cols-3">
+              <div className="grid grid-cols-1 gap-4 text-sm sm:grid-cols-2 md:grid-cols-4">
                 <div>
                   <p className="text-white/50">Measurement ID</p>
                   <p className="font-mono font-bold text-teal-400">{gaData.measurementId}</p>
                 </div>
                 <div>
                   <p className="text-white/50">Active Users (Live)</p>
-                  <p className="text-xl font-bold text-teal-400">{gaData.activeUsers || 0}</p>
+                  <p className="text-xl font-bold text-teal-400">
+                    {hasMetrics ? (gaData.activeUsers ?? 0).toLocaleString() : '—'}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-white/50">Total Visits (30d)</p>
+                  <p className="text-xl font-bold text-teal-400">
+                    {hasMetrics ? (gaData.totalVisits ?? 0).toLocaleString() : '—'}
+                  </p>
                 </div>
                 <div>
                   <p className="text-white/50">Status</p>

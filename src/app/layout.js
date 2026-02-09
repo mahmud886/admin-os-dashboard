@@ -1,5 +1,6 @@
 import { AuthProvider } from '@/context/AuthContext';
 import { ToastProvider } from '@/components/ui/toast';
+import { GoogleAnalytics } from '@/components/analytics/GoogleAnalytics';
 import './globals.css';
 
 export const metadata = {
@@ -16,6 +17,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" className="dark">
       <body>
+        <GoogleAnalytics />
         <AuthProvider>
           <ToastProvider>{children}</ToastProvider>
         </AuthProvider>

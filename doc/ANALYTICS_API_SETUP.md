@@ -47,20 +47,46 @@ Returns aggregated analytics data for the dashboard.
 }
 ```
 
-### 2. Google Analytics Status
+### 2. Google Analytics
 
 **GET** `/api/analytics/google`
 
-Returns Google Analytics configuration status.
+Returns Google Analytics configuration and, when the GA4 Data API is set up, live metrics and visit location.
 
-**Response:**
+**Environment variables:**
+
+- `NEXT_PUBLIC_GA_MEASUREMENT_ID` – GA4 Measurement ID (e.g. `G-MG27CK781R`) for gtag.js page tracking.
+- `GA4_PROPERTY_ID` – Numeric GA4 Property ID (from Admin > Property Settings) for the Data API.
+- `GOOGLE_APPLICATION_CREDENTIALS` or `GOOGLE_SERVICE_ACCOUNT_KEY` – Service account credentials for the Data API.
+
+**Response (with Data API configured):**
 
 ```json
 {
   "configured": true,
-  "measurementId": "G-XXXXXXXXXX",
+  "measurementId": "G-MG27CK781R",
+  "activeUsers": 5,
+  "totalVisits": 1200,
+  "totalUsers": 800,
+  "visitLocation": [
+    { "country": "United States", "city": "New York", "users": 100 },
+    { "country": "United Kingdom", "city": "London", "users": 80 }
+  ],
+  "note": null
+}
+```
+
+**Response (gtag only, no Data API):**
+
+```json
+{
+  "configured": true,
+  "measurementId": "G-MG27CK781R",
   "activeUsers": 0,
-  "note": "Optional note"
+  "totalVisits": 0,
+  "totalUsers": 0,
+  "visitLocation": [],
+  "note": "Dashboard metrics need GA4 Data API: set GA4_PROPERTY_ID and Google service account credentials."
 }
 ```
 
