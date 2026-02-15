@@ -11,14 +11,14 @@ export function GoogleAnalyticsKPIShimmer() {
         {[1, 2, 3, 4].map((index) => (
           <Card key={index} className="bg-[#111111] border-border">
             <CardHeader className="pb-2">
-              <div className="h-4 w-32 bg-gray-700 rounded animate-pulse"></div>
+              <div className="h-4 w-32 bg-teal-400/10 rounded animate-pulse"></div>
             </CardHeader>
             <CardContent>
               <div className="flex items-center justify-between">
-                <div className="h-9 w-20 bg-gray-700 rounded animate-pulse"></div>
+                <div className="h-9 w-20 bg-teal-400/10 rounded animate-pulse"></div>
                 <div className="flex items-center gap-2">
-                  <div className="h-6 w-12 bg-gray-700 rounded animate-pulse"></div>
-                  <div className="h-4 w-4 bg-gray-700 rounded animate-pulse"></div>
+                  <div className="h-6 w-12 bg-teal-400/10 rounded animate-pulse"></div>
+                  <div className="h-4 w-4 bg-teal-400/10 rounded animate-pulse"></div>
                 </div>
               </div>
             </CardContent>

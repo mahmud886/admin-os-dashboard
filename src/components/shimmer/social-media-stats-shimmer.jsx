@@ -11,13 +11,13 @@ export function SocialMediaStatsShimmer() {
         {[1, 2, 3, 4].map((index) => (
           <Card key={index} className="bg-[#111111] border-border">
             <CardHeader className="pb-2">
-              <div className="h-4 w-24 bg-gray-700 rounded animate-pulse"></div>
+              <div className="h-4 w-24 bg-teal-400/10 rounded animate-pulse"></div>
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
-                <div className="h-7 w-32 bg-gray-700 rounded animate-pulse"></div>
-                <div className="h-4 w-28 bg-gray-700 rounded animate-pulse"></div>
-                <div className="h-4 w-4 bg-gray-700 rounded animate-pulse"></div>
+                <div className="h-7 w-32 bg-teal-400/10 rounded animate-pulse"></div>
+                <div className="h-4 w-28 bg-teal-400/10 rounded animate-pulse"></div>
+                <div className="h-4 w-4 bg-teal-400/10 rounded animate-pulse"></div>
               </div>
             </CardContent>
           </Card>

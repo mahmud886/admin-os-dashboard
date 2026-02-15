@@ -56,7 +56,7 @@ export function EpisodeStatsCard() {
           <div className="flex items-center justify-between">
             <div className="text-3xl font-bold text-teal-400">
               {stats.loading ? (
-                <div className="w-8 h-8 border-2 border-teal-400 rounded-full border-t-transparent animate-spin"></div>
+                <div className="w-8 h-8 border-2 border-teal-400/10 rounded-full border-t-teal-400 animate-spin"></div>
               ) : (
                 stats.total
               )}

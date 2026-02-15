@@ -12,13 +12,13 @@ export function MetricsReferralsShimmer() {
           {[1, 2, 3].map((index) => (
             <Card key={index} className="bg-[#111111] border-border">
               <CardHeader className="pb-2">
-                <div className="h-4 w-28 bg-gray-700 rounded animate-pulse"></div>
+                <div className="h-4 w-28 bg-teal-400/10 rounded animate-pulse"></div>
               </CardHeader>
               <CardContent>
-                <div className="mb-2 h-9 w-20 bg-gray-700 rounded animate-pulse"></div>
+                <div className="mb-2 h-9 w-20 bg-teal-400/10 rounded animate-pulse"></div>
                 <div className="flex items-center gap-2">
-                  <div className="h-4 w-4 bg-gray-700 rounded animate-pulse"></div>
-                  <div className="h-4 w-32 bg-gray-700 rounded animate-pulse"></div>
+                  <div className="h-4 w-4 bg-teal-400/10 rounded animate-pulse"></div>
+                  <div className="h-4 w-32 bg-teal-400/10 rounded animate-pulse"></div>
                 </div>
               </CardContent>
             </Card>
@@ -28,17 +28,17 @@ export function MetricsReferralsShimmer() {
         {/* Top Referral Nodes Shimmer */}
         <Card className="bg-[#111111] border-border">
           <CardHeader>
-            <div className="h-6 w-40 bg-gray-700 rounded animate-pulse"></div>
+            <div className="h-6 w-40 bg-teal-400/10 rounded animate-pulse"></div>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               {[1, 2, 3, 4].map((index) => (
                 <div key={index} className="flex items-center justify-between">
                   <div>
-                    <div className="h-5 w-32 bg-gray-700 rounded animate-pulse mb-1"></div>
-                    <div className="h-4 w-20 bg-gray-700 rounded animate-pulse"></div>
+                    <div className="h-5 w-32 bg-teal-400/10 rounded animate-pulse mb-1"></div>
+                    <div className="h-4 w-20 bg-teal-400/10 rounded animate-pulse"></div>
                   </div>
-                  <div className="h-6 w-12 bg-gray-700 rounded animate-pulse"></div>
+                  <div className="h-6 w-12 bg-teal-400/10 rounded animate-pulse"></div>
                 </div>
               ))}
             </div>

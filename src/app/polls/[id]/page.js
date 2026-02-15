@@ -275,7 +275,7 @@ export default function PollDetailsPage() {
                         {option.description && <p className="text-sm text-gray-400 ml-11">{option.description}</p>}
                         {totalVotes > 0 && (
                           <div className="mt-3 ml-11">
-                            <div className="w-full bg-gray-700/30 rounded-full h-2 overflow-hidden">
+                            <div className="w-full bg-teal-400/10 rounded-full h-2 overflow-hidden">
                               <div
                                 className="h-full bg-teal-400 transition-all duration-500"
                                 style={{ width: `${percentage}%` }}

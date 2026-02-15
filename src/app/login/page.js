@@ -51,7 +51,7 @@ function LoginForm() {
   if (authLoading) {
     return (
       <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-teal-400 rounded-full border-t-transparent animate-spin"></div>
+        <div className="w-8 h-8 border-2 border-teal-400/10 rounded-full border-t-teal-400 animate-spin"></div>
       </div>
     );
   }
