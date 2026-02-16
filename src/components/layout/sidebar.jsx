@@ -31,6 +31,7 @@ const navigation = [
   { name: 'POLL MANAGEMENT', href: '/polls', icon: BarChart3 },
   { name: 'E-MAIL LIST', href: '/emails', icon: Users },
   { name: 'PAYMENTS', href: '/payments', icon: CreditCard },
+  { name: 'BLOGS', href: '/blogs', icon: BookOpen },
   { name: 'CONTENT MANAGER', href: '/content', icon: FileText },
   { name: 'PRODUCT STORE', href: '/products', icon: Package },
   { name: 'STORE ORDERS', href: '/ecommerce/orders', icon: ShoppingCart },
