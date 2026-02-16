@@ -7,11 +7,10 @@ import {
   Book,
   BookOpen,
   CreditCard,
-  FileText,
   Home,
   LayoutDashboard,
   Menu,
-  Package,
+  Newspaper,
   PlusCircle,
   ShoppingCart,
   Users,
@@ -31,10 +30,11 @@ const navigation = [
   { name: 'POLL MANAGEMENT', href: '/polls', icon: BarChart3 },
   { name: 'E-MAIL LIST', href: '/emails', icon: Users },
   { name: 'SUPPORTER DONATIONS', href: '/supporter-donations', icon: CreditCard },
-  { name: 'CONTENT MANAGER', href: '/content', icon: FileText },
-  { name: 'PRODUCT STORE', href: '/products', icon: Package },
+  { name: 'BLOGS MANAGEMENT', href: '/admin/blogs', icon: Newspaper },
   { name: 'STORE ORDERS', href: '/ecommerce/orders', icon: ShoppingCart },
   { name: 'STORE CUSTOMERS', href: '/ecommerce/customers', icon: Users },
+  // { name: 'CONTENT MANAGER', href: '/content', icon: FileText },
+  // { name: 'PRODUCT STORE', href: '/products', icon: Package },
 ];
 
 export function Sidebar() {
