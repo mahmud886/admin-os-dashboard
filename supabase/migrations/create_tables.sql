@@ -170,3 +170,76 @@ GRANT USAGE ON SCHEMA public TO authenticated;
 GRANT ALL ON episodes TO authenticated;
 GRANT ALL ON polls TO authenticated;
 GRANT ALL ON poll_options TO authenticated;
+-- ==========================================
+-- E-COMMERCE MODULE
+-- ==========================================
+
+-- 1. Create Customers Table
+CREATE TABLE IF NOT EXISTS ecommerce_customers (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    email TEXT UNIQUE NOT NULL,
+    name TEXT,
+    stripe_customer_id TEXT,
+    phone TEXT,
+    address JSONB,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- 2. Create Orders Table
+CREATE TABLE IF NOT EXISTS ecommerce_orders (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    order_number TEXT UNIQUE NOT NULL, -- e.g. SPORE-XXXX
+    customer_id UUID REFERENCES ecommerce_customers(id) ON DELETE SET NULL,
+    stripe_session_id TEXT UNIQUE,
+    stripe_payment_intent_id TEXT,
+    amount_total DECIMAL(10, 2) NOT NULL,
+    currency TEXT DEFAULT 'usd',
+    status TEXT DEFAULT 'pending', -- pending, paid, shipped, cancelled, refunded
+    payment_status TEXT DEFAULT 'unpaid', -- unpaid, paid, no_payment_required
+    shipping_address JSONB,
+    billing_address JSONB,
+    metadata JSONB DEFAULT '{}'::jsonb,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- 3. Create Order Items Table
+CREATE TABLE IF NOT EXISTS ecommerce_order_items (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    order_id UUID REFERENCES ecommerce_orders(id) ON DELETE CASCADE,
+    product_name TEXT NOT NULL,
+    product_id TEXT, -- External ID or internal reference
+    variant_id TEXT,
+    quantity INTEGER NOT NULL DEFAULT 1,
+    unit_amount DECIMAL(10, 2) NOT NULL, -- Price per unit
+    total_amount DECIMAL(10, 2) NOT NULL, -- quantity * unit_amount
+    image_url TEXT,
+    metadata JSONB DEFAULT '{}'::jsonb,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- 4. Create Indexes for Performance
+CREATE INDEX IF NOT EXISTS idx_ecommerce_customers_email ON ecommerce_customers(email);
+CREATE INDEX IF NOT EXISTS idx_ecommerce_orders_customer_id ON ecommerce_orders(customer_id);
+CREATE INDEX IF NOT EXISTS idx_ecommerce_orders_stripe_session_id ON ecommerce_orders(stripe_session_id);
+CREATE INDEX IF NOT EXISTS idx_ecommerce_orders_order_number ON ecommerce_orders(order_number);
+CREATE INDEX IF NOT EXISTS idx_ecommerce_order_items_order_id ON ecommerce_order_items(order_id);
+
+-- 5. Add RLS Policies
+ALTER TABLE ecommerce_customers ENABLE ROW LEVEL SECURITY;
+ALTER TABLE ecommerce_orders ENABLE ROW LEVEL SECURITY;
+ALTER TABLE ecommerce_order_items ENABLE ROW LEVEL SECURITY;
+
+-- Allow public read access for now (for admin dashboard to work without complex auth setup)
+CREATE POLICY "Enable read access for all users" ON ecommerce_customers FOR SELECT USING (true);
+CREATE POLICY "Enable insert access for all users" ON ecommerce_customers FOR INSERT WITH CHECK (true);
+CREATE POLICY "Enable update access for all users" ON ecommerce_customers FOR UPDATE USING (true);
+
+CREATE POLICY "Enable read access for all users" ON ecommerce_orders FOR SELECT USING (true);
+CREATE POLICY "Enable insert access for all users" ON ecommerce_orders FOR INSERT WITH CHECK (true);
+CREATE POLICY "Enable update access for all users" ON ecommerce_orders FOR UPDATE USING (true);
+
+CREATE POLICY "Enable read access for all users" ON ecommerce_order_items FOR SELECT USING (true);
+CREATE POLICY "Enable insert access for all users" ON ecommerce_order_items FOR INSERT WITH CHECK (true);
+CREATE POLICY "Enable update access for all users" ON ecommerce_order_items FOR UPDATE USING (true);

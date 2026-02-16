@@ -13,9 +13,11 @@ import {
   Menu,
   Package,
   PlusCircle,
+  ShoppingCart,
   Users,
   X,
 } from 'lucide-react';
+
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -31,6 +33,8 @@ const navigation = [
   { name: 'PAYMENTS', href: '/payments', icon: CreditCard },
   { name: 'CONTENT MANAGER', href: '/content', icon: FileText },
   { name: 'PRODUCT STORE', href: '/products', icon: Package },
+  { name: 'STORE ORDERS', href: '/ecommerce/orders', icon: ShoppingCart },
+  { name: 'STORE CUSTOMERS', href: '/ecommerce/customers', icon: Users },
 ];
 
 export function Sidebar() {
