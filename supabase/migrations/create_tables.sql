@@ -243,3 +243,46 @@ CREATE POLICY "Enable update access for all users" ON ecommerce_orders FOR UPDAT
 CREATE POLICY "Enable read access for all users" ON ecommerce_order_items FOR SELECT USING (true);
 CREATE POLICY "Enable insert access for all users" ON ecommerce_order_items FOR INSERT WITH CHECK (true);
 CREATE POLICY "Enable update access for all users" ON ecommerce_order_items FOR UPDATE USING (true);
+
+-- 6. Create Donations Table
+CREATE TABLE IF NOT EXISTS supporter_donations (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    donation_number TEXT UNIQUE NOT NULL, -- e.g. DON-XXXX
+    stripe_session_id TEXT UNIQUE,
+    stripe_payment_intent_id TEXT,
+
+    -- Supporter Details
+    supporter_name TEXT,
+    supporter_email TEXT NOT NULL,
+    supporter_note TEXT,
+    mailing_address TEXT,
+
+    -- Donation Details
+    tier_id TEXT NOT NULL, -- 'archivist', 'emblem', 'patron', 'support-universe'
+    tier_name TEXT NOT NULL,
+    amount DECIMAL(10, 2) NOT NULL,
+    currency TEXT DEFAULT 'usd',
+
+    -- Status
+    status TEXT DEFAULT 'pending', -- pending, paid, refunded
+    payment_status TEXT DEFAULT 'unpaid',
+
+    -- Metadata
+    metadata JSONB DEFAULT '{}'::jsonb,
+
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- 7. Create Indexes for Donations
+CREATE INDEX IF NOT EXISTS idx_supporter_donations_email ON supporter_donations(supporter_email);
+CREATE INDEX IF NOT EXISTS idx_supporter_donations_stripe_session_id ON supporter_donations(stripe_session_id);
+CREATE INDEX IF NOT EXISTS idx_supporter_donations_tier_id ON supporter_donations(tier_id);
+
+-- 8. Add RLS Policies for Donations
+ALTER TABLE supporter_donations ENABLE ROW LEVEL SECURITY;
+
+-- Allow public read/write access for now (for admin dashboard to work without complex auth setup)
+CREATE POLICY "Enable read access for all users" ON supporter_donations FOR SELECT USING (true);
+CREATE POLICY "Enable insert access for all users" ON supporter_donations FOR INSERT WITH CHECK (true);
+CREATE POLICY "Enable update access for all users" ON supporter_donations FOR UPDATE USING (true);

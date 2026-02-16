@@ -382,3 +382,52 @@ BEGIN
   (order_id_3, 'Limited Edition Vinyl', 1, 250.00, 250.00, 'https://images.unsplash.com/photo-1539375665275-f9de415ef9ac?auto=format&fit=crop&w=800&q=80');
 
 END $$;
+
+-- ==========================================
+-- SUPPORTER DONATIONS SEED DATA
+-- ==========================================
+
+DO $$
+DECLARE
+  don_id_1 UUID;
+  don_id_2 UUID;
+  don_id_3 UUID;
+  don_id_4 UUID;
+BEGIN
+  -- Donation 1: The Archivist
+  INSERT INTO supporter_donations (
+    donation_number, supporter_name, supporter_email, mailing_address,
+    tier_id, tier_name, amount, currency, status, payment_status, created_at
+  ) VALUES (
+    'DON-1001', 'John Doe', 'john.doe@example.com', '123 Main St, New York, NY, US',
+    'archivist', 'THE ARCHIVIST', 5.00, 'USD', 'paid', 'paid', NOW() - INTERVAL '5 days'
+  ) RETURNING id INTO don_id_1;
+
+  -- Donation 2: The Emblem
+  INSERT INTO supporter_donations (
+    donation_number, supporter_name, supporter_email, mailing_address,
+    tier_id, tier_name, amount, currency, status, payment_status, created_at
+  ) VALUES (
+    'DON-1002', 'Jane Smith', 'jane.smith@example.com', '456 Elm St, London, UK',
+    'emblem', 'THE EMBLEM', 15.00, 'USD', 'paid', 'paid', NOW() - INTERVAL '3 days'
+  ) RETURNING id INTO don_id_2;
+
+  -- Donation 3: The Patron
+  INSERT INTO supporter_donations (
+    donation_number, supporter_name, supporter_email, mailing_address,
+    tier_id, tier_name, amount, currency, status, payment_status, created_at
+  ) VALUES (
+    'DON-1003', 'Alice Johnson', 'alice.j@example.com', '789 Pine St, Toronto, CA',
+    'patron', 'THE PATRON', 50.00, 'USD', 'paid', 'paid', NOW() - INTERVAL '1 day'
+  ) RETURNING id INTO don_id_3;
+
+  -- Donation 4: Support the Universe (Custom Amount)
+  INSERT INTO supporter_donations (
+    donation_number, supporter_name, supporter_email, mailing_address,
+    tier_id, tier_name, amount, currency, status, payment_status, created_at
+  ) VALUES (
+    'DON-1004', 'Bob Brown', 'bob.brown@example.com', '321 Oak St, Sydney, AU',
+    'support-universe', 'SUPPORT THE UNIVERSE', 100.00, 'USD', 'paid', 'paid', NOW() - INTERVAL '2 hours'
+  ) RETURNING id INTO don_id_4;
+
+END $$;

@@ -74,9 +74,7 @@ export default function EcommerceDashboard() {
               <ShoppingCart className="h-4 w-4 text-teal-400" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-white">
-                {loading ? '...' : stats?.total_orders || 0}
-              </div>
+              <div className="text-2xl font-bold text-white">{loading ? '...' : stats?.total_orders || 0}</div>
               <p className="text-xs text-gray-500 mt-1">All time orders</p>
             </CardContent>
           </Card>
@@ -86,9 +84,7 @@ export default function EcommerceDashboard() {
               <Users className="h-4 w-4 text-teal-400" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-white">
-                {loading ? '...' : stats?.total_customers || 0}
-              </div>
+              <div className="text-2xl font-bold text-white">{loading ? '...' : stats?.total_customers || 0}</div>
               <p className="text-xs text-gray-500 mt-1">Registered customers</p>
             </CardContent>
           </Card>
@@ -115,7 +111,10 @@ export default function EcommerceDashboard() {
                   <div className="text-center py-4 text-gray-500">No recent orders found.</div>
                 ) : (
                   recentOrders.map((order) => (
-                    <div key={order.id} className="flex items-center justify-between p-4 border border-border rounded-lg bg-[#0a0a0a]/50">
+                    <div
+                      key={order.id}
+                      className="flex items-center justify-between p-4 border border-border rounded-lg bg-[#0a0a0a]/50"
+                    >
                       <div className="flex items-center gap-4">
                         <div className="h-9 w-9 rounded-full bg-teal-400/10 flex items-center justify-center">
                           <Package className="h-5 w-5 text-teal-400" />
@@ -143,19 +142,28 @@ export default function EcommerceDashboard() {
             </CardHeader>
             <CardContent className="space-y-4">
               <Link href="/products">
-                <Button variant="outline" className="w-full justify-start h-12 border-border hover:bg-teal-400/10 hover:text-teal-400">
+                <Button
+                  variant="outline"
+                  className="w-full justify-start h-12 border-border hover:bg-teal-400/10 hover:text-teal-400"
+                >
                   <Package className="mr-2 h-4 w-4" />
                   MANAGE PRODUCTS
                 </Button>
               </Link>
               <Link href="/ecommerce/orders">
-                <Button variant="outline" className="w-full justify-start h-12 border-border hover:bg-teal-400/10 hover:text-teal-400">
+                <Button
+                  variant="outline"
+                  className="w-full justify-start h-12 border-border hover:bg-teal-400/10 hover:text-teal-400"
+                >
                   <ShoppingCart className="mr-2 h-4 w-4" />
                   VIEW ALL ORDERS
                 </Button>
               </Link>
               <Link href="/ecommerce/customers">
-                <Button variant="outline" className="w-full justify-start h-12 border-border hover:bg-teal-400/10 hover:text-teal-400">
+                <Button
+                  variant="outline"
+                  className="w-full justify-start h-12 border-border hover:bg-teal-400/10 hover:text-teal-400"
+                >
                   <Users className="mr-2 h-4 w-4" />
                   CUSTOMER DATABASE
                 </Button>
