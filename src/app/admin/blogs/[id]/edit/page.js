@@ -1,18 +1,17 @@
 'use client';
 
+import RichTextEditor from '@/components/editor/rich-text-editor';
 import { MainLayout } from '@/components/layout/main-layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import RichTextEditor from '@/components/editor/rich-text-editor';
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { ArrowLeft, Save, Loader2, Trash2 } from 'lucide-react';
-import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
-import { use } from 'react';
+import { ArrowLeft, Loader2, Save, Trash2 } from 'lucide-react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { use, useEffect, useState } from 'react';
 
 export default function EditBlogPage({ params }) {
   const router = useRouter();
@@ -41,7 +40,7 @@ export default function EditBlogPage({ params }) {
         });
       } catch (error) {
         console.error('Error fetching blog:', error);
-        router.push('/blogs');
+        router.push('/admin/blogs');
       } finally {
         setLoading(false);
       }
@@ -83,7 +82,7 @@ export default function EditBlogPage({ params }) {
         throw new Error('Failed to update blog');
       }
 
-      router.push('/blogs');
+      router.push('/admin/blogs');
       router.refresh();
     } catch (error) {
       console.error('Error updating blog:', error);
@@ -101,7 +100,7 @@ export default function EditBlogPage({ params }) {
         method: 'DELETE',
       });
       if (!res.ok) throw new Error('Failed to delete blog');
-      router.push('/blogs');
+      router.push('/admin/blogs');
       router.refresh();
     } catch (error) {
       console.error('Error deleting blog:', error);
@@ -124,7 +123,7 @@ export default function EditBlogPage({ params }) {
     <MainLayout breadcrumb="SYSTEM CONSOLE / BLOGS / EDIT">
       <div className="w-full max-w-none px-6 space-y-6">
         <div className="flex items-center justify-between">
-          <Link href="/blogs">
+          <Link href="/admin/blogs">
             <Button variant="ghost" className="pl-0 text-gray-400 hover:text-teal-400">
               <ArrowLeft className="w-4 h-4 mr-2" />
               CANCEL

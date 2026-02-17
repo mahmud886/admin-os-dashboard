@@ -6,8 +6,12 @@ import { ArrowLeft, Calendar, User, Pencil } from 'lucide-react';
 import { notFound } from 'next/navigation';
 
 export default async function BlogDetailPage({ params }) {
-  const { slug } = await params;
-  const blog = await blogsService.getBySlug(slug);
+  const { id } = await params;
+  let blog = await blogsService.getBySlug(id);
+
+  if (!blog && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)) {
+    blog = await blogsService.getById(id);
+  }
 
   if (!blog) {
     notFound();
@@ -17,7 +21,7 @@ export default async function BlogDetailPage({ params }) {
     <MainLayout breadcrumb={`SYSTEM CONSOLE / BLOGS / ${blog.title.toUpperCase()}`}>
       <div className="w-full max-w-none px-6 space-y-8">
         <div className="flex justify-between items-center">
-          <Link href="/blogs">
+          <Link href="/admin/blogs">
             <Button variant="ghost" className="pl-0 text-gray-400 hover:text-teal-400">
               <ArrowLeft className="w-4 h-4 mr-2" />
               BACK TO LOGS

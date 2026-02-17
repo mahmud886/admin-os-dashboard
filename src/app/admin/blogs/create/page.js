@@ -61,7 +61,7 @@ export default function CreateBlogPage() {
         throw new Error('Failed to create blog');
       }
 
-      router.push('/blogs');
+      router.push('/admin/blogs');
       router.refresh();
     } catch (error) {
       console.error('Error creating blog:', error);
@@ -75,7 +75,7 @@ export default function CreateBlogPage() {
     <MainLayout breadcrumb="SYSTEM CONSOLE / BLOGS / NEW ENTRY">
       <div className="w-full max-w-none px-6 space-y-6">
         <div className="flex items-center justify-between">
-          <Link href="/blogs">
+          <Link href="/admin/blogs">
             <Button variant="ghost" className="pl-0 text-gray-400 hover:text-teal-400">
               <ArrowLeft className="w-4 h-4 mr-2" />
               CANCEL

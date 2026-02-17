@@ -2,13 +2,25 @@
 
 import { MainLayout } from '@/components/layout/main-layout';
 import { EcommerceOrdersTableShimmer } from '@/components/shimmer/ecommerce-orders-table-shimmer';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Eye, Package, Search, ShoppingCart, User } from 'lucide-react';
+import { useToast } from '@/components/ui/toast';
+import { Eye, Package, Search, ShoppingCart, Trash2, User } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 const getStatusColor = (status) => {
@@ -47,11 +59,15 @@ const formatCurrency = (amount, currency = 'usd') => {
 };
 
 export default function OrdersPage() {
+  const router = useRouter();
+  const { addToast } = useToast();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [statusFilter, setStatusFilter] = useState('all');
   const [selectedOrder, setSelectedOrder] = useState(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [orderToDelete, setOrderToDelete] = useState(null);
 
   useEffect(() => {
     fetchOrders();
@@ -65,7 +81,7 @@ export default function OrdersPage() {
         url += `?status=${statusFilter}`;
       }
 
-      const response = await fetch(url);
+      const response = await fetch(url, { cache: 'no-store' });
       const data = await response.json();
 
       if (!response.ok) throw new Error(data.error || 'Failed to fetch orders');
@@ -74,26 +90,70 @@ export default function OrdersPage() {
     } catch (err) {
       console.error('Error fetching orders:', err);
       setError(err.message);
+      addToast({
+        title: 'Error',
+        description: 'Failed to fetch orders.',
+        variant: 'destructive',
+      });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDeleteClick = (order) => {
+    setOrderToDelete(order);
+    setDeleteDialogOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!orderToDelete) return;
+
+    try {
+      const response = await fetch(`/api/ecommerce/orders/${orderToDelete.id}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Failed to delete order');
+      }
+
+      addToast({
+        title: 'Success',
+        description: 'Order deleted successfully.',
+      });
+
+      await fetchOrders();
+    } catch (err) {
+      console.error('Error deleting order:', err);
+      addToast({
+        title: 'Error',
+        description: err.message || 'Failed to delete order.',
+        variant: 'destructive',
+      });
+    } finally {
+      setDeleteDialogOpen(false);
+      setOrderToDelete(null);
     }
   };
 
   return (
     <MainLayout breadcrumb="ECOMMERCE / ORDERS">
       <div className="space-y-6">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-teal-400">ORDER MANIFEST</h1>
-          <Button variant="outline" onClick={fetchOrders}>
-            REFRESH DATA
-          </Button>
+        <div className="flex flex-col gap-4 justify-between items-start sm:flex-row sm:items-center">
+          <h1 className="text-2xl font-bold text-teal-400 sm:text-3xl lg:text-4xl">ORDER MANIFEST</h1>
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={fetchOrders}>
+              REFRESH DATA
+            </Button>
+          </div>
         </div>
 
         {/* Filters */}
         <Card className="bg-[#111111] border-border">
-          <CardContent className="p-4 flex flex-col sm:flex-row gap-4">
+          <CardContent className="flex flex-col gap-4 p-4 sm:flex-row">
             <div className="relative flex-1">
-              <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-500" />
+              <Search className="absolute left-2 top-2.5 w-4 h-4 text-gray-500" />
               <Input placeholder="Search orders..." className="pl-8 bg-[#0a0a0a] border-border" />
             </div>
             <Select value={statusFilter} onValueChange={setStatusFilter}>
@@ -118,19 +178,19 @@ export default function OrdersPage() {
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-border bg-[#0a0a0a]/50">
-                    <th className="p-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                    <th className="p-4 text-xs font-medium tracking-wider text-left text-gray-400 uppercase">
                       Order ID
                     </th>
-                    <th className="p-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                    <th className="p-4 text-xs font-medium tracking-wider text-left text-gray-400 uppercase">
                       Customer
                     </th>
-                    <th className="p-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Status</th>
-                    <th className="p-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                    <th className="p-4 text-xs font-medium tracking-wider text-left text-gray-400 uppercase">Status</th>
+                    <th className="p-4 text-xs font-medium tracking-wider text-left text-gray-400 uppercase">
                       Payment
                     </th>
-                    <th className="p-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Total</th>
-                    <th className="p-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Date</th>
-                    <th className="p-4 text-right text-xs font-medium text-gray-400 uppercase tracking-wider">
+                    <th className="p-4 text-xs font-medium tracking-wider text-left text-gray-400 uppercase">Total</th>
+                    <th className="p-4 text-xs font-medium tracking-wider text-left text-gray-400 uppercase">Date</th>
+                    <th className="p-4 text-xs font-medium tracking-wider text-right text-gray-400 uppercase">
                       Actions
                     </th>
                   </tr>
@@ -146,13 +206,14 @@ export default function OrdersPage() {
                     </tr>
                   ) : (
                     orders.map((order) => (
-                      <tr key={order.id} className="hover:bg-accent/5 transition-colors">
+                      <tr key={order.id} className="transition-colors hover:bg-accent/5">
                         <td className="p-4 font-mono text-sm text-teal-400">{order.order_number}</td>
                         <td className="p-4">
                           <div className="text-sm font-medium text-white">
                             {order.ecommerce_customers?.name || 'Guest'}
                           </div>
                           <div className="text-xs text-gray-500">{order.ecommerce_customers?.email}</div>
+                          <div className="text-xs text-gray-500">{order.ecommerce_customers?.phone}</div>
                         </td>
                         <td className="p-4">
                           <Badge variant="outline" className={getStatusColor(order.status)}>
@@ -164,19 +225,29 @@ export default function OrdersPage() {
                             {order.payment_status.toUpperCase()}
                           </Badge>
                         </td>
-                        <td className="p-4 text-sm text-white font-medium">
+                        <td className="p-4 text-sm font-medium text-white">
                           {formatCurrency(order.amount_total, order.currency)}
                         </td>
                         <td className="p-4 text-sm text-gray-400">{formatDate(order.created_at)}</td>
                         <td className="p-4 text-right">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-8 w-8 p-0"
-                            onClick={() => setSelectedOrder(order)}
-                          >
-                            <Eye className="h-4 w-4 text-teal-400" />
-                          </Button>
+                          <div className="flex gap-2 justify-end">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="p-0 w-8 h-8"
+                              onClick={() => setSelectedOrder(order)}
+                            >
+                              <Eye className="w-4 h-4 text-teal-400" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="p-0 w-8 h-8"
+                              onClick={() => handleDeleteClick(order)}
+                            >
+                              <Trash2 className="w-4 h-4 text-red-400" />
+                            </Button>
+                          </div>
                         </td>
                       </tr>
                     ))
@@ -187,12 +258,33 @@ export default function OrdersPage() {
           </CardContent>
         </Card>
 
+        {/* Delete Confirmation Dialog */}
+        <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+          <AlertDialogContent className="bg-[#111111] border-border text-white">
+            <AlertDialogHeader>
+              <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+              <AlertDialogDescription className="text-gray-400">
+                This action cannot be undone. This will permanently delete the order{' '}
+                <span className="font-mono text-teal-400">{orderToDelete?.order_number}</span> and all associated items.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel className="text-white bg-transparent border-border hover:bg-white/10 hover:text-white">
+                Cancel
+              </AlertDialogCancel>
+              <AlertDialogAction className="text-white bg-red-600 border-none hover:bg-red-700" onClick={confirmDelete}>
+                Delete
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+
         {/* Order Details Dialog */}
         <Dialog open={!!selectedOrder} onOpenChange={(open) => !open && setSelectedOrder(null)}>
           <DialogContent className="bg-[#111111] border-border text-white max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle className="text-xl font-bold text-teal-400 flex items-center gap-2">
-                <ShoppingCart className="h-5 w-5" />
+              <DialogTitle className="flex gap-2 items-center text-xl font-bold text-teal-400">
+                <ShoppingCart className="w-5 h-5" />
                 ORDER MANIFEST: {selectedOrder?.order_number}
               </DialogTitle>
               <DialogDescription className="text-gray-400">
@@ -202,7 +294,7 @@ export default function OrdersPage() {
             </DialogHeader>
 
             {selectedOrder && (
-              <div className="space-y-6 mt-4">
+              <div className="mt-4 space-y-6">
                 {/* Status Badges */}
                 <div className="flex flex-wrap gap-4 p-4 bg-[#0a0a0a] rounded-lg border border-border">
                   <div className="flex flex-col gap-1">
@@ -226,10 +318,10 @@ export default function OrdersPage() {
                 </div>
 
                 {/* Customer Info */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   <div className="p-4 bg-[#0a0a0a] rounded-lg border border-border">
-                    <h3 className="text-sm font-medium text-teal-400 mb-3 flex items-center gap-2">
-                      <User className="h-4 w-4" /> CUSTOMER
+                    <h3 className="flex gap-2 items-center mb-3 text-sm font-medium text-teal-400">
+                      <User className="w-4 h-4" /> CUSTOMER
                     </h3>
                     <div className="space-y-1 text-sm">
                       <p className="font-medium text-white">{selectedOrder.ecommerce_customers?.name || 'Guest'}</p>
@@ -238,8 +330,8 @@ export default function OrdersPage() {
                     </div>
                   </div>
                   <div className="p-4 bg-[#0a0a0a] rounded-lg border border-border">
-                    <h3 className="text-sm font-medium text-teal-400 mb-3 flex items-center gap-2">
-                      <Package className="h-4 w-4" /> SHIPPING
+                    <h3 className="flex gap-2 items-center mb-3 text-sm font-medium text-teal-400">
+                      <Package className="w-4 h-4" /> SHIPPING
                     </h3>
                     <div className="space-y-1 text-sm text-gray-400">
                       {selectedOrder.shipping_address ? (
@@ -260,11 +352,11 @@ export default function OrdersPage() {
 
                 {/* Order Items */}
                 <div>
-                  <h3 className="text-sm font-medium text-teal-400 mb-3">ORDER ITEMS</h3>
-                  <div className="border border-border rounded-lg overflow-hidden">
+                  <h3 className="mb-3 text-sm font-medium text-teal-400">ORDER ITEMS</h3>
+                  <div className="overflow-hidden rounded-lg border border-border">
                     <table className="w-full text-sm">
                       <thead className="bg-[#0a0a0a]">
-                        <tr className="text-left text-xs text-gray-500 uppercase">
+                        <tr className="text-xs text-left text-gray-500 uppercase">
                           <th className="p-3 font-medium">Product</th>
                           <th className="p-3 font-medium text-right">Price</th>
                           <th className="p-3 font-medium text-right">Qty</th>
@@ -275,25 +367,25 @@ export default function OrdersPage() {
                         {selectedOrder.ecommerce_order_items?.map((item) => (
                           <tr key={item.id}>
                             <td className="p-3">
-                              <div className="flex items-center gap-3">
+                              <div className="flex gap-3 items-center">
                                 {item.image_url ? (
-                                  <div className="h-10 w-10 rounded-md overflow-hidden bg-gray-800 flex-shrink-0">
+                                  <div className="overflow-hidden flex-shrink-0 w-10 h-10 bg-gray-800 rounded-md">
                                     <img
                                       src={item.image_url}
                                       alt={item.product_name}
-                                      className="h-full w-full object-cover"
+                                      className="object-cover w-full h-full"
                                       onError={(e) => {
                                         e.target.onerror = null;
                                         e.target.style.display = 'none';
                                         e.target.parentElement.classList.add('flex', 'items-center', 'justify-center');
                                         e.target.parentElement.innerHTML =
-                                          '<svg class="h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>';
+                                          '<svg class="w-5 h-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>';
                                       }}
                                     />
                                   </div>
                                 ) : (
-                                  <div className="h-10 w-10 rounded-md bg-gray-800 flex items-center justify-center flex-shrink-0">
-                                    <Package className="h-5 w-5 text-gray-500" />
+                                  <div className="flex flex-shrink-0 justify-center items-center w-10 h-10 bg-gray-800 rounded-md">
+                                    <Package className="w-5 h-5 text-gray-500" />
                                   </div>
                                 )}
                                 <div>
@@ -308,7 +400,7 @@ export default function OrdersPage() {
                               {formatCurrency(item.unit_amount, selectedOrder.currency)}
                             </td>
                             <td className="p-3 text-right text-white">{item.quantity}</td>
-                            <td className="p-3 text-right font-medium text-white">
+                            <td className="p-3 font-medium text-right text-white">
                               {formatCurrency(item.total_amount, selectedOrder.currency)}
                             </td>
                           </tr>
