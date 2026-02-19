@@ -1,6 +1,6 @@
-import { AuthProvider } from '@/context/AuthContext';
-import { ToastProvider } from '@/components/ui/toast';
 import { GoogleAnalytics } from '@/components/analytics/GoogleAnalytics';
+import { ToastProvider } from '@/components/ui/toast';
+import { AuthProvider } from '@/context/AuthContext';
 import { Space_Grotesk } from 'next/font/google';
 import './globals.css';
 
@@ -13,9 +13,9 @@ export const metadata = {
   title: 'SPORE FALL - Admin Console',
   description: 'Administrative dashboard for system management',
   icons: {
-    icon: '/assets/images/sporefall.jpeg',
-    shortcut: '/assets/images/sporefall.jpeg',
-    apple: '/assets/images/sporefall.jpeg',
+    icon: '/assets/favicon_io/favicon-32x32.png',
+    shortcut: '/assets/favicon_io/favicon-16x16.png',
+    apple: '/assets/favicon_io/apple-touch-icon.png',
   },
 };
 

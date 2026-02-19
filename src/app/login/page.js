@@ -64,7 +64,7 @@ function LoginForm() {
           <div className="relative inline-flex items-center justify-center w-20 h-20 mb-4 rounded-lg bg-[#0a0a0a] border border-teal-400/50 overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-br from-teal-900/20 via-transparent to-transparent"></div>
             <Image
-              src="/assets/images/sporefall.jpeg"
+              src="/assets/favicon_io/android-chrome-192x192.png"
               alt="Spore Fall Logo"
               fill
               sizes="(max-width: 768px) 80px, 80px"

@@ -65,7 +65,7 @@ export function Sidebar() {
           <div className="flex gap-3 items-center">
             <div className="relative flex-shrink-0 w-10 h-10">
               <Image
-                src="/assets/images/sporefall.jpeg"
+                src="/assets/favicon_io/android-chrome-192x192.png"
                 alt="Spore Fall Logo"
                 fill
                 sizes="(max-width: 768px) 40px, 40px"
