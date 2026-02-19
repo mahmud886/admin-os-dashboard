@@ -303,3 +303,131 @@ BEGIN
   RAISE NOTICE 'Poll IDs: %, %, %, %, %', poll_id_1, poll_id_2, poll_id_3, poll_id_4, poll_id_5;
 
 END $$;
+
+-- ==========================================
+-- E-COMMERCE SEED DATA
+-- ==========================================
+
+DO $$
+DECLARE
+  cust_id_1 UUID;
+  cust_id_2 UUID;
+  order_id_1 UUID;
+  order_id_2 UUID;
+  order_id_3 UUID;
+BEGIN
+  -- Create Customers
+  INSERT INTO ecommerce_customers (email, name, phone, address)
+  VALUES 
+  ('alex.chen@example.com', 'Alex Chen', '+15550101', '{"line1": "123 Neo Tokyo Blvd", "city": "Neo Tokyo", "country": "JP", "postal_code": "100-0001"}'),
+  ('sarah.connor@example.com', 'Sarah Connor', '+15550102', '{"line1": "456 Resistance Way", "city": "Los Angeles", "country": "US", "postal_code": "90001"}')
+  RETURNING id INTO cust_id_1;
+
+  -- Get the second ID (since we inserted 2 values in one statement, only the first might be returned or all depending on implementation, let's do separate inserts to be safe or just select back)
+  SELECT id INTO cust_id_2 FROM ecommerce_customers WHERE email = 'sarah.connor@example.com';
+  IF cust_id_2 IS NULL THEN
+     -- Fallback if previous insert didn't work as expected for second row
+     INSERT INTO ecommerce_customers (email, name, phone, address)
+     VALUES ('sarah.connor@example.com', 'Sarah Connor', '+15550102', '{"line1": "456 Resistance Way", "city": "Los Angeles", "country": "US", "postal_code": "90001"}')
+     RETURNING id INTO cust_id_2;
+  END IF;
+
+  -- Create Orders
+  -- Order 1: Paid and Shipped
+  INSERT INTO ecommerce_orders (
+    order_number, customer_id, amount_total, status, payment_status, 
+    shipping_address, created_at
+  ) VALUES (
+    'SPORE-1001', cust_id_1, 125.50, 'shipped', 'paid', 
+    '{"line1": "123 Neo Tokyo Blvd", "city": "Neo Tokyo", "country": "JP", "postal_code": "100-0001"}',
+    NOW() - INTERVAL '2 days'
+  ) RETURNING id INTO order_id_1;
+
+  -- Order 2: Paid and Pending
+  INSERT INTO ecommerce_orders (
+    order_number, customer_id, amount_total, status, payment_status, 
+    shipping_address, created_at
+  ) VALUES (
+    'SPORE-1002', cust_id_2, 59.99, 'pending', 'paid', 
+    '{"line1": "456 Resistance Way", "city": "Los Angeles", "country": "US", "postal_code": "90001"}',
+    NOW() - INTERVAL '1 day'
+  ) RETURNING id INTO order_id_2;
+
+  -- Order 3: Unpaid
+  INSERT INTO ecommerce_orders (
+    order_number, customer_id, amount_total, status, payment_status, 
+    shipping_address, created_at
+  ) VALUES (
+    'SPORE-1003', cust_id_1, 250.00, 'pending', 'unpaid', 
+    '{"line1": "123 Neo Tokyo Blvd", "city": "Neo Tokyo", "country": "JP", "postal_code": "100-0001"}',
+    NOW() - INTERVAL '1 hour'
+  ) RETURNING id INTO order_id_3;
+
+  -- Create Order Items
+  -- Items for Order 1
+  INSERT INTO ecommerce_order_items (order_id, product_name, quantity, unit_amount, total_amount, image_url)
+  VALUES 
+  (order_id_1, 'Neural Link Tee', 2, 45.00, 90.00, 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=800&q=80'),
+  (order_id_1, 'Spore Sticker Pack', 1, 15.50, 15.50, 'https://images.unsplash.com/photo-1572375992501-4b0892d50c69?auto=format&fit=crop&w=800&q=80'),
+  (order_id_1, 'Neon Wristband', 2, 10.00, 20.00, 'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?auto=format&fit=crop&w=800&q=80');
+
+  -- Items for Order 2
+  INSERT INTO ecommerce_order_items (order_id, product_name, quantity, unit_amount, total_amount, image_url)
+  VALUES 
+  (order_id_2, 'Resistance Hoodie', 1, 59.99, 59.99, 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?auto=format&fit=crop&w=800&q=80');
+
+  -- Items for Order 3
+  INSERT INTO ecommerce_order_items (order_id, product_name, quantity, unit_amount, total_amount, image_url)
+  VALUES 
+  (order_id_3, 'Limited Edition Vinyl', 1, 250.00, 250.00, 'https://images.unsplash.com/photo-1539375665275-f9de415ef9ac?auto=format&fit=crop&w=800&q=80');
+
+END $$;
+
+-- ==========================================
+-- SUPPORTER DONATIONS SEED DATA
+-- ==========================================
+
+DO $$
+DECLARE
+  don_id_1 UUID;
+  don_id_2 UUID;
+  don_id_3 UUID;
+  don_id_4 UUID;
+BEGIN
+  -- Donation 1: The Archivist
+  INSERT INTO supporter_donations (
+    donation_number, supporter_name, supporter_email, mailing_address,
+    tier_id, tier_name, amount, currency, status, payment_status, created_at
+  ) VALUES (
+    'DON-1001', 'John Doe', 'john.doe@example.com', '123 Main St, New York, NY, US',
+    'archivist', 'THE ARCHIVIST', 5.00, 'USD', 'paid', 'paid', NOW() - INTERVAL '5 days'
+  ) RETURNING id INTO don_id_1;
+
+  -- Donation 2: The Emblem
+  INSERT INTO supporter_donations (
+    donation_number, supporter_name, supporter_email, mailing_address,
+    tier_id, tier_name, amount, currency, status, payment_status, created_at
+  ) VALUES (
+    'DON-1002', 'Jane Smith', 'jane.smith@example.com', '456 Elm St, London, UK',
+    'emblem', 'THE EMBLEM', 15.00, 'USD', 'paid', 'paid', NOW() - INTERVAL '3 days'
+  ) RETURNING id INTO don_id_2;
+
+  -- Donation 3: The Patron
+  INSERT INTO supporter_donations (
+    donation_number, supporter_name, supporter_email, mailing_address,
+    tier_id, tier_name, amount, currency, status, payment_status, created_at
+  ) VALUES (
+    'DON-1003', 'Alice Johnson', 'alice.j@example.com', '789 Pine St, Toronto, CA',
+    'patron', 'THE PATRON', 50.00, 'USD', 'paid', 'paid', NOW() - INTERVAL '1 day'
+  ) RETURNING id INTO don_id_3;
+
+  -- Donation 4: Support the Universe (Custom Amount)
+  INSERT INTO supporter_donations (
+    donation_number, supporter_name, supporter_email, mailing_address,
+    tier_id, tier_name, amount, currency, status, payment_status, created_at
+  ) VALUES (
+    'DON-1004', 'Bob Brown', 'bob.brown@example.com', '321 Oak St, Sydney, AU',
+    'support-universe', 'SUPPORT THE UNIVERSE', 100.00, 'USD', 'paid', 'paid', NOW() - INTERVAL '2 hours'
+  ) RETURNING id INTO don_id_4;
+
+END $$;

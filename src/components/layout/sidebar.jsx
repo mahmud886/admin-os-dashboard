@@ -7,15 +7,16 @@ import {
   Book,
   BookOpen,
   CreditCard,
-  FileText,
   Home,
   LayoutDashboard,
   Menu,
-  Package,
+  Newspaper,
   PlusCircle,
+  ShoppingCart,
   Users,
   X,
 } from 'lucide-react';
+
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -28,9 +29,12 @@ const navigation = [
   { name: 'EPISODE MANAGEMENT', href: '/episodes', icon: Book },
   { name: 'POLL MANAGEMENT', href: '/polls', icon: BarChart3 },
   { name: 'E-MAIL LIST', href: '/emails', icon: Users },
-  { name: 'PAYMENTS', href: '/payments', icon: CreditCard },
-  { name: 'CONTENT MANAGER', href: '/content', icon: FileText },
-  { name: 'PRODUCT STORE', href: '/products', icon: Package },
+  { name: 'SUPPORTER DONATIONS', href: '/supporter-donations', icon: CreditCard },
+  { name: 'BLOGS MANAGEMENT', href: '/admin/blogs', icon: Newspaper },
+  { name: 'STORE ORDERS', href: '/ecommerce/orders', icon: ShoppingCart },
+  { name: 'STORE CUSTOMERS', href: '/ecommerce/customers', icon: Users },
+  // { name: 'CONTENT MANAGER', href: '/content', icon: FileText },
+  // { name: 'PRODUCT STORE', href: '/products', icon: Package },
 ];
 
 export function Sidebar() {
