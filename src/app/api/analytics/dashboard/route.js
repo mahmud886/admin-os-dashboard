@@ -50,32 +50,32 @@ export async function GET(request) {
     let totalShares = 0;
     let recentSharesCount = 0;
 
-    // Try poll_shares first (created_at field)
+    // Try social_media_clicks first (clicked_at field) - PREFERRED
     try {
       const { data: testShares, error: testError } = await supabase
-        .from('poll_shares')
-        .select('id, created_at')
+        .from('social_media_clicks')
+        .select('id, clicked_at')
         .limit(1);
 
       if (!testError) {
-        tableName = 'poll_shares';
-        dateField = 'created_at';
+        tableName = 'social_media_clicks';
+        dateField = 'clicked_at';
       }
     } catch (e) {
       // Table doesn't exist, try next one
     }
 
-    // Try social_media_clicks (clicked_at field)
+    // Try poll_shares second (created_at field) - FALLBACK
     if (!tableName) {
       try {
         const { data: testShares, error: testError } = await supabase
-          .from('social_media_clicks')
-          .select('id, clicked_at')
+          .from('poll_shares')
+          .select('id, created_at')
           .limit(1);
 
         if (!testError) {
-          tableName = 'social_media_clicks';
-          dateField = 'clicked_at';
+          tableName = 'poll_shares';
+          dateField = 'created_at';
         }
       } catch (e) {
         // Table doesn't exist
@@ -86,28 +86,34 @@ export async function GET(request) {
     if (tableName && dateField) {
       try {
         // Get ALL shares for platform stats, UTM sources, and referrers (all-time data)
-        const { data: allSharesData, error: allSharesError } = await supabase.from(tableName).select('*');
+        // We fetch more fields to support visitor tracking
+        // Order by date descending to ensure we get the latest data for active users
+        // Limit to 2000 to get a reasonable amount of history (Supabase default is 1000)
+        const { data: allSharesData, error: allSharesError } = await supabase
+          .from(tableName)
+          .select('*')
+          .order(dateField, { ascending: false })
+          .limit(2000);
 
         // Get shares within timeframe for daily shares and recent shares count
         const { data: timeframeSharesData, error: timeframeSharesError } = await supabase
           .from(tableName)
           .select('*')
           .gte(dateField, startDate.toISOString())
-          .lte(dateField, endDate.toISOString());
+          .lte(dateField, endDate.toISOString())
+          .order(dateField, { ascending: false });
 
         if (allSharesError && allSharesError.code !== '42P01') {
           // 42P01 is "relation does not exist" - ignore if table doesn't exist
           console.error('Error fetching all shares:', allSharesError.message);
         } else if (!allSharesError) {
           allShares = allSharesData || [];
-          totalShares = allShares.length;
         }
 
         if (timeframeSharesError && timeframeSharesError.code !== '42P01') {
           console.error('Error fetching timeframe shares:', timeframeSharesError.message);
         } else if (!timeframeSharesError) {
           recentShares = timeframeSharesData || [];
-          recentSharesCount = recentShares.length;
         }
       } catch (tableError) {
         // Table might not exist yet
@@ -120,9 +126,39 @@ export async function GET(request) {
       console.log('💡 Run migration: supabase/migrations/create_shares_table.sql');
     }
 
+    // Process Visitor Stats (Page Views vs Social Shares)
+    const pageViews = allShares.filter((s) => s.platform === 'page_view');
+    const socialShares = allShares.filter((s) => s.platform !== 'page_view');
+
+    // Update total shares to only count actual shares, not page views
+    totalShares = socialShares.length;
+
+    // Update recent shares count (filtered)
+    recentSharesCount = recentShares.filter((s) => s.platform !== 'page_view').length;
+
+    // Calculate Visitor Stats
+    const totalVisits = pageViews.length;
+    const uniqueUAs = new Set(pageViews.map((s) => s.user_agent));
+    const uniqueVisitors = uniqueUAs.size;
+
+    // Active Users (last 30 mins)
+    const thirtyMinutesAgo = new Date(Date.now() - 30 * 60 * 1000);
+    const activeUsers = new Set(
+      allShares
+        .filter((s) => {
+          const dateStr = s[dateField] || s.created_at || s.clicked_at;
+          return dateStr && new Date(dateStr) > thirtyMinutesAgo;
+        })
+        .map((s) => s.user_agent)
+    ).size;
+
     // Calculate daily shares (from recent shares within timeframe)
     const dailySharesMap = {};
-    recentShares.forEach((share) => {
+    // Use recentShares but filter out page_views if we only want "Daily Shares" chart to show shares
+    // Or keep them if we want "Daily Activity". Frontend usually shows "Recent Shares".
+    const recentSocialShares = recentShares.filter((s) => s.platform !== 'page_view');
+
+    recentSocialShares.forEach((share) => {
       const dateValue = share[dateField] || share.created_at || share.clicked_at;
       if (dateValue) {
         const date = new Date(dateValue).toISOString().split('T')[0];
@@ -143,6 +179,8 @@ export async function GET(request) {
     }
 
     // Platform statistics (from ALL shares - all-time data)
+    // We include page_view here if we want to see it in the list, or exclude it?
+    // Frontend includes it (icon: 👁️). Let's include it.
     const platformMap = {};
     allShares.forEach((share) => {
       const platform = share.platform || 'unknown';
@@ -237,6 +275,10 @@ export async function GET(request) {
         totalVotes: totalVotes || 0,
         totalShares: totalShares || 0,
         recentShares: recentSharesCount || 0,
+        // Added visitor stats
+        totalVisits: totalVisits || 0,
+        uniqueVisitors: uniqueVisitors || 0,
+        activeUsers: activeUsers || 0,
       },
       dailyShares: dailySharesArray.length > 0 ? dailySharesArray : generateEmptyDailyShares(timeframe),
       platformStats: platformStats.length > 0 ? platformStats : [],

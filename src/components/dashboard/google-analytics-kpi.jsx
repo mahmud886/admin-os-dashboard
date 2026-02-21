@@ -15,32 +15,33 @@ export function GoogleAnalyticsKPI({ gaData, analyticsData, onRefresh }) {
   const totalVotes = overview.totalVotes ?? 0;
   const totalShares = overview.totalShares ?? 0;
   const avgVotesPerPoll = totalPolls > 0 ? (totalVotes / totalPolls).toFixed(1) : '0';
-  const gaConfigured = gaData?.configured === true;
-  const activeUsers = gaData?.activeUsers ?? 0;
-  const totalVisits = gaData?.totalVisits ?? 0;
-  const totalUsersGA = gaData?.totalUsers ?? 0;
+
+  // Internal tracking stats
+  const activeUsers = overview.activeUsers ?? 0;
+  const totalVisits = overview.totalVisits ?? 0;
+  const uniqueVisitors = overview.uniqueVisitors ?? 0;
 
   const kpis = [
     {
       title: 'ACTIVE USERS',
-      value: gaConfigured ? activeUsers.toLocaleString() : '—',
+      value: activeUsers.toLocaleString(),
       change: 'Live',
       changeType: 'positive',
-      sub: gaConfigured ? 'GA4 realtime' : 'Not configured',
+      sub: 'Realtime (30m)',
     },
     {
       title: 'TOTAL VISITS',
-      value: gaConfigured ? totalVisits.toLocaleString() : '—',
-      change: '30 days',
+      value: totalVisits.toLocaleString(),
+      change: 'All time',
       changeType: 'positive',
-      sub: gaConfigured ? 'Sessions' : 'Not configured',
+      sub: 'Page Views',
     },
     {
-      title: 'TOTAL USERS (30D)',
-      value: gaConfigured ? totalUsersGA.toLocaleString() : '—',
-      change: 'GA4',
+      title: 'UNIQUE VISITORS',
+      value: uniqueVisitors.toLocaleString(),
+      change: 'All time',
       changeType: 'positive',
-      sub: gaConfigured ? 'Users' : '—',
+      sub: 'Unique Devices',
     },
     {
       title: 'TOTAL VOTES',
