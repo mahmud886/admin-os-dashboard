@@ -20,7 +20,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/components/ui/toast';
-import { Eye, Pencil, Plus, Trash2 } from 'lucide-react';
+import { Copy, ExternalLink, Eye, Lock, Pencil, Plus, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
@@ -118,6 +118,7 @@ export default function EpisodesPage() {
       primary_genre: episode.primary_genre || '',
       secondary_genre: episode.secondary_genre || 'none',
       status: episode.status || 'DRAFT',
+      password: episode.password || '',
     });
     setEditOpen(true);
   };
@@ -223,11 +224,11 @@ export default function EpisodesPage() {
   return (
     <MainLayout breadcrumb="SYSTEM CONSOLE / EPISODES">
       <div className="space-y-6">
-        <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
+        <div className="flex flex-col gap-4 justify-between items-start sm:flex-row sm:items-center">
           <h1 className="text-2xl font-bold text-teal-400 sm:text-3xl lg:text-4xl">EPISODE MANAGEMENT</h1>
           <Link href="/create-episode">
             <Button className="w-full sm:w-auto">
-              <Plus className="w-4 h-4 mr-2" />
+              <Plus className="mr-2 w-4 h-4" />
               CREATE EPISODE
             </Button>
           </Link>
@@ -276,7 +277,7 @@ export default function EpisodesPage() {
                           <div className="mt-1 text-sm text-gray-400">ID: {episode.id}</div>
                           <div className="mt-1 text-xs text-gray-400">Unique ID: {episode.unique_episode_id}</div>
                           {episode.description && (
-                            <div className="max-w-md mt-1 text-xs text-gray-500 line-clamp-1">
+                            <div className="mt-1 max-w-md text-xs text-gray-500 line-clamp-1">
                               {episode.description}
                             </div>
                           )}
@@ -302,7 +303,20 @@ export default function EpisodesPage() {
                         <td className="p-4 text-gray-400">{episode.runtime || 'N/A'}</td>
                         <td className="p-4 text-gray-400">{formatDate(episode.release_datetime)}</td>
                         <td className="p-4">
-                          <div className="flex items-center gap-2">
+                          <div className="flex gap-2 items-center">
+                            {(episode.visibility === 'LOCKED' || episode.password) && (
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                title="Open Premiere Page"
+                                onClick={() =>
+                                  window.open(`${window.location.origin}/premiere/${episode.id}`, '_blank')
+                                }
+                                className="text-teal-400 hover:text-teal-300 hover:bg-teal-400/10"
+                              >
+                                <ExternalLink className="w-4 h-4" />
+                              </Button>
+                            )}
                             <Dialog open={viewOpen && selectedEpisode?.id === episode.id} onOpenChange={setViewOpen}>
                               <DialogTrigger asChild>
                                 <Button variant="ghost" size="icon" title="View" onClick={() => handleView(episode)}>
@@ -403,6 +417,38 @@ export default function EpisodesPage() {
                                   )}
                                 </div>
                                 <DialogFooter>
+                                  {(episode.visibility === 'LOCKED' || episode.password) && (
+                                    <div className="flex gap-2 mr-auto">
+                                      <Button
+                                        variant="outline"
+                                        onClick={() => {
+                                          navigator.clipboard.writeText(
+                                            `${window.location.origin}/premiere/${episode.id}`
+                                          );
+                                          addToast({
+                                            variant: 'success',
+                                            title: 'Link Copied',
+                                            description: 'Premiere link copied to clipboard',
+                                            duration: 2000,
+                                          });
+                                        }}
+                                        className="text-gray-400 hover:text-white border-white/10"
+                                      >
+                                        <Copy className="mr-2 w-4 h-4" />
+                                        Copy Link
+                                      </Button>
+                                      <Button
+                                        variant="secondary"
+                                        onClick={() =>
+                                          window.open(`${window.location.origin}/premiere/${episode.id}`, '_blank')
+                                        }
+                                        className="text-teal-400 border hover:text-teal-300 border-teal-500/30"
+                                      >
+                                        <Lock className="mr-2 w-4 h-4" />
+                                        Open Premiere
+                                      </Button>
+                                    </div>
+                                  )}
                                   <Button variant="outline" onClick={() => setViewOpen(false)}>
                                     CLOSE
                                   </Button>
@@ -538,6 +584,42 @@ export default function EpisodesPage() {
                                         className="bg-[#0a0a0a] border-border"
                                       />
                                     </div>
+                                    <div className="space-y-2">
+                                      <Label htmlFor="edit-password">Password (Optional)</Label>
+                                      <div className="relative">
+                                        <Input
+                                          id="edit-password"
+                                          type="text"
+                                          value={editFormData.password || ''}
+                                          onChange={(e) =>
+                                            setEditFormData({ ...editFormData, password: e.target.value })
+                                          }
+                                          placeholder="Set password for locked episodes"
+                                          className="bg-[#0a0a0a] border-border pr-20"
+                                        />
+                                        {editFormData.password && (
+                                          <Button
+                                            type="button"
+                                            variant="ghost"
+                                            size="sm"
+                                            className="absolute top-0 right-0 h-full text-xs text-teal-400 hover:text-teal-300"
+                                            onClick={() => {
+                                              navigator.clipboard.writeText(
+                                                `${window.location.origin}/premiere/${selectedEpisode.id}`
+                                              );
+                                              addToast({
+                                                variant: 'success',
+                                                title: 'Link Copied',
+                                                description: 'Premiere link copied to clipboard',
+                                                duration: 2000,
+                                              });
+                                            }}
+                                          >
+                                            Copy Link
+                                          </Button>
+                                        )}
+                                      </div>
+                                    </div>
                                   </div>
                                   <div className="space-y-2">
                                     <Label htmlFor="edit-description">Description</Label>
@@ -651,7 +733,7 @@ export default function EpisodesPage() {
                                     </div>
                                   </div>
                                   <div className="grid grid-cols-2 gap-4 pt-2">
-                                    <div className="flex items-center justify-between">
+                                    <div className="flex justify-between items-center">
                                       <Label htmlFor="edit-notify" className="text-base font-medium text-teal-400">
                                         NOTIFY USERS
                                       </Label>
@@ -663,7 +745,7 @@ export default function EpisodesPage() {
                                         }
                                       />
                                     </div>
-                                    <div className="flex items-center justify-between">
+                                    <div className="flex justify-between items-center">
                                       <Label
                                         htmlFor="edit-age-restricted"
                                         className="text-base font-medium text-teal-400"
@@ -695,7 +777,7 @@ export default function EpisodesPage() {
                                   <Button onClick={handleUpdateEpisode} disabled={isUpdating}>
                                     {isUpdating ? (
                                       <>
-                                        <div className="w-4 h-4 mr-2 border-2 border-teal-400 rounded-full border-t-transparent animate-spin"></div>
+                                        <div className="mr-2 w-4 h-4 rounded-full border-2 border-teal-400 animate-spin border-t-transparent"></div>
                                         UPDATING...
                                       </>
                                     ) : (

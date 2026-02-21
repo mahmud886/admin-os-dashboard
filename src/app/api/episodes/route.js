@@ -23,6 +23,9 @@ export async function GET(request) {
     // Build query
     let query = supabase.from('episodes').select('*', { count: 'exact' }).order('created_at', { ascending: false });
 
+    // Check authentication for sensitive data
+    const { user } = await getAuthenticatedUser();
+
     // Apply filters
     if (visibility) {
       query = query.eq('visibility', visibility);
@@ -43,8 +46,18 @@ export async function GET(request) {
       return createErrorResponse('Failed to fetch episodes', 500, error.message);
     }
 
+    // If not authenticated, do not expose passwords
+    const safeEpisodes = data.map((episode) => {
+      if (!user) {
+        const safe = { ...episode, has_password: !!episode.password };
+        delete safe.password;
+        return safe;
+      }
+      return episode;
+    });
+
     return createResponse({
-      episodes: data || [],
+      episodes: safeEpisodes || [],
       total: count || 0,
       limit,
       offset,
@@ -77,6 +90,7 @@ export async function POST(request) {
     // Prepare episode data
     const episodeData = {
       title: body.title,
+      password: body.password || null,
       description: body.description || null,
       episode_number: parseInt(body.episode_number),
       season_number: parseInt(body.season_number),
