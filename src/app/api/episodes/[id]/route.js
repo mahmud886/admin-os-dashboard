@@ -16,11 +16,22 @@ export async function GET(request, { params }) {
 
     const { data, error } = await supabase.from('episodes').select('*').eq('id', id).single();
 
+    // Check authentication for sensitive data
+    const { user } = await getAuthenticatedUser();
+
     if (error) {
       if (error.code === 'PGRST116') {
         return createErrorResponse('Episode not found', 404);
       }
       return createErrorResponse('Failed to fetch episode', 500, error.message);
+    }
+
+    // If not authenticated, do not expose password
+    if (!user && data) {
+      // Add has_password flag
+      data.has_password = !!data.password;
+      // Remove actual password
+      delete data.password;
     }
 
     return createResponse({ episode: data });
@@ -68,6 +79,7 @@ export async function PUT(request, { params }) {
 
     // Update only provided fields
     if (body.title !== undefined) updateData.title = body.title;
+    if (body.password !== undefined) updateData.password = body.password;
     if (body.description !== undefined) updateData.description = body.description;
     if (body.episode_number !== undefined) updateData.episode_number = parseInt(body.episode_number);
     if (body.season_number !== undefined) updateData.season_number = parseInt(body.season_number);

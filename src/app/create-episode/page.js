@@ -31,6 +31,7 @@ export default function CreateEpisodePage() {
   const [accessLevel, setAccessLevel] = useState('');
   const [releaseDateTime, setReleaseDateTime] = useState('');
   const [clearanceLevel, setClearanceLevel] = useState('');
+  const [password, setPassword] = useState('');
   const [ageRestricted, setAgeRestricted] = useState(false);
 
   // Media Assets
@@ -144,6 +145,7 @@ export default function CreateEpisodePage() {
         access_level: accessLevel || 'free',
         release_datetime: releaseDateTime ? new Date(releaseDateTime).toISOString() : null,
         clearance_level: clearanceLevel ? parseInt(clearanceLevel) : 1,
+        password: password.trim() || null,
         notify: notify || false,
         age_restricted: ageRestricted || false,
         thumb_image_url: thumbImageUrl.trim() || null,
@@ -483,6 +485,20 @@ export default function CreateEpisodePage() {
                   autoComplete="off"
                 />
                 <p className="text-xs text-gray-500">Security clearance required (1-5). Default: 1</p>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="password" className="text-gray-300">
+                  PASSWORD (OPTIONAL)
+                </Label>
+                <Input
+                  id="password"
+                  placeholder="Set password for locked episodes"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="bg-[#0a0a0a] border-border focus:ring-2 focus:ring-teal-400 focus:border-teal-400 focus:outline-none"
+                  autoComplete="off"
+                />
+                <p className="text-xs text-gray-500">Users will need this password to access the episode</p>
               </div>
               <div className="flex items-center justify-between pt-2 border-t border-border/50">
                 <div className="space-y-1">
