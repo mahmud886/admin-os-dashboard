@@ -1,7 +1,6 @@
 'use client';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ExternalLink } from 'lucide-react';
 
 const PLATFORM_LABELS = {
   facebook: 'FACEBOOK',
@@ -42,7 +41,6 @@ export function SocialMediaStats({ analyticsData }) {
                 <div className="space-y-2">
                   <div className="text-2xl font-bold text-teal-400">SHARES 0</div>
                   <div className="text-sm text-gray-400">No platform data yet</div>
-                  <ExternalLink className="w-4 h-4 text-muted-foreground" />
                 </div>
               </CardContent>
             </Card>
@@ -69,7 +67,6 @@ export function SocialMediaStats({ analyticsData }) {
                 <div className="space-y-2">
                   <div className="text-2xl font-bold text-teal-400">SHARES {item.count}</div>
                   <div className="text-sm text-gray-400">ENGAGEMENT {pct}%</div>
-                  <ExternalLink className="w-4 h-4 text-muted-foreground" />
                 </div>
               </CardContent>
             </Card>

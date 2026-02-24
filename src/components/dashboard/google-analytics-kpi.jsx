@@ -2,7 +2,6 @@
 
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ExternalLink } from 'lucide-react';
 
 const KPI_COLORS = {
   positive: 'border-green-500 bg-green-500/50 text-green-400 hover:bg-green-500',
@@ -76,16 +75,15 @@ export function GoogleAnalyticsKPI({ gaData, analyticsData, onRefresh }) {
               <CardTitle className="text-sm font-medium text-gray-400">{kpi.title}</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="flex items-center justify-between">
+              <div className="flex justify-between items-center">
                 <div className="text-3xl font-bold text-teal-400">{kpi.value}</div>
-                <div className="flex items-center gap-2">
+                <div className="flex gap-2 items-center">
                   <Badge
                     variant={kpi.changeType === 'positive' ? 'default' : 'destructive'}
                     className={KPI_COLORS[kpi.changeType] ?? KPI_COLORS.positive}
                   >
                     {kpi.change}
                   </Badge>
-                  <ExternalLink className="w-4 h-4 text-gray-400" />
                 </div>
               </div>
               {kpi.sub && <p className="mt-1 text-xs text-gray-500">{kpi.sub}</p>}
