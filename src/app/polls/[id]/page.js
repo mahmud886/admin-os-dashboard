@@ -1,15 +1,15 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
 import { MainLayout } from '@/components/layout/main-layout';
+import { PollDetailsShimmer } from '@/components/shimmer/poll-details-shimmer';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/components/ui/toast';
-import { PollDetailsShimmer } from '@/components/shimmer/poll-details-shimmer';
 import { ArrowLeft, CheckCircle2 } from 'lucide-react';
+import { useParams, useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 const getStatusBadgeColor = (status) => {
   switch (status) {
@@ -263,6 +263,19 @@ export default function PollDetailsPage() {
                     onClick={() => handleOptionVoteClick(option)}
                   >
                     <div className="flex items-start justify-between gap-4">
+                      {option.image_url && (
+                        <div className="relative w-20 h-20 rounded-md border border-border overflow-hidden bg-black/50 shrink-0">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={option.image_url}
+                            alt={option.name}
+                            className="object-cover w-full h-full"
+                            onError={(e) => {
+                              e.target.style.display = 'none';
+                            }}
+                          />
+                        </div>
+                      )}
                       <div className="flex-1">
                         <div className="flex items-center gap-3 mb-2">
                           <div className="flex items-center justify-center w-8 h-8 rounded-full bg-teal-900/30 border border-teal-400/50 text-teal-400 font-semibold">

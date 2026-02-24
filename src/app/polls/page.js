@@ -115,6 +115,7 @@ export default function PollsPage() {
             id: opt.id,
             name: opt.name || '',
             description: opt.description || '',
+            image_url: opt.image_url || '',
             count: opt.vote_count || 0,
           }))
       : [];
@@ -132,7 +133,7 @@ export default function PollsPage() {
   const addEditOption = () => {
     setEditFormData({
       ...editFormData,
-      options: [...editFormData.options, { id: null, name: '', description: '', count: 0 }],
+      options: [...editFormData.options, { id: null, name: '', description: '', image_url: '', count: 0 }],
     });
   };
 
@@ -269,6 +270,7 @@ export default function PollsPage() {
             id: opt.id,
             name: opt.name.trim(),
             description: opt.description?.trim() || null,
+            image_url: opt.image_url?.trim() || null,
             count: parseInt(opt.count) || 0,
             vote_count: parseInt(opt.count) || 0,
           })),
@@ -597,6 +599,29 @@ export default function PollsPage() {
                                               onChange={(e) => updateEditOption(index, 'description', e.target.value)}
                                               className="min-h-[60px] bg-[#0a0a0a] border-border resize-none focus:ring-2 focus:ring-teal-400 focus:border-teal-400 focus:outline-none"
                                             />
+                                            <div className="flex gap-4 items-start">
+                                              <div className="flex-1">
+                                                <Input
+                                                  placeholder={`Option ${index + 1} Image URL`}
+                                                  value={option.image_url || ''}
+                                                  onChange={(e) => updateEditOption(index, 'image_url', e.target.value)}
+                                                  className="bg-[#0a0a0a] border-border focus:ring-2 focus:ring-teal-400 focus:border-teal-400 focus:outline-none"
+                                                />
+                                              </div>
+                                              {option.image_url && (
+                                                <div className="overflow-hidden relative w-10 h-10 rounded-md border border-border bg-black/50 shrink-0">
+                                                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                                                  <img
+                                                    src={option.image_url}
+                                                    alt={`Option ${index + 1}`}
+                                                    className="object-cover w-full h-full"
+                                                    onError={(e) => {
+                                                      e.target.style.display = 'none';
+                                                    }}
+                                                  />
+                                                </div>
+                                              )}
+                                            </div>
                                             <Input
                                               type="number"
                                               min="0"

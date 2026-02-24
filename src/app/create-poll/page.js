@@ -22,8 +22,8 @@ export default function CreatePollPage() {
   const [pollDescription, setPollDescription] = useState('');
   const [pollDuration, setPollDuration] = useState('');
   const [options, setOptions] = useState([
-    { name: '', description: '', count: 0 },
-    { name: '', description: '', count: 0 },
+    { name: '', description: '', image_url: '', count: 0 },
+    { name: '', description: '', image_url: '', count: 0 },
   ]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
@@ -58,7 +58,7 @@ export default function CreatePollPage() {
   }, [addToast]);
 
   const addOption = () => {
-    setOptions([...options, { name: '', description: '', count: 0 }]);
+    setOptions([...options, { name: '', description: '', image_url: '', count: 0 }]);
   };
 
   const removeOption = (index) => {
@@ -106,6 +106,7 @@ export default function CreatePollPage() {
         options: validOptions.map((opt) => ({
           name: opt.name.trim(),
           description: opt.description.trim() || null,
+          image_url: opt.image_url?.trim() || null,
           count: parseInt(opt.count) || 0,
         })),
       };
@@ -363,6 +364,36 @@ export default function CreatePollPage() {
                       className="min-h-[80px] bg-[#0a0a0a] border-border resize-none focus:ring-2 focus:ring-teal-400 focus:border-teal-400 focus:outline-none"
                       autoComplete="off"
                     />
+                  </div>
+                  <div>
+                    <Label htmlFor={`option-image-${index}`} className="block mb-1 text-xs text-gray-400">
+                      Option Image URL
+                    </Label>
+                    <div className="flex gap-4 items-start">
+                      <div className="flex-1">
+                        <Input
+                          id={`option-image-${index}`}
+                          placeholder="https://..."
+                          value={option.image_url || ''}
+                          onChange={(e) => updateOption(index, 'image_url', e.target.value)}
+                          className="bg-[#0a0a0a] border-border focus:ring-2 focus:ring-teal-400 focus:border-teal-400 focus:outline-none"
+                          autoComplete="off"
+                        />
+                      </div>
+                      {option.image_url && (
+                        <div className="relative w-16 h-16 rounded-md border border-border overflow-hidden bg-black/50 shrink-0">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={option.image_url}
+                            alt={`Option ${index + 1}`}
+                            className="object-cover w-full h-full"
+                            onError={(e) => {
+                              e.target.style.display = 'none';
+                            }}
+                          />
+                        </div>
+                      )}
+                    </div>
                   </div>
                   <div>
                     <Label htmlFor={`option-count-${index}`} className="block mb-1 text-xs text-gray-400">

@@ -136,6 +136,7 @@ export async function POST(request) {
       poll_id: poll.id,
       name: option.name,
       description: option.description || null,
+      image_url: option.image_url || null,
       vote_count: parseInt(option.count) || parseInt(option.vote_count) || 0,
       display_order: index,
     }));

@@ -174,6 +174,7 @@ export async function PUT(request, { params }) {
         poll_id: id,
         name: option.name,
         description: option.description || null,
+        image_url: option.image_url || null,
         vote_count: parseInt(option.count) || parseInt(option.vote_count) || 0,
         display_order: index,
       }));
