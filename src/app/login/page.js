@@ -4,27 +4,57 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useAuth } from '@/hooks/useAuth';
-import { Lock, User } from 'lucide-react';
+import { Lock, Smartphone, User } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
 
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { signIn, isAuthenticated, loading: authLoading, configError } = useAuth();
+  const {
+    signIn,
+    verifyLoginMFA,
+    isAuthenticated,
+    loading: authLoading,
+    configError,
+    needsMFA,
+    listFactors,
+  } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
+  // MFA State
+  const [mfaRequired, setMfaRequired] = useState(false);
+  const [mfaFactorId, setMfaFactorId] = useState(null);
+  const [mfaCode, setMfaCode] = useState('');
+
   // Redirect if already authenticated
   useEffect(() => {
-    if (!authLoading && isAuthenticated) {
+    if (!authLoading && isAuthenticated && !needsMFA && !mfaRequired) {
       const redirect = searchParams.get('redirect') || '/dashboard';
       router.push(redirect);
     }
-  }, [isAuthenticated, authLoading, router, searchParams]);
+  }, [isAuthenticated, authLoading, router, searchParams, needsMFA, mfaRequired]);
+
+  // Handle MFA requirement from session check (e.g. on refresh)
+  useEffect(() => {
+    if (needsMFA && !mfaFactorId) {
+      setMfaRequired(true);
+      // Fetch factors to get ID
+      listFactors().then((result) => {
+        if (result.success && result.data.totp.length > 0) {
+          const verifiedFactor = result.data.totp.find((f) => f.status === 'verified');
+          if (verifiedFactor) {
+            setMfaFactorId(verifiedFactor.id);
+          }
+        }
+      });
+    }
+  }, [needsMFA, mfaFactorId, listFactors]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -32,18 +62,36 @@ function LoginForm() {
     setIsLoading(true);
 
     try {
-      const result = await signIn(email.trim(), password);
-
-      if (result.success) {
-        const redirect = searchParams.get('redirect') || '/dashboard';
-        router.push(redirect);
+      if (mfaRequired) {
+        // Handle MFA Verification
+        const result = await verifyLoginMFA(mfaFactorId, mfaCode);
+        if (result.success) {
+          const redirect = searchParams.get('redirect') || '/dashboard';
+          router.push(redirect);
+        } else {
+          setError(result.error || 'Invalid verification code');
+        }
       } else {
-        setError(result.error || 'Invalid credentials. Access denied.');
+        // Handle Normal Login
+        const result = await signIn(email.trim(), password);
+
+        if (result.success) {
+          if (result.mfaRequired) {
+            setMfaRequired(true);
+            setMfaFactorId(result.factorId);
+            setIsLoading(false);
+            return;
+          }
+          const redirect = searchParams.get('redirect') || '/dashboard';
+          router.push(redirect);
+        } else {
+          setError(result.error || 'Invalid credentials. Access denied.');
+        }
       }
     } catch (err) {
       setError(err.message || 'An error occurred. Please try again.');
     } finally {
-      setIsLoading(false);
+      if (!mfaRequired) setIsLoading(false);
     }
   };
 
@@ -78,7 +126,9 @@ function LoginForm() {
 
         {/* Login Card */}
         <div className="bg-[#111111] border border-border rounded-lg p-8 shadow-lg">
-          <h2 className="mb-6 text-2xl font-semibold text-center text-gray-200">AUTHENTICATION REQUIRED</h2>
+          <h2 className="mb-6 text-2xl font-semibold text-center text-gray-200">
+            {mfaRequired ? 'TWO-FACTOR AUTHENTICATION' : 'AUTHENTICATION REQUIRED'}
+          </h2>
 
           {/* Configuration Error */}
           {configError && (
@@ -93,39 +143,74 @@ function LoginForm() {
           )}
 
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Email/Username Field */}
-            <div className="space-y-2">
-              <Label htmlFor="email" className="flex items-center gap-2 text-gray-300">
-                <User className="w-4 h-4" />
-                USERNAME / EMAIL
-              </Label>
-              <Input
-                id="email"
-                type="text"
-                placeholder="Enter your username or email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="bg-[#0a0a0a] border-border text-gray-200 placeholder:text-gray-500"
-                required
-              />
-            </div>
+            {mfaRequired ? (
+              <div className="space-y-4">
+                <p className="text-sm text-center text-gray-400 mb-4">
+                  Please enter the 6-digit code from your authenticator app.
+                </p>
+                <div className="space-y-2">
+                  <Label htmlFor="mfaCode" className="flex items-center gap-2 text-gray-300">
+                    <Smartphone className="w-4 h-4" />
+                    VERIFICATION CODE
+                  </Label>
+                  <Input
+                    id="mfaCode"
+                    type="text"
+                    placeholder="000000"
+                    value={mfaCode}
+                    onChange={(e) => setMfaCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                    className="bg-[#0a0a0a] border-border text-gray-200 placeholder:text-gray-500 text-center text-lg tracking-widest"
+                    required
+                    maxLength={6}
+                    autoFocus
+                  />
+                </div>
+              </div>
+            ) : (
+              <>
+                {/* Email/Username Field */}
+                <div className="space-y-2">
+                  <Label htmlFor="email" className="flex items-center gap-2 text-gray-300">
+                    <User className="w-4 h-4" />
+                    USERNAME / EMAIL
+                  </Label>
+                  <Input
+                    id="email"
+                    type="text"
+                    placeholder="Enter your username or email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="bg-[#0a0a0a] border-border text-gray-200 placeholder:text-gray-500"
+                    required
+                  />
+                </div>
 
-            {/* Password Field */}
-            <div className="space-y-2">
-              <Label htmlFor="password" className="flex items-center gap-2 text-gray-300">
-                <Lock className="w-4 h-4" />
-                PASSWORD
-              </Label>
-              <Input
-                id="password"
-                type="password"
-                placeholder="Enter your password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="bg-[#0a0a0a] border-border text-gray-200 placeholder:text-gray-500"
-                required
-              />
-            </div>
+                {/* Password Field */}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="password" className="flex items-center gap-2 text-gray-300">
+                      <Lock className="w-4 h-4" />
+                      PASSWORD
+                    </Label>
+                    <Link
+                      href="/forgot-password"
+                      className="text-xs text-teal-400 hover:text-teal-300 transition-colors"
+                    >
+                      Forgot Password?
+                    </Link>
+                  </div>
+                  <Input
+                    id="password"
+                    type="password"
+                    placeholder="Enter your password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="bg-[#0a0a0a] border-border text-gray-200 placeholder:text-gray-500"
+                    required
+                  />
+                </div>
+              </>
+            )}
 
             {/* Error Message */}
             {error && (
@@ -137,8 +222,10 @@ function LoginForm() {
               {isLoading ? (
                 <>
                   <div className="w-4 h-4 border-2 border-teal-400 rounded-full border-t-transparent animate-spin"></div>
-                  AUTHENTICATING...
+                  {mfaRequired ? 'VERIFYING...' : 'AUTHENTICATING...'}
                 </>
+              ) : mfaRequired ? (
+                'VERIFY IDENTITY'
               ) : (
                 'SECURE LOGIN'
               )}

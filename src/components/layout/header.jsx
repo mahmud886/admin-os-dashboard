@@ -1,7 +1,5 @@
 'use client';
 
-import { LogOut, Settings, User } from 'lucide-react';
-import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -11,6 +9,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { useAuth } from '@/hooks/useAuth';
+import { LogOut, Settings, User } from 'lucide-react';
+import Link from 'next/link';
 import { useState } from 'react';
 
 export function Header({ title, breadcrumb }) {
@@ -41,9 +42,11 @@ export function Header({ title, breadcrumb }) {
             <span className="w-2 h-2 bg-green-400 rounded-full mr-2"></span>
             LIVE SYNC ACTIVE
           </Button>
-          <Button variant="ghost" size="icon" className="h-9 w-9">
-            <Settings className="h-4 w-4 lg:h-5 lg:w-5" />
-          </Button>
+          <Link href="/settings">
+            <Button variant="ghost" size="icon" className="h-9 w-9">
+              <Settings className="h-4 w-4 lg:h-5 lg:w-5" />
+            </Button>
+          </Link>
           <Button variant="ghost" size="icon" className="h-9 w-9">
             <User className="h-4 w-4 lg:h-5 lg:w-5" />
           </Button>
@@ -64,9 +67,11 @@ export function Header({ title, breadcrumb }) {
           <span className="w-2 h-2 bg-green-400 rounded-full mr-2"></span>
           LIVE SYNC ACTIVE
         </Button>
-        <Button variant="ghost" size="icon" className="h-9 w-9">
-          <Settings className="h-4 w-4 lg:h-5 lg:w-5" />
-        </Button>
+        <Link href="/settings">
+          <Button variant="ghost" size="icon" className="h-9 w-9">
+            <Settings className="h-4 w-4 lg:h-5 lg:w-5" />
+          </Button>
+        </Link>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon" className="h-9 w-9">
@@ -80,6 +85,13 @@ export function Header({ title, breadcrumb }) {
                 <p className="text-xs leading-none text-gray-400 truncate">{user?.email || 'Not logged in'}</p>
               </div>
             </DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem asChild>
+              <Link href="/settings" className="cursor-pointer">
+                <Settings className="mr-2 h-4 w-4" />
+                <span>Settings</span>
+              </Link>
+            </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem
               onClick={handleLogout}

@@ -64,7 +64,7 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY=your_supabase_anon_key
 NEXT_PUBLIC_STATIC_ADMIN_EMAIL=admin@example.com
 NEXT_PUBLIC_STATIC_ADMIN_PASSWORD=your_secure_password
 
-# Optional: For user creation scripts
+# Optional: For API routes and user creation scripts
 SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
 ```
 

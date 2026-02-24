@@ -11,6 +11,7 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
   const [session, setSession] = useState(null);
   const [configError, setConfigError] = useState(null);
+  const [needsMFA, setNeedsMFA] = useState(false);
   const router = useRouter();
 
   // Initialize Supabase client with error handling
@@ -40,6 +41,7 @@ export function AuthProvider({ children }) {
 
         setSession(session);
         setUser(session?.user ?? null);
+        checkMFA(session);
       } catch (error) {
         console.error('Error getting session:', error);
         setUser(null);
@@ -57,6 +59,7 @@ export function AuthProvider({ children }) {
     } = supabase.auth.onAuthStateChange(async (_event, session) => {
       setSession(session);
       setUser(session?.user ?? null);
+      checkMFA(session);
       setLoading(false);
     });
 
@@ -67,84 +70,183 @@ export function AuthProvider({ children }) {
     };
   }, [supabase, configError]);
 
+  const checkMFA = async (session) => {
+    if (!session) {
+      setNeedsMFA(false);
+      return;
+    }
+    try {
+      const { data, error } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+      if (!error && data) {
+        // If user has AAL2 enabled (nextLevel='aal2') but is currently at AAL1 (currentLevel='aal1')
+        if (data.nextLevel === 'aal2' && data.currentLevel === 'aal1') {
+          setNeedsMFA(true);
+        } else {
+          setNeedsMFA(false);
+        }
+      }
+    } catch (error) {
+      console.error('Error checking MFA level:', error);
+    }
+  };
+
   const signIn = async (email, password) => {
     try {
       if (!supabase) {
         throw new Error(configError || 'Supabase client not initialized. Please check your environment variables.');
       }
 
-      // Validate against static credentials before calling Supabase
-      // Note: These env vars need NEXT_PUBLIC_ prefix to be accessible in client components
-      const staticEmail = process.env.NEXT_PUBLIC_STATIC_ADMIN_EMAIL;
-      const staticPassword = process.env.NEXT_PUBLIC_STATIC_ADMIN_PASSWORD;
-
-      if (!staticEmail || !staticPassword) {
-        throw new Error('Server configuration error. Please contact administrator.');
-      }
-
-      // Trim and normalize email for comparison
-      const normalizedEmail = email.trim().toLowerCase();
-      const normalizedStaticEmail = staticEmail.trim().toLowerCase();
-
-      // Validate credentials match static user before calling Supabase
-      if (normalizedEmail !== normalizedStaticEmail || password !== staticPassword) {
-        throw new Error('Invalid credentials. Access denied.');
-      }
-
-      // If credentials match, proceed with Supabase sign-in
+      // Proceed with Supabase sign-in directly
       const { data, error } = await supabase.auth.signInWithPassword({
-        email: staticEmail, // Use the exact email from env for Supabase
-        password: staticPassword, // Use the exact password from env for Supabase
+        email,
+        password,
       });
 
       if (error) {
-        // Provide more helpful error messages
-        if (error.message.includes('Invalid login credentials')) {
-          throw new Error(
-            'Invalid login credentials. The user does not exist in Supabase Auth or the password is incorrect. ' +
-              'Please create the user in your Supabase Dashboard: Authentication → Users → Add User'
-          );
-        }
         throw error;
       }
 
-      setSession(data.session);
-      setUser(data.user);
-      return { success: true, error: null };
+      // Check if MFA is enabled for this user
+      const { data: factors, error: factorsError } = await supabase.auth.mfa.listFactors();
+      if (factorsError) throw factorsError;
+
+      const totpFactor = factors.totp.find((factor) => factor.status === 'verified');
+
+      if (totpFactor) {
+        return {
+          success: true,
+          mfaRequired: true,
+          factorId: totpFactor.id,
+        };
+      }
+
+      return { success: true };
     } catch (error) {
-      return {
-        success: false,
-        error: error.message || 'An error occurred during sign-in',
-      };
+      console.error('Sign in error:', error);
+      return { success: false, error: error.message };
+    }
+  };
+
+  const verifyLoginMFA = async (factorId, code) => {
+    try {
+      const challenge = await supabase.auth.mfa.challenge({ factorId });
+      if (challenge.error) throw challenge.error;
+
+      const verify = await supabase.auth.mfa.verify({
+        factorId,
+        challengeId: challenge.data.id,
+        code,
+      });
+
+      if (verify.error) throw verify.error;
+
+      return { success: true };
+    } catch (error) {
+      console.error('MFA verification error:', error);
+      return { success: false, error: error.message };
+    }
+  };
+
+  const resetPasswordForEmail = async (email) => {
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+      if (error) throw error;
+      return { success: true };
+    } catch (error) {
+      console.error('Reset password error:', error);
+      return { success: false, error: error.message };
+    }
+  };
+
+  const updatePassword = async (newPassword) => {
+    try {
+      const { error } = await supabase.auth.updateUser({ password: newPassword });
+      if (error) throw error;
+      return { success: true };
+    } catch (error) {
+      console.error('Update password error:', error);
+      return { success: false, error: error.message };
+    }
+  };
+
+  const enrollMFA = async () => {
+    try {
+      const { data, error } = await supabase.auth.mfa.enroll({
+        factorType: 'totp',
+      });
+      if (error) throw error;
+      return { success: true, data };
+    } catch (error) {
+      console.error('MFA enrollment error:', error);
+      return { success: false, error: error.message };
+    }
+  };
+
+  const verifyMFAEnrollment = async (factorId, code) => {
+    try {
+      const { data, error } = await supabase.auth.mfa.challengeAndVerify({
+        factorId,
+        code,
+      });
+      if (error) throw error;
+      return { success: true, data };
+    } catch (error) {
+      console.error('MFA verification error:', error);
+      return { success: false, error: error.message };
+    }
+  };
+
+  const unenrollMFA = async (factorId) => {
+    try {
+      const { error } = await supabase.auth.mfa.unenroll({ factorId });
+      if (error) throw error;
+      return { success: true };
+    } catch (error) {
+      console.error('MFA unenroll error:', error);
+      return { success: false, error: error.message };
+    }
+  };
+
+  const listFactors = async () => {
+    try {
+      const { data, error } = await supabase.auth.mfa.listFactors();
+      if (error) throw error;
+      return { success: true, data };
+    } catch (error) {
+      console.error('List factors error:', error);
+      return { success: false, error: error.message };
     }
   };
 
   const signOut = async () => {
     try {
-      if (!supabase) {
-        throw new Error('Supabase client not initialized');
-      }
-
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
-
-      setSession(null);
+      await supabase.auth.signOut();
       setUser(null);
+      setSession(null);
       router.push('/login');
     } catch (error) {
       console.error('Error signing out:', error);
-      throw error;
     }
   };
 
   const value = {
     user,
-    session,
     loading,
-    signIn,
-    signOut,
+    session,
     isAuthenticated: !!user,
     configError,
+    needsMFA,
+    signIn,
+    signOut,
+    verifyLoginMFA,
+    resetPasswordForEmail,
+    updatePassword,
+    enrollMFA,
+    verifyMFAEnrollment,
+    unenrollMFA,
+    listFactors,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
