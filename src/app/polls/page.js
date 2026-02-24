@@ -1,6 +1,7 @@
 'use client';
 
 import { MainLayout } from '@/components/layout/main-layout';
+import { PollsTableShimmer } from '@/components/shimmer/polls-table-shimmer';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -18,8 +19,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/components/ui/toast';
-import { PollsTableShimmer } from '@/components/shimmer/polls-table-shimmer';
-import { Eye, Pencil, Plus, Trash2 } from 'lucide-react';
+import { Download, Eye, Pencil, Plus, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -315,6 +315,46 @@ export default function PollsPage() {
     setDeleteOpen(true);
   };
 
+  const handleExportCSV = () => {
+    if (!polls.length) {
+      addToast({ title: 'No data', description: 'No polls to export', variant: 'warning' });
+      return;
+    }
+
+    const headers = ['Poll ID', 'Title', 'Description', 'Status', 'Total Votes', 'Starts At', 'Episode'];
+
+    const csvContent = [
+      headers.join(','),
+      ...polls.map((poll) => {
+        const episodeInfo = poll.episodes
+          ? `${poll.episodes.title || ''} (S${poll.episodes.season_number || '?'} EP${poll.episodes.episode_number || '?'})`
+          : 'N/A';
+
+        const row = [
+          `"${(poll.id || '').replace(/"/g, '""')}"`,
+          `"${(poll.title || '').replace(/"/g, '""')}"`,
+          `"${(poll.description || '').replace(/"/g, '""')}"`,
+          `"${(poll.status || '').replace(/"/g, '""')}"`,
+          `"${getTotalVotes(poll)}"`,
+          `"${poll.starts_at ? new Date(poll.starts_at).toISOString() : ''}"`,
+          `"${episodeInfo.replace(/"/g, '""')}"`,
+        ];
+        return row.join(',');
+      }),
+    ].join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `polls_export_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    addToast({ title: 'Exported', description: 'Polls list exported to CSV', variant: 'success' });
+  };
+
   const confirmDelete = async () => {
     if (!selectedPoll) return;
 
@@ -360,15 +400,16 @@ export default function PollsPage() {
   return (
     <MainLayout breadcrumb="SYSTEM CONSOLE / POLLS">
       <div className="space-y-6">
-        <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
+        <div className="flex flex-col gap-4 justify-between items-start sm:flex-row sm:items-center">
           <h1 className="text-2xl font-bold text-teal-400 sm:text-3xl lg:text-4xl">ACTIVE PROTOCOLS</h1>
-          <div className="flex items-center w-full gap-2 sm:w-auto">
-            <Button variant="outline" className="flex-1 sm:flex-initial">
-              SYNC GLOBAL
+          <div className="flex gap-2 items-center w-full sm:w-auto">
+            <Button variant="outline" onClick={handleExportCSV} className="flex-1 sm:flex-initial">
+              <Download className="mr-2 w-4 h-4" />
+              EXPORT CSV
             </Button>
             <Link href="/create-poll">
               <Button className="flex-1 sm:flex-initial">
-                <Plus className="w-4 h-4 mr-2" />
+                <Plus className="mr-2 w-4 h-4" />
                 CREATE POLL
               </Button>
             </Link>
@@ -430,7 +471,7 @@ export default function PollsPage() {
                         </td>
                         <td className="p-4 text-gray-400">{formatDate(poll.starts_at)}</td>
                         <td className="p-4">
-                          <div className="flex items-center gap-2">
+                          <div className="flex gap-2 items-center">
                             <Button
                               variant="ghost"
                               size="icon"
@@ -452,7 +493,7 @@ export default function PollsPage() {
                                   <DialogTitle>EDIT POLL</DialogTitle>
                                   <DialogDescription>Update poll information</DialogDescription>
                                 </DialogHeader>
-                                <div className="flex-1 py-4 pr-2 space-y-4 overflow-y-auto">
+                                <div className="overflow-y-auto flex-1 py-4 pr-2 space-y-4">
                                   <div className="space-y-2">
                                     <Label htmlFor="edit-poll-title">Poll Title</Label>
                                     <Input
@@ -508,7 +549,7 @@ export default function PollsPage() {
 
                                   {/* Poll Options Editor */}
                                   <div className="pt-4 space-y-4 border-t border-border">
-                                    <div className="flex items-center justify-between">
+                                    <div className="flex justify-between items-center">
                                       <Label className="text-gray-300">Poll Options</Label>
                                       <Button
                                         type="button"
@@ -517,7 +558,7 @@ export default function PollsPage() {
                                         onClick={addEditOption}
                                         className="text-xs"
                                       >
-                                        <Plus className="w-3 h-3 mr-1" />
+                                        <Plus className="mr-1 w-3 h-3" />
                                         ADD OPTION
                                       </Button>
                                     </div>
@@ -527,7 +568,7 @@ export default function PollsPage() {
                                           key={index}
                                           className="p-3 space-y-3 rounded-md border border-border bg-[#0a0a0a]"
                                         >
-                                          <div className="flex items-center justify-between">
+                                          <div className="flex justify-between items-center">
                                             <Label className="text-sm font-medium text-teal-400">
                                               OPTION {index + 1}
                                             </Label>
@@ -537,7 +578,7 @@ export default function PollsPage() {
                                                 variant="ghost"
                                                 size="sm"
                                                 onClick={() => removeEditOption(index)}
-                                                className="w-6 h-6 p-0 text-red-400 hover:text-red-300"
+                                                className="p-0 w-6 h-6 text-red-400 hover:text-red-300"
                                               >
                                                 <Trash2 className="w-3 h-3" />
                                               </Button>

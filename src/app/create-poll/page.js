@@ -159,20 +159,20 @@ export default function CreatePollPage() {
   return (
     <MainLayout breadcrumb="SYSTEM CONSOLE / CREATE-POLL">
       <div className="space-y-6">
-        <div className="flex items-center gap-4 mb-2">
+        <div className="flex gap-4 items-center mb-2">
           <Button
             variant="ghost"
             size="sm"
             onClick={() => router.push('/polls')}
             className="text-gray-400 hover:text-teal-400"
           >
-            <ArrowLeft className="w-4 h-4 mr-2" />
+            <ArrowLeft className="mr-2 w-4 h-4" />
             BACK TO POLLS
           </Button>
         </div>
-        <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
-          <h1 className="text-2xl font-bold text-teal-400 sm:text-3xl lg:text-4xl">FORGE NEW PROTOCOL</h1>
-          <div className="flex items-center w-full gap-2 sm:w-auto">
+        <div className="flex flex-col gap-4 justify-between items-start sm:flex-row sm:items-center">
+          <h1 className="text-2xl font-bold text-teal-400 uppercase sm:text-3xl lg:text-4xl">Create Poll</h1>
+          <div className="flex gap-2 items-center w-full sm:w-auto">
             <Button
               variant="outline"
               onClick={() => handleSubmit(true)}
@@ -181,12 +181,12 @@ export default function CreatePollPage() {
             >
               {isSubmitting ? (
                 <>
-                  <div className="w-4 h-4 mr-2 border-2 border-teal-400 rounded-full border-t-transparent animate-spin"></div>
+                  <div className="mr-2 w-4 h-4 rounded-full border-2 border-teal-400 animate-spin border-t-transparent"></div>
                   SAVING...
                 </>
               ) : (
                 <>
-                  <Save className="w-4 h-4 mr-2" />
+                  <Save className="mr-2 w-4 h-4" />
                   <span className="hidden sm:inline">SAVE DRAFT</span>
                   <span className="sm:hidden">SAVE</span>
                 </>
@@ -199,12 +199,12 @@ export default function CreatePollPage() {
             >
               {isSubmitting ? (
                 <>
-                  <div className="w-4 h-4 mr-2 border-2 border-white rounded-full border-t-transparent animate-spin"></div>
+                  <div className="mr-2 w-4 h-4 rounded-full border-2 border-white animate-spin border-t-transparent"></div>
                   DEPLOYING...
                 </>
               ) : (
                 <>
-                  <Send className="w-4 h-4 mr-2" />
+                  <Send className="mr-2 w-4 h-4" />
                   <span className="hidden sm:inline">DEPLOY LIVE</span>
                   <span className="sm:hidden">DEPLOY</span>
                 </>
@@ -215,7 +215,7 @@ export default function CreatePollPage() {
 
         {/* Error Message */}
         {error && (
-          <div className="p-4 text-sm text-red-400 border rounded-md bg-red-950/30 border-red-500/50">
+          <div className="p-4 text-sm text-red-400 rounded-md border bg-red-950/30 border-red-500/50">
             <div className="mb-1 font-semibold">Error:</div>
             <div>{error}</div>
           </div>
@@ -324,7 +324,7 @@ export default function CreatePollPage() {
           <CardContent className="space-y-6">
             {options.map((option, index) => (
               <div key={index} className="space-y-4 p-4 border border-border rounded-md bg-[#0a0a0a]">
-                <div className="flex items-center justify-between">
+                <div className="flex justify-between items-center">
                   <Label className="text-sm font-medium text-teal-400">OPTION {index + 1}</Label>
                   {options.length > 2 && (
                     <Button
@@ -384,14 +384,14 @@ export default function CreatePollPage() {
               </div>
             ))}
             <Button variant="outline" onClick={addOption} className="w-full border-2 border-dashed">
-              <Plus className="w-4 h-4 mr-2" />
+              <Plus className="mr-2 w-4 h-4" />
               ADD OPTION
             </Button>
           </CardContent>
         </Card>
 
         {/* Action Buttons Section */}
-        <div className="flex items-center justify-end gap-4 pt-4 border-t border-border">
+        <div className="flex gap-4 justify-end items-center pt-4 border-t border-border">
           <Button
             variant="outline"
             onClick={() => handleSubmit(true)}
@@ -400,12 +400,12 @@ export default function CreatePollPage() {
           >
             {isSubmitting ? (
               <>
-                <div className="w-4 h-4 mr-2 border-2 border-teal-400 rounded-full border-t-transparent animate-spin"></div>
+                <div className="mr-2 w-4 h-4 rounded-full border-2 border-teal-400 animate-spin border-t-transparent"></div>
                 SAVING...
               </>
             ) : (
               <>
-                <Save className="w-4 h-4 mr-2" />
+                <Save className="mr-2 w-4 h-4" />
                 SAVE DRAFT
               </>
             )}
@@ -417,12 +417,12 @@ export default function CreatePollPage() {
           >
             {isSubmitting ? (
               <>
-                <div className="w-4 h-4 mr-2 border-2 border-white rounded-full border-t-transparent animate-spin"></div>
+                <div className="mr-2 w-4 h-4 rounded-full border-2 border-white animate-spin border-t-transparent"></div>
                 DEPLOYING...
               </>
             ) : (
               <>
-                <Send className="w-4 h-4 mr-2" />
+                <Send className="mr-2 w-4 h-4" />
                 DEPLOY LIVE
               </>
             )}

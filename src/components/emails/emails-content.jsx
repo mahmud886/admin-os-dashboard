@@ -13,7 +13,7 @@ import {
 } from '@/components/ui/dialog';
 import { useToast } from '@/components/ui/toast';
 import { useAuth } from '@/hooks/useAuth';
-import { Download, Filter, Mail, Trash2 } from 'lucide-react';
+import { Download, Mail, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 export function EmailsContent() {
@@ -90,6 +90,39 @@ export function EmailsContent() {
     setConfirmOpen(true);
   }
 
+  function handleExportCSV() {
+    if (!subscribers.length) {
+      addToast({ title: 'No data', description: 'No subscribers to export', variant: 'warning' });
+      return;
+    }
+
+    const headers = ['Name', 'Email', 'Segment', 'First Signal', 'Message'];
+    const csvContent = [
+      headers.join(','),
+      ...subscribers.map((s) => {
+        const row = [
+          `"${s.name.replace(/"/g, '""')}"`,
+          `"${s.email.replace(/"/g, '""')}"`,
+          `"${s.segment.replace(/"/g, '""')}"`,
+          `"${s.firstSignal.replace(/"/g, '""')}"`,
+          `"${s.message.replace(/"/g, '""')}"`,
+        ];
+        return row.join(',');
+      }),
+    ].join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `subscribers_export_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    addToast({ title: 'Exported', description: 'Subscribers list exported to CSV', variant: 'success' });
+  }
+
   const totalSubscribers = subscribers.length.toLocaleString();
   const weekAgo = new Date();
   weekAgo.setDate(weekAgo.getDate() - 7);
@@ -103,7 +136,7 @@ export function EmailsContent() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-teal-400 sm:text-3xl lg:text-4xl">SUBSCRIBER MATRIX</h1>
+      <h1 className="text-2xl font-bold text-teal-400 uppercase sm:text-3xl lg:text-4xl">Email list</h1>
       {error && <div className="p-3 text-red-300 rounded-md border border-red-500/50 bg-red-900/30">{error}</div>}
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
@@ -123,22 +156,22 @@ export function EmailsContent() {
             <div className="text-4xl font-bold text-teal-400">{activeThisWeek}</div>
           </CardContent>
         </Card>
-        <Card className="bg-[#111111] border-border">
+        {/* <Card className="bg-[#111111] border-border">
           <CardHeader>
             <CardTitle className="text-sm font-medium text-gray-400">UNSUBSCRIBE RATE</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-4xl font-bold text-destructive">{unsubscribeRate}</div>
           </CardContent>
-        </Card>
+        </Card> */}
       </div>
 
       <div className="flex gap-2 justify-end items-center">
-        <Button variant="outline">
+        {/* <Button variant="outline">
           <Filter className="mr-2 w-4 h-4" />
           FILTER
-        </Button>
-        <Button>
+        </Button> */}
+        <Button onClick={handleExportCSV}>
           <Download className="mr-2 w-4 h-4" />
           EXPORT CSV
         </Button>

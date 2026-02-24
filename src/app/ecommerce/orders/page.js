@@ -1,6 +1,7 @@
 'use client';
 
 import { MainLayout } from '@/components/layout/main-layout';
+import { EcommerceCustomersTableShimmer } from '@/components/shimmer/ecommerce-customers-table-shimmer';
 import { EcommerceOrdersTableShimmer } from '@/components/shimmer/ecommerce-orders-table-shimmer';
 import {
   AlertDialog,
@@ -18,8 +19,9 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/components/ui/toast';
-import { Eye, Package, Search, ShoppingCart, Trash2, User } from 'lucide-react';
+import { Download, Eye, Package, Search, ShoppingCart, Trash2, User } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
@@ -61,6 +63,8 @@ const formatCurrency = (amount, currency = 'usd') => {
 export default function OrdersPage() {
   const router = useRouter();
   const { addToast } = useToast();
+
+  // Orders State
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -69,9 +73,18 @@ export default function OrdersPage() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [orderToDelete, setOrderToDelete] = useState(null);
 
+  // Customers State
+  const [customers, setCustomers] = useState([]);
+  const [customersLoading, setCustomersLoading] = useState(true);
+  const [customerSearch, setCustomerSearch] = useState('');
+
   useEffect(() => {
     fetchOrders();
   }, [statusFilter]);
+
+  useEffect(() => {
+    fetchCustomers();
+  }, [customerSearch]);
 
   const fetchOrders = async () => {
     try {
@@ -97,6 +110,28 @@ export default function OrdersPage() {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchCustomers = async () => {
+    try {
+      setCustomersLoading(true);
+      let url = '/api/ecommerce/customers';
+      if (customerSearch) {
+        url += `?search=${customerSearch}`;
+      }
+
+      const response = await fetch(url);
+      const data = await response.json();
+
+      if (!response.ok) throw new Error(data.error || 'Failed to fetch customers');
+
+      setCustomers(data.customers || []);
+    } catch (err) {
+      console.error('Error fetching customers:', err);
+      // Optional: toast error only if meaningful
+    } finally {
+      setCustomersLoading(false);
     }
   };
 
@@ -137,126 +172,315 @@ export default function OrdersPage() {
     }
   };
 
+  const handleExportOrdersCSV = () => {
+    if (!orders.length) {
+      addToast({ title: 'No data', description: 'No orders to export', variant: 'warning' });
+      return;
+    }
+
+    const headers = [
+      'Order ID',
+      'Customer Name',
+      'Customer Email',
+      'Status',
+      'Payment Status',
+      'Total',
+      'Currency',
+      'Date',
+    ];
+
+    const csvContent = [
+      headers.join(','),
+      ...orders.map((order) => {
+        const row = [
+          `"${(order.order_number || '').replace(/"/g, '""')}"`,
+          `"${(order.ecommerce_customers?.name || 'Guest').replace(/"/g, '""')}"`,
+          `"${(order.ecommerce_customers?.email || '').replace(/"/g, '""')}"`,
+          `"${(order.status || '').replace(/"/g, '""')}"`,
+          `"${(order.payment_status || '').replace(/"/g, '""')}"`,
+          `"${order.amount_total || 0}"`,
+          `"${(order.currency || 'USD').toUpperCase()}"`,
+          `"${order.created_at ? new Date(order.created_at).toISOString() : ''}"`,
+        ];
+        return row.join(',');
+      }),
+    ].join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `orders_export_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    addToast({ title: 'Exported', description: 'Orders list exported to CSV', variant: 'success' });
+  };
+
+  const handleExportCustomersCSV = () => {
+    if (!customers.length) {
+      addToast({ title: 'No data', description: 'No customers to export', variant: 'warning' });
+      return;
+    }
+
+    const headers = ['Name', 'Email', 'Phone', 'City', 'Country', 'Joined Date'];
+
+    const csvContent = [
+      headers.join(','),
+      ...customers.map((customer) => {
+        const row = [
+          `"${(customer.name || 'Unknown').replace(/"/g, '""')}"`,
+          `"${(customer.email || '').replace(/"/g, '""')}"`,
+          `"${(customer.phone || '').replace(/"/g, '""')}"`,
+          `"${(customer.address?.city || '').replace(/"/g, '""')}"`,
+          `"${(customer.address?.country || '').replace(/"/g, '""')}"`,
+          `"${customer.created_at ? new Date(customer.created_at).toISOString() : ''}"`,
+        ];
+        return row.join(',');
+      }),
+    ].join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `customers_export_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    addToast({ title: 'Exported', description: 'Customers list exported to CSV', variant: 'success' });
+  };
+
   return (
-    <MainLayout breadcrumb="ECOMMERCE / ORDERS">
+    <MainLayout breadcrumb="ECOMMERCE / OPERATIONS">
       <div className="space-y-6">
         <div className="flex flex-col gap-4 justify-between items-start sm:flex-row sm:items-center">
-          <h1 className="text-2xl font-bold text-teal-400 sm:text-3xl lg:text-4xl">ORDER MANIFEST</h1>
-          <div className="flex gap-2">
-            <Button variant="outline" onClick={fetchOrders}>
-              REFRESH DATA
-            </Button>
-          </div>
+          <h1 className="text-2xl font-bold text-teal-400 sm:text-3xl lg:text-4xl">ECOMMERCE OPERATIONS</h1>
         </div>
 
-        {/* Filters */}
-        <Card className="bg-[#111111] border-border">
-          <CardContent className="flex flex-col gap-4 p-4 sm:flex-row">
-            <div className="relative flex-1">
-              <Search className="absolute left-2 top-2.5 w-4 h-4 text-gray-500" />
-              <Input placeholder="Search orders..." className="pl-8 bg-[#0a0a0a] border-border" />
-            </div>
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-full sm:w-[200px] bg-[#0a0a0a] border-border">
-                <SelectValue placeholder="Filter by status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Statuses</SelectItem>
-                <SelectItem value="pending">Pending</SelectItem>
-                <SelectItem value="paid">Paid</SelectItem>
-                <SelectItem value="shipped">Shipped</SelectItem>
-                <SelectItem value="cancelled">Cancelled</SelectItem>
-              </SelectContent>
-            </Select>
-          </CardContent>
-        </Card>
+        <Tabs defaultValue="orders" className="w-full">
+          <TabsList className="grid w-full grid-cols-2 lg:w-[400px] mb-6 bg-[#111111]">
+            <TabsTrigger value="orders">ORDERS</TabsTrigger>
+            <TabsTrigger value="customers">CUSTOMERS</TabsTrigger>
+          </TabsList>
 
-        {/* Orders Table */}
-        <Card className="bg-[#111111] border-border">
-          <CardContent className="p-0">
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b border-border bg-[#0a0a0a]/50">
-                    <th className="p-4 text-xs font-medium tracking-wider text-left text-gray-400 uppercase">
-                      Order ID
-                    </th>
-                    <th className="p-4 text-xs font-medium tracking-wider text-left text-gray-400 uppercase">
-                      Customer
-                    </th>
-                    <th className="p-4 text-xs font-medium tracking-wider text-left text-gray-400 uppercase">Status</th>
-                    <th className="p-4 text-xs font-medium tracking-wider text-left text-gray-400 uppercase">
-                      Payment
-                    </th>
-                    <th className="p-4 text-xs font-medium tracking-wider text-left text-gray-400 uppercase">Total</th>
-                    <th className="p-4 text-xs font-medium tracking-wider text-left text-gray-400 uppercase">Date</th>
-                    <th className="p-4 text-xs font-medium tracking-wider text-right text-gray-400 uppercase">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border">
-                  {loading ? (
-                    <EcommerceOrdersTableShimmer />
-                  ) : orders.length === 0 ? (
-                    <tr>
-                      <td colSpan="7" className="p-8 text-center text-gray-400">
-                        No orders found matching the criteria.
-                      </td>
-                    </tr>
-                  ) : (
-                    orders.map((order) => (
-                      <tr key={order.id} className="transition-colors hover:bg-accent/5">
-                        <td className="p-4 font-mono text-sm text-teal-400">{order.order_number}</td>
-                        <td className="p-4">
-                          <div className="text-sm font-medium text-white">
-                            {order.ecommerce_customers?.name || 'Guest'}
-                          </div>
-                          <div className="text-xs text-gray-500">{order.ecommerce_customers?.email}</div>
-                          <div className="text-xs text-gray-500">{order.ecommerce_customers?.phone}</div>
-                        </td>
-                        <td className="p-4">
-                          <Badge variant="outline" className={getStatusColor(order.status)}>
-                            {order.status.toUpperCase()}
-                          </Badge>
-                        </td>
-                        <td className="p-4">
-                          <Badge variant="outline" className={getStatusColor(order.payment_status)}>
-                            {order.payment_status.toUpperCase()}
-                          </Badge>
-                        </td>
-                        <td className="p-4 text-sm font-medium text-white">
-                          {formatCurrency(order.amount_total, order.currency)}
-                        </td>
-                        <td className="p-4 text-sm text-gray-400">{formatDate(order.created_at)}</td>
-                        <td className="p-4 text-right">
-                          <div className="flex gap-2 justify-end">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="p-0 w-8 h-8"
-                              onClick={() => setSelectedOrder(order)}
-                            >
-                              <Eye className="w-4 h-4 text-teal-400" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="p-0 w-8 h-8"
-                              onClick={() => handleDeleteClick(order)}
-                            >
-                              <Trash2 className="w-4 h-4 text-red-400" />
-                            </Button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
+          <TabsContent value="orders" className="space-y-6">
+            <div className="flex gap-2 justify-end">
+              <Button variant="outline" onClick={fetchOrders}>
+                REFRESH DATA
+              </Button>
+              <Button onClick={handleExportOrdersCSV}>
+                <Download className="mr-2 w-4 h-4" />
+                EXPORT CSV
+              </Button>
             </div>
-          </CardContent>
-        </Card>
+
+            {/* Filters */}
+            <Card className="bg-[#111111] border-border">
+              <CardContent className="flex flex-col gap-4 p-4 sm:flex-row">
+                <div className="relative flex-1">
+                  <Search className="absolute left-2 top-2.5 w-4 h-4 text-gray-500" />
+                  <Input placeholder="Search orders..." className="pl-8 bg-[#0a0a0a] border-border" />
+                </div>
+                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                  <SelectTrigger className="w-full sm:w-[200px] bg-[#0a0a0a] border-border">
+                    <SelectValue placeholder="Filter by status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Statuses</SelectItem>
+                    <SelectItem value="pending">Pending</SelectItem>
+                    <SelectItem value="paid">Paid</SelectItem>
+                    <SelectItem value="shipped">Shipped</SelectItem>
+                    <SelectItem value="cancelled">Cancelled</SelectItem>
+                  </SelectContent>
+                </Select>
+              </CardContent>
+            </Card>
+
+            {/* Orders Table */}
+            <Card className="bg-[#111111] border-border">
+              <CardContent className="p-0">
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="border-b border-border bg-[#0a0a0a]/50">
+                        <th className="p-4 text-xs font-medium tracking-wider text-left text-gray-400 uppercase">
+                          Order ID
+                        </th>
+                        <th className="p-4 text-xs font-medium tracking-wider text-left text-gray-400 uppercase">
+                          Customer
+                        </th>
+                        <th className="p-4 text-xs font-medium tracking-wider text-left text-gray-400 uppercase">
+                          Status
+                        </th>
+                        <th className="p-4 text-xs font-medium tracking-wider text-left text-gray-400 uppercase">
+                          Payment
+                        </th>
+                        <th className="p-4 text-xs font-medium tracking-wider text-left text-gray-400 uppercase">
+                          Total
+                        </th>
+                        <th className="p-4 text-xs font-medium tracking-wider text-left text-gray-400 uppercase">
+                          Date
+                        </th>
+                        <th className="p-4 text-xs font-medium tracking-wider text-right text-gray-400 uppercase">
+                          Actions
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-border">
+                      {loading ? (
+                        <EcommerceOrdersTableShimmer />
+                      ) : orders.length === 0 ? (
+                        <tr>
+                          <td colSpan="7" className="p-8 text-center text-gray-400">
+                            No orders found matching the criteria.
+                          </td>
+                        </tr>
+                      ) : (
+                        orders.map((order) => (
+                          <tr key={order.id} className="transition-colors hover:bg-accent/5">
+                            <td className="p-4 font-mono text-sm text-teal-400">{order.order_number}</td>
+                            <td className="p-4">
+                              <div className="text-sm font-medium text-white">
+                                {order.ecommerce_customers?.name || 'Guest'}
+                              </div>
+                              <div className="text-xs text-gray-500">{order.ecommerce_customers?.email}</div>
+                              <div className="text-xs text-gray-500">{order.ecommerce_customers?.phone}</div>
+                            </td>
+                            <td className="p-4">
+                              <Badge variant="outline" className={getStatusColor(order.status)}>
+                                {order.status.toUpperCase()}
+                              </Badge>
+                            </td>
+                            <td className="p-4">
+                              <Badge variant="outline" className={getStatusColor(order.payment_status)}>
+                                {order.payment_status.toUpperCase()}
+                              </Badge>
+                            </td>
+                            <td className="p-4 text-sm font-medium text-white">
+                              {formatCurrency(order.amount_total, order.currency)}
+                            </td>
+                            <td className="p-4 text-sm text-gray-400">{formatDate(order.created_at)}</td>
+                            <td className="p-4 text-right">
+                              <div className="flex gap-2 justify-end">
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="p-0 w-8 h-8"
+                                  onClick={() => setSelectedOrder(order)}
+                                >
+                                  <Eye className="w-4 h-4 text-teal-400" />
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="p-0 w-8 h-8"
+                                  onClick={() => handleDeleteClick(order)}
+                                >
+                                  <Trash2 className="w-4 h-4 text-red-400" />
+                                </Button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="customers" className="space-y-6">
+            <div className="flex gap-2 justify-end">
+              <Button variant="outline" onClick={fetchCustomers}>
+                REFRESH DATA
+              </Button>
+              <Button onClick={handleExportCustomersCSV}>
+                <Download className="mr-2 w-4 h-4" />
+                EXPORT CSV
+              </Button>
+            </div>
+
+            {/* Customer Filters */}
+            <Card className="bg-[#111111] border-border">
+              <CardContent className="flex flex-col gap-4 p-4 sm:flex-row">
+                <div className="relative flex-1">
+                  <Search className="absolute left-2 top-2.5 w-4 h-4 text-gray-500" />
+                  <Input
+                    placeholder="Search customers by name or email..."
+                    className="pl-8 bg-[#0a0a0a] border-border"
+                    value={customerSearch}
+                    onChange={(e) => setCustomerSearch(e.target.value)}
+                  />
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Customers Table */}
+            <Card className="bg-[#111111] border-border">
+              <CardContent className="p-0">
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="border-b border-border bg-[#0a0a0a]/50">
+                        <th className="p-4 text-xs font-medium tracking-wider text-left text-gray-400 uppercase">
+                          Name
+                        </th>
+                        <th className="p-4 text-xs font-medium tracking-wider text-left text-gray-400 uppercase">
+                          Contact
+                        </th>
+                        <th className="p-4 text-xs font-medium tracking-wider text-left text-gray-400 uppercase">
+                          Location
+                        </th>
+                        <th className="p-4 text-xs font-medium tracking-wider text-left text-gray-400 uppercase">
+                          Joined
+                        </th>
+                        <th className="p-4 text-xs font-medium tracking-wider text-right text-gray-400 uppercase">
+                          Actions
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-border">
+                      {customersLoading ? (
+                        <EcommerceCustomersTableShimmer />
+                      ) : customers.length === 0 ? (
+                        <tr>
+                          <td colSpan="5" className="p-8 text-center text-gray-400">
+                            No customers found.
+                          </td>
+                        </tr>
+                      ) : (
+                        customers.map((customer) => (
+                          <tr key={customer.id} className="transition-colors hover:bg-accent/5">
+                            <td className="p-4 font-medium text-white">{customer.name || 'Unknown'}</td>
+                            <td className="p-4">
+                              <div className="text-sm text-gray-400">{customer.email}</div>
+                              <div className="text-xs text-gray-500">{customer.phone}</div>
+                            </td>
+                            <td className="p-4 text-sm text-gray-400">
+                              {customer.address?.city && customer.address?.country
+                                ? `${customer.address.city}, ${customer.address.country}`
+                                : 'Unknown'}
+                            </td>
+                            <td className="p-4 text-sm text-gray-400">{formatDate(customer.created_at)}</td>
+                            <td className="p-4 text-right">
+                              <Button variant="ghost" size="sm" className="p-0 w-8 h-8">
+                                <Eye className="w-4 h-4 text-teal-400" />
+                              </Button>
+                            </td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
 
         {/* Delete Confirmation Dialog */}
         <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
