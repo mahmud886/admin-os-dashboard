@@ -30,6 +30,8 @@ const getStatusBadgeColor = (status) => {
       return 'border-green-500 bg-green-500/50 text-green-400 hover:bg-green-500';
     case 'UPCOMING':
       return 'border-orange-500 bg-orange-500/50 text-orange-400 hover:bg-orange-500';
+    case 'FEATURED':
+      return 'border-purple-500 bg-purple-500/50 text-purple-400 hover:bg-purple-500';
     case 'LOCKED':
       return 'border-white/50 bg-white/10 text-white hover:bg-white/20';
     case 'DRAFT':
@@ -531,6 +533,7 @@ export default function EpisodesPage() {
                                         </SelectTrigger>
                                         <SelectContent>
                                           <SelectItem value="AVAILABLE">AVAILABLE</SelectItem>
+                                          <SelectItem value="FEATURED">FEATURED</SelectItem>
                                           <SelectItem value="UPCOMING">UPCOMING</SelectItem>
                                           <SelectItem value="LOCKED">LOCKED</SelectItem>
                                           <SelectItem value="DRAFT">DRAFT</SelectItem>

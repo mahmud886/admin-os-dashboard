@@ -9,6 +9,7 @@ export const EpisodeVisibility = {
   LOCKED: 'LOCKED',
   DRAFT: 'DRAFT',
   ARCHIVED: 'ARCHIVED',
+  FEATURED: 'FEATURED',
 };
 
 // Episode access levels
@@ -35,7 +36,7 @@ export const EpisodeSchema = {
   season_number: 'integer NOT NULL',
   runtime: 'text', // Format: MM:SS or HH:MM:SS
   unique_episode_id: 'text UNIQUE NOT NULL',
-  visibility: `text NOT NULL DEFAULT 'DRAFT' CHECK (visibility IN ('AVAILABLE', 'UPCOMING', 'LOCKED', 'DRAFT', 'ARCHIVED'))`,
+  visibility: `text NOT NULL DEFAULT 'DRAFT' CHECK (visibility IN ('AVAILABLE', 'UPCOMING', 'LOCKED', 'DRAFT', 'ARCHIVED', 'FEATURED'))`,
   access_level: `text NOT NULL DEFAULT 'free' CHECK (access_level IN ('free', 'premium', 'vip'))`,
   release_datetime: 'timestamptz',
   clearance_level: 'integer DEFAULT 1',

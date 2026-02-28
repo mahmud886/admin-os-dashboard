@@ -413,6 +413,7 @@ export default function CreateEpisodePage() {
                   <SelectContent>
                     <SelectItem value="DRAFT">DRAFT - Hidden, work in progress</SelectItem>
                     <SelectItem value="AVAILABLE">AVAILABLE - Live and accessible</SelectItem>
+                    <SelectItem value="FEATURED">FEATURED - Highlighted episode</SelectItem>
                     <SelectItem value="UPCOMING">UPCOMING - Scheduled for release</SelectItem>
                     <SelectItem value="LOCKED">LOCKED - Requires clearance</SelectItem>
                     <SelectItem value="ARCHIVED">ARCHIVED - No longer active</SelectItem>

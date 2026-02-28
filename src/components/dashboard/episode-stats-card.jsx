@@ -13,6 +13,7 @@ export function EpisodeStatsCard() {
     available: 0,
     draft: 0,
     upcoming: 0,
+    featured: 0,
     loading: true,
   });
 
@@ -30,6 +31,7 @@ export function EpisodeStatsCard() {
             available: episodes.filter((e) => e.visibility === 'AVAILABLE').length,
             draft: episodes.filter((e) => e.visibility === 'DRAFT').length,
             upcoming: episodes.filter((e) => e.visibility === 'UPCOMING').length,
+            featured: episodes.filter((e) => e.visibility === 'FEATURED').length,
             loading: false,
           });
         }
@@ -47,16 +49,16 @@ export function EpisodeStatsCard() {
       {/* Total Episodes */}
       <Card className="bg-[#111111] border-border hover:border-teal-400/50 transition-colors">
         <CardHeader className="pb-2">
-          <div className="flex items-center justify-between">
+          <div className="flex justify-between items-center">
             <CardTitle className="text-sm font-medium text-gray-400">TOTAL EPISODES</CardTitle>
             <Book className="w-5 h-5 text-teal-400" />
           </div>
         </CardHeader>
         <CardContent>
-          <div className="flex items-center justify-between">
+          <div className="flex justify-between items-center">
             <div className="text-3xl font-bold text-teal-400">
               {stats.loading ? (
-                <div className="w-8 h-8 border-2 border-teal-400/10 rounded-full border-t-teal-400 animate-spin"></div>
+                <div className="w-8 h-8 rounded-full border-2 animate-spin border-teal-400/10 border-t-teal-400"></div>
               ) : (
                 stats.total
               )}
@@ -64,21 +66,25 @@ export function EpisodeStatsCard() {
             <Link href="/episodes">
               <Button variant="ghost" size="sm" className="text-gray-400 hover:text-teal-400">
                 VIEW ALL
-                <ExternalLink className="w-4 h-4 ml-2" />
+                <ExternalLink className="ml-2 w-4 h-4" />
               </Button>
             </Link>
           </div>
           {!stats.loading && (
             <div className="mt-2 space-y-1">
-              <div className="flex items-center justify-between text-xs">
+              <div className="flex justify-between items-center text-xs">
                 <span className="text-gray-500">Available:</span>
                 <span className="font-medium text-green-400">{stats.available}</span>
               </div>
-              <div className="flex items-center justify-between text-xs">
+              <div className="flex justify-between items-center text-xs">
+                <span className="text-gray-500">Featured:</span>
+                <span className="font-medium text-purple-400">{stats.featured}</span>
+              </div>
+              <div className="flex justify-between items-center text-xs">
                 <span className="text-gray-500">Draft:</span>
                 <span className="font-medium text-gray-400">{stats.draft}</span>
               </div>
-              <div className="flex items-center justify-between text-xs">
+              <div className="flex justify-between items-center text-xs">
                 <span className="text-gray-500">Upcoming:</span>
                 <span className="font-medium text-orange-400">{stats.upcoming}</span>
               </div>
@@ -90,16 +96,16 @@ export function EpisodeStatsCard() {
       {/* Available Episodes */}
       <Card className="bg-[#111111] border-border hover:border-teal-400/50 transition-colors">
         <CardHeader className="pb-2">
-          <div className="flex items-center justify-between">
+          <div className="flex justify-between items-center">
             <CardTitle className="text-sm font-medium text-gray-400">AVAILABLE EPISODES</CardTitle>
             <BookOpen className="w-5 h-5 text-green-400" />
           </div>
         </CardHeader>
         <CardContent>
-          <div className="flex items-center justify-between">
+          <div className="flex justify-between items-center">
             <div className="text-3xl font-bold text-green-400">
               {stats.loading ? (
-                <div className="w-8 h-8 border-2 border-green-400 rounded-full border-t-transparent animate-spin"></div>
+                <div className="w-8 h-8 rounded-full border-2 border-green-400 animate-spin border-t-transparent"></div>
               ) : (
                 stats.available
               )}
