@@ -240,32 +240,32 @@ export default function CreateEpisodePage() {
   return (
     <MainLayout breadcrumb="SYSTEM CONSOLE / CREATE-EPISODE">
       <div className="space-y-6">
-        <div className="flex items-center gap-4 mb-2">
+        <div className="flex gap-4 items-center mb-2">
           <Button
             variant="ghost"
             size="sm"
             onClick={() => router.push('/episodes')}
             className="text-gray-400 hover:text-teal-400"
           >
-            <ArrowLeft className="w-4 h-4 mr-2" />
+            <ArrowLeft className="mr-2 w-4 h-4" />
             BACK TO EPISODES
           </Button>
         </div>
-        <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
-          <h1 className="text-2xl font-bold text-teal-400 sm:text-3xl lg:text-4xl">FORGE NEW EPISODE</h1>
-          <div className="flex items-center w-full gap-2 sm:w-auto">
+        <div className="flex flex-col gap-4 justify-between items-start sm:flex-row sm:items-center">
+          <h1 className="text-2xl font-bold text-teal-400 sm:text-3xl lg:text-4xl">CREATE EPISODE</h1>
+          <div className="flex gap-2 items-center w-full sm:w-auto">
             <Button
               variant="outline"
               onClick={() => handleSubmit(true)}
               className="flex-1 sm:flex-initial"
               disabled={isSubmitting}
             >
-              <Save className="w-4 h-4 mr-2" />
+              <Save className="mr-2 w-4 h-4" />
               <span className="hidden sm:inline">SAVE DRAFT</span>
               <span className="sm:hidden">SAVE</span>
             </Button>
             <Button onClick={() => handleSubmit(false)} className="flex-1 sm:flex-initial" disabled={isSubmitting}>
-              <Send className="w-4 h-4 mr-2" />
+              <Send className="mr-2 w-4 h-4" />
               <span className="hidden sm:inline">DEPLOY LIVE</span>
               <span className="sm:hidden">DEPLOY</span>
             </Button>
@@ -274,7 +274,7 @@ export default function CreateEpisodePage() {
 
         {/* Error Message */}
         {error && (
-          <div className="p-4 text-sm text-red-400 border rounded-md bg-red-950/30 border-red-500/50">
+          <div className="p-4 text-sm text-red-400 rounded-md border bg-red-950/30 border-red-500/50">
             <div className="mb-1 font-semibold">Error:</div>
             <div>{error}</div>
           </div>
@@ -282,7 +282,7 @@ export default function CreateEpisodePage() {
 
         {/* Success Message */}
         {success && (
-          <div className="p-4 text-sm text-green-400 border rounded-md bg-green-950/30 border-green-500/50">
+          <div className="p-4 text-sm text-green-400 rounded-md border bg-green-950/30 border-green-500/50">
             <div className="mb-1 font-semibold">Success!</div>
             <div>Episode created successfully. Redirecting to episodes page...</div>
           </div>
@@ -501,7 +501,7 @@ export default function CreateEpisodePage() {
                 />
                 <p className="text-xs text-gray-500">Users will need this password to access the episode</p>
               </div>
-              <div className="flex items-center justify-between pt-2 border-t border-border/50">
+              <div className="flex justify-between items-center pt-2 border-t border-border/50">
                 <div className="space-y-1">
                   <Label htmlFor="notify" className="text-base font-medium text-teal-400">
                     NOTIFY USERS
@@ -510,7 +510,7 @@ export default function CreateEpisodePage() {
                 </div>
                 <Switch id="notify" checked={notify} onCheckedChange={setNotify} />
               </div>
-              <div className="flex items-center justify-between">
+              <div className="flex justify-between items-center">
                 <div className="space-y-1">
                   <Label htmlFor="age-restriction" className="text-base font-medium text-teal-400">
                     AGE RESTRICTED
@@ -610,7 +610,7 @@ export default function CreateEpisodePage() {
           <CardContent className="space-y-4">
             <div className="space-y-4">
               {tags.map((tag, index) => (
-                <div key={index} className="flex items-center gap-2">
+                <div key={index} className="flex gap-2 items-center">
                   <Input
                     placeholder={`Enter tag ${index + 1} (e.g., action, sci-fi, mystery)`}
                     value={tag}
@@ -632,7 +632,7 @@ export default function CreateEpisodePage() {
                 </div>
               ))}
               <Button variant="outline" onClick={addTag} className="w-full border-2 border-dashed">
-                <Plus className="w-4 h-4 mr-2" />
+                <Plus className="mr-2 w-4 h-4" />
                 ADD TAG
               </Button>
               <p className="text-xs text-gray-500">
@@ -684,7 +684,7 @@ export default function CreateEpisodePage() {
         </Card>
 
         {/* Action Buttons Section */}
-        <div className="flex items-center justify-end gap-4 pt-4 border-t border-border">
+        <div className="flex gap-4 justify-end items-center pt-4 border-t border-border">
           <Button
             variant="outline"
             onClick={() => handleSubmit(true)}
@@ -693,12 +693,12 @@ export default function CreateEpisodePage() {
           >
             {isSubmitting ? (
               <>
-                <div className="w-4 h-4 mr-2 border-2 border-teal-400 rounded-full border-t-transparent animate-spin"></div>
+                <div className="mr-2 w-4 h-4 rounded-full border-2 border-teal-400 animate-spin border-t-transparent"></div>
                 SAVING...
               </>
             ) : (
               <>
-                <Save className="w-4 h-4 mr-2" />
+                <Save className="mr-2 w-4 h-4" />
                 SAVE DRAFT
               </>
             )}
@@ -706,12 +706,12 @@ export default function CreateEpisodePage() {
           <Button onClick={() => handleSubmit(false)} className="min-w-[140px]" disabled={isSubmitting}>
             {isSubmitting ? (
               <>
-                <div className="w-4 h-4 mr-2 border-2 border-white rounded-full border-t-transparent animate-spin"></div>
+                <div className="mr-2 w-4 h-4 rounded-full border-2 border-white animate-spin border-t-transparent"></div>
                 DEPLOYING...
               </>
             ) : (
               <>
-                <Send className="w-4 h-4 mr-2" />
+                <Send className="mr-2 w-4 h-4" />
                 DEPLOY LIVE
               </>
             )}

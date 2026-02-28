@@ -403,7 +403,7 @@ export default function PollsPage() {
     <MainLayout breadcrumb="SYSTEM CONSOLE / POLLS">
       <div className="space-y-6">
         <div className="flex flex-col gap-4 justify-between items-start sm:flex-row sm:items-center">
-          <h1 className="text-2xl font-bold text-teal-400 sm:text-3xl lg:text-4xl">ACTIVE PROTOCOLS</h1>
+          <h1 className="text-2xl font-bold text-teal-400 sm:text-3xl lg:text-4xl">MANAGE POLLS</h1>
           <div className="flex gap-2 items-center w-full sm:w-auto">
             <Button variant="outline" onClick={handleExportCSV} className="flex-1 sm:flex-initial">
               <Download className="mr-2 w-4 h-4" />
