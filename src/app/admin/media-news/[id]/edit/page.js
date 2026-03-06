@@ -118,8 +118,8 @@ export default function EditMediaNewsPage({ params }) {
   if (loading) {
     return (
       <MainLayout breadcrumb="SYSTEM CONSOLE / MEDIA NEWS">
-        <div className="flex items-center justify-center h-96">
-          <Loader2 className="w-8 h-8 animate-spin text-teal-500" />
+        <div className="flex justify-center items-center h-96">
+          <Loader2 className="w-8 h-8 text-teal-500 animate-spin" />
         </div>
       </MainLayout>
     );
@@ -127,37 +127,37 @@ export default function EditMediaNewsPage({ params }) {
 
   return (
     <MainLayout breadcrumb="SYSTEM CONSOLE / MEDIA NEWS / EDIT ENTRY">
-      <div className="w-full max-w-none px-6 space-y-6">
-        <div className="flex items-center justify-between">
+      <div className="px-6 space-y-6 w-full max-w-none">
+        <div className="flex justify-between items-center">
           <Link href="/admin/media-news">
             <Button variant="ghost" className="pl-0 text-gray-400 hover:text-teal-400">
-              <ArrowLeft className="w-4 h-4 mr-2" />
+              <ArrowLeft className="mr-2 w-4 h-4" />
               CANCEL
             </Button>
           </Link>
-          <div className="flex items-center gap-2">
+          <div className="flex gap-2 items-center">
             <Button
               variant="destructive"
               onClick={handleDelete}
               disabled={saving}
-              className="bg-red-500/10 text-red-500 hover:bg-red-500/20"
+              className="text-red-500 bg-red-500/10 hover:bg-red-500/20"
             >
-              <Trash2 className="w-4 h-4 mr-2" />
+              <Trash2 className="mr-2 w-4 h-4" />
               DELETE
             </Button>
             <Button
               onClick={handleSubmit}
               disabled={saving || !formData.title || !formData.content}
-              className="bg-teal-500 hover:bg-teal-600 text-black font-semibold"
+              className="font-semibold text-black bg-teal-500 hover:bg-teal-600"
             >
-              {saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
+              {saving ? <Loader2 className="mr-2 w-4 h-4 animate-spin" /> : <Save className="mr-2 w-4 h-4" />}
               SAVE CHANGES
             </Button>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 space-y-6">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+          <div className="space-y-6 lg:col-span-2">
             <Card className="bg-[#111111] border-border">
               <CardContent className="p-6 space-y-4">
                 <div className="space-y-2">

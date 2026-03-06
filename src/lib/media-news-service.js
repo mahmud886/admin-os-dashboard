@@ -79,6 +79,9 @@ export const mediaNewsService = {
     const supabase = await createClient();
     const dbData = mapToDB(newsData);
 
+    // Update published_at to current time on edit
+    dbData.published_at = new Date().toISOString();
+
     const { data, error } = await supabase.from('media_news').update(dbData).eq('id', id).select().single();
 
     if (error) throw error;
