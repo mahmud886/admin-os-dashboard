@@ -1,17 +1,18 @@
 'use client';
 
+import RichTextEditor from '@/components/editor/rich-text-editor';
 import { MainLayout } from '@/components/layout/main-layout';
+import { BlogPreviewModal } from '@/components/preview/blog-preview-modal';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import RichTextEditor from '@/components/editor/rich-text-editor';
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { ArrowLeft, Save, Loader2 } from 'lucide-react';
-import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
+import { ArrowLeft, Loader2, Save } from 'lucide-react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 export default function CreateBlogPage() {
   const router = useRouter();
@@ -73,26 +74,29 @@ export default function CreateBlogPage() {
 
   return (
     <MainLayout breadcrumb="SYSTEM CONSOLE / BLOGS / NEW ENTRY">
-      <div className="w-full max-w-none px-6 space-y-6">
-        <div className="flex items-center justify-between">
+      <div className="px-6 space-y-6 w-full max-w-none">
+        <div className="flex justify-between items-center">
           <Link href="/admin/blogs">
             <Button variant="ghost" className="pl-0 text-gray-400 hover:text-teal-400">
-              <ArrowLeft className="w-4 h-4 mr-2" />
+              <ArrowLeft className="mr-2 w-4 h-4" />
               CANCEL
             </Button>
           </Link>
-          <Button
-            onClick={handleSubmit}
-            disabled={loading || !formData.title || !formData.content}
-            className="bg-teal-500 hover:bg-teal-600 text-black font-semibold"
-          >
-            {loading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
-            PUBLISH ENTRY
-          </Button>
+          <div className="flex gap-2">
+            <BlogPreviewModal blog={formData} />
+            <Button
+              onClick={handleSubmit}
+              disabled={loading || !formData.title || !formData.content}
+              className="font-semibold text-black bg-teal-500 hover:bg-teal-600"
+            >
+              {loading ? <Loader2 className="mr-2 w-4 h-4 animate-spin" /> : <Save className="mr-2 w-4 h-4" />}
+              PUBLISH ENTRY
+            </Button>
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 space-y-6">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+          <div className="space-y-6 lg:col-span-2">
             <Card className="bg-[#111111] border-border">
               <CardContent className="p-6 space-y-4">
                 <div className="space-y-2">
@@ -155,8 +159,8 @@ export default function CreateBlogPage() {
                 </div>
 
                 {formData.coverImage && (
-                  <div className="rounded-lg overflow-hidden border border-border aspect-video">
-                    <img src={formData.coverImage} alt="Preview" className="w-full h-full object-cover" />
+                  <div className="overflow-hidden rounded-lg border border-border aspect-video">
+                    <img src={formData.coverImage} alt="Preview" className="object-cover w-full h-full" />
                   </div>
                 )}
 
