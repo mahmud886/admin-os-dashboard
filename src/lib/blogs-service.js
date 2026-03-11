@@ -11,6 +11,8 @@ function mapToModel(record) {
     coverImage: record.cover_image,
     tags: record.tags || [],
     author: record.author,
+    isPasswordProtected: record.is_password_protected || false,
+    accessPassword: record.access_password || '',
     publishedAt: record.published_at,
     createdAt: record.created_at,
     updatedAt: record.updated_at,
@@ -26,6 +28,8 @@ function mapToDB(model) {
     cover_image: model.coverImage,
     tags: model.tags,
     author: model.author,
+    is_password_protected: model.isPasswordProtected,
+    access_password: model.accessPassword,
     // published_at is usually handled by default or specific logic
   };
 }

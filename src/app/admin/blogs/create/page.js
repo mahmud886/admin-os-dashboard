@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import { useAuth } from '@/context/AuthContext';
 import { ArrowLeft, Loader2, Save } from 'lucide-react';
@@ -25,11 +26,17 @@ export default function CreateBlogPage() {
     coverImage: '',
     tags: '',
     content: '',
+    isPasswordProtected: false,
+    accessPassword: '',
   });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSwitchChange = (checked) => {
+    setFormData((prev) => ({ ...prev, isPasswordProtected: checked }));
   };
 
   const handleContentChange = (content) => {
@@ -174,6 +181,33 @@ export default function CreateBlogPage() {
                     className="bg-[#1a1a1a] border-border text-gray-300 focus:border-teal-500/50"
                   />
                 </div>
+
+                <div className="flex items-center pt-4 space-x-4 border-t border-border">
+                  <div className="flex items-center space-x-2">
+                    <Switch
+                      id="password-protection"
+                      checked={formData.isPasswordProtected}
+                      onCheckedChange={handleSwitchChange}
+                    />
+                    <Label htmlFor="password-protection" className="text-gray-300 cursor-pointer">
+                      Password Protected
+                    </Label>
+                  </div>
+                </div>
+
+                {formData.isPasswordProtected && (
+                  <div className="space-y-2 animate-in fade-in slide-in-from-top-2">
+                    <Label className="text-teal-400">ACCESS PASSWORD</Label>
+                    <Input
+                      name="accessPassword"
+                      type="password"
+                      value={formData.accessPassword}
+                      onChange={handleChange}
+                      placeholder="Set access password"
+                      className="bg-[#1a1a1a] border-teal-500/50 text-white focus:border-teal-500"
+                    />
+                  </div>
+                )}
               </CardContent>
             </Card>
           </div>
