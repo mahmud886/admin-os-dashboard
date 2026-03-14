@@ -165,6 +165,13 @@
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
+.blog-content video {
+  width: 100%;
+  border-radius: 8px;
+  margin: 2rem 0;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
 /* Glitch Text Effect Simulation */
 .glitch-text {
   position: relative;

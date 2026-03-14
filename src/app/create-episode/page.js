@@ -81,8 +81,32 @@ export default function CreateEpisodePage() {
     if (!episodeSeason || episodeSeason === '') {
       errors.push('Season number is required');
     }
+    if (!episodeRuntime.trim()) {
+      errors.push('Runtime is required');
+    }
     if (!uniqueEpisodeId.trim()) {
       errors.push('Unique episode ID is required');
+    }
+    if (!visibility) {
+      errors.push('Visibility is required');
+    }
+    if (!accessLevel) {
+      errors.push('Access Level is required');
+    }
+    if (!releaseDateTime) {
+      errors.push('Release Date Time is required');
+    }
+    if (!clearanceLevel) {
+      errors.push('Clearance Level is required');
+    }
+    if (!episodeDescription.trim()) {
+      errors.push('Description is required');
+    }
+    if (!thumbImageUrl.trim()) {
+      errors.push('Thumb Image URL is required');
+    }
+    if (!bannerImageUrl.trim()) {
+      errors.push('Banner Image URL is required');
     }
 
     // Validate unique episode ID format (optional pattern check)
@@ -313,7 +337,7 @@ export default function CreateEpisodePage() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="episode-description" className="text-gray-300">
-                  EPISODE DESCRIPTION
+                  EPISODE DESCRIPTION <span className="text-red-400">*</span>
                 </Label>
                 <Textarea
                   id="episode-description"
@@ -321,9 +345,10 @@ export default function CreateEpisodePage() {
                   value={episodeDescription}
                   onChange={(e) => setEpisodeDescription(e.target.value)}
                   className="min-h-[100px] bg-[#0a0a0a] border-border resize-none focus:ring-2 focus:ring-teal-400 focus:border-teal-400 focus:outline-none"
+                  required
                   autoComplete="off"
                 />
-                <p className="text-xs text-gray-500">Optional: Describe the episode's storyline and content</p>
+                <p className="text-xs text-gray-500">Describe the episode's storyline and content</p>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
@@ -363,7 +388,7 @@ export default function CreateEpisodePage() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="episode-runtime" className="text-gray-300">
-                  EPISODE RUNTIME
+                  EPISODE RUNTIME <span className="text-red-400">*</span>
                 </Label>
                 <Input
                   id="episode-runtime"
@@ -371,11 +396,10 @@ export default function CreateEpisodePage() {
                   value={episodeRuntime}
                   onChange={(e) => setEpisodeRuntime(e.target.value)}
                   className="bg-[#0a0a0a] border-border focus:ring-2 focus:ring-teal-400 focus:border-teal-400 focus:outline-none"
+                  required
                   autoComplete="off"
                 />
-                <p className="text-xs text-gray-500">
-                  Format: MM:SS (e.g., 42:15) or HH:MM:SS (e.g., 1:30:45) - Optional
-                </p>
+                <p className="text-xs text-gray-500">Format: MM:SS (e.g., 42:15) or HH:MM:SS (e.g., 1:30:45)</p>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="episode-id" className="text-gray-300">
@@ -404,9 +428,9 @@ export default function CreateEpisodePage() {
             <CardContent className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="visibility" className="text-gray-300">
-                  VISIBILITY STATUS
+                  VISIBILITY STATUS <span className="text-red-400">*</span>
                 </Label>
-                <Select value={visibility} onValueChange={setVisibility}>
+                <Select value={visibility} onValueChange={setVisibility} required>
                   <SelectTrigger className="bg-[#0a0a0a] border-border focus:ring-2 focus:ring-teal-400 focus:border-teal-400">
                     <SelectValue placeholder="Choose visibility status..." />
                   </SelectTrigger>
@@ -423,9 +447,9 @@ export default function CreateEpisodePage() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="access-level" className="text-gray-300">
-                  ACCESS LEVEL
+                  ACCESS LEVEL <span className="text-red-400">*</span>
                 </Label>
-                <Select value={accessLevel} onValueChange={setAccessLevel}>
+                <Select value={accessLevel} onValueChange={setAccessLevel} required>
                   <SelectTrigger className="bg-[#0a0a0a] border-border focus:ring-2 focus:ring-teal-400 focus:border-teal-400">
                     <SelectValue placeholder="Choose access level..." />
                   </SelectTrigger>
@@ -439,7 +463,7 @@ export default function CreateEpisodePage() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="release-datetime" className="text-gray-300">
-                  RELEASE DATE & TIME
+                  RELEASE DATE & TIME <span className="text-red-400">*</span>
                 </Label>
                 <Input
                   id="release-datetime"
@@ -468,12 +492,13 @@ export default function CreateEpisodePage() {
                   }}
                   className="bg-[#0a0a0a] border-border focus:ring-2 focus:ring-teal-400 focus:border-teal-400 focus:outline-none cursor-pointer"
                   autoComplete="off"
+                  required
                 />
                 <p className="text-xs text-gray-500">Optional: Click to open calendar and time picker</p>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="clearance-level" className="text-gray-300">
-                  CLEARANCE LEVEL
+                  CLEARANCE LEVEL <span className="text-red-400">*</span>
                 </Label>
                 <Input
                   id="clearance-level"
@@ -484,6 +509,7 @@ export default function CreateEpisodePage() {
                   onChange={(e) => setClearanceLevel(e.target.value)}
                   className="bg-[#0a0a0a] border-border focus:ring-2 focus:ring-teal-400 focus:border-teal-400 focus:outline-none"
                   autoComplete="off"
+                  required
                 />
                 <p className="text-xs text-gray-500">Security clearance required (1-5). Default: 1</p>
               </div>

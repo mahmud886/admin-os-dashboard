@@ -87,7 +87,7 @@ export async function PUT(request, { params }) {
     if (body.unique_episode_id !== undefined) updateData.unique_episode_id = body.unique_episode_id;
     if (body.visibility !== undefined) updateData.visibility = body.visibility;
     if (body.access_level !== undefined) updateData.access_level = body.access_level;
-    if (body.release_datetime !== undefined) updateData.release_datetime = body.release_datetime;
+    if (body.release_datetime !== undefined) updateData.release_datetime = body.release_datetime || null;
     if (body.clearance_level !== undefined) updateData.clearance_level = parseInt(body.clearance_level);
     if (body.notify !== undefined) updateData.notify = body.notify;
     if (body.age_restricted !== undefined) updateData.age_restricted = body.age_restricted;

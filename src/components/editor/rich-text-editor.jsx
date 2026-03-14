@@ -1,25 +1,28 @@
 'use client';
 
-import { useEditor, EditorContent } from '@tiptap/react';
-import StarterKit from '@tiptap/starter-kit';
+import { Video } from '@/components/editor/video-extension';
+import { Button } from '@/components/ui/button';
 import Image from '@tiptap/extension-image';
 import Link from '@tiptap/extension-link';
 import Placeholder from '@tiptap/extension-placeholder';
+import Youtube from '@tiptap/extension-youtube';
+import { EditorContent, useEditor } from '@tiptap/react';
+import StarterKit from '@tiptap/starter-kit';
 import {
   Bold,
+  Heading1,
+  Heading2,
+  Image as ImageIcon,
   Italic,
+  Link as LinkIcon,
   List,
   ListOrdered,
   Quote,
-  Heading1,
-  Heading2,
-  Undo,
   Redo,
-  Link as LinkIcon,
-  Image as ImageIcon,
-  Code,
+  Undo,
+  Video as VideoIcon,
+  Youtube as YoutubeIcon,
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 
 const MenuBar = ({ editor }) => {
   if (!editor) {
@@ -47,6 +50,26 @@ const MenuBar = ({ editor }) => {
     }
 
     editor.chain().focus().extendMarkRange('link').setLink({ href: url }).run();
+  };
+
+  const addYoutubeVideo = () => {
+    const url = window.prompt('Enter YouTube URL');
+
+    if (url) {
+      editor.commands.setYoutubeVideo({
+        src: url,
+        width: 640,
+        height: 480,
+      });
+    }
+  };
+
+  const addVideo = () => {
+    const url = window.prompt('Enter Video URL');
+
+    if (url) {
+      editor.commands.setVideo({ src: url });
+    }
   };
 
   return (
@@ -118,6 +141,12 @@ const MenuBar = ({ editor }) => {
       <Button variant="ghost" size="sm" onClick={addImage} className="text-gray-400">
         <ImageIcon className="w-4 h-4" />
       </Button>
+      <Button variant="ghost" size="sm" onClick={addYoutubeVideo} className="text-gray-400">
+        <YoutubeIcon className="w-4 h-4" />
+      </Button>
+      <Button variant="ghost" size="sm" onClick={addVideo} className="text-gray-400">
+        <VideoIcon className="w-4 h-4" />
+      </Button>
       <Button variant="ghost" size="sm" onClick={() => editor.chain().focus().undo().run()} className="text-gray-400">
         <Undo className="w-4 h-4" />
       </Button>
@@ -136,6 +165,11 @@ export default function RichTextEditor({ content, onChange, editable = true }) {
       Link.configure({
         openOnClick: false,
       }),
+      Youtube.configure({
+        controls: true,
+        nocookie: true,
+      }),
+      Video,
       Placeholder.configure({
         placeholder: 'Write something amazing...',
       }),

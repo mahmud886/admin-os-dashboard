@@ -128,6 +128,29 @@ export default function EpisodesPage() {
   const handleUpdateEpisode = async () => {
     if (!selectedEpisode) return;
 
+    const errors = [];
+    if (!editFormData.title?.trim()) errors.push('Episode title is required');
+    if (!editFormData.episode_number) errors.push('Episode number is required');
+    if (!editFormData.season_number) errors.push('Season number is required');
+    if (!editFormData.runtime) errors.push('Runtime is required');
+    if (!editFormData.visibility) errors.push('Visibility is required');
+    if (!editFormData.access_level) errors.push('Access level is required');
+    if (!editFormData.release_datetime) errors.push('Release Date & Time is required');
+    if (!editFormData.clearance_level) errors.push('Clearance level is required');
+    if (!editFormData.description) errors.push('Description is required');
+    if (!editFormData.thumb_image_url) errors.push('Thumb image URL is required');
+    if (!editFormData.banner_image_url) errors.push('Banner image URL is required');
+
+    if (errors.length > 0) {
+      addToast({
+        variant: 'error',
+        title: 'Validation Error',
+        description: errors.join('. '),
+        duration: 5000,
+      });
+      return;
+    }
+
     try {
       setIsUpdating(true);
       const response = await fetch(`/api/episodes/${selectedEpisode.id}`, {
@@ -542,12 +565,15 @@ export default function EpisodesPage() {
                                       </Select>
                                     </div>
                                     <div className="space-y-2">
-                                      <Label htmlFor="edit-access-level">Access Level</Label>
+                                      <Label htmlFor="edit-access-level">
+                                        Access Level <span className="text-red-400">*</span>
+                                      </Label>
                                       <Select
                                         value={editFormData.access_level || 'free'}
                                         onValueChange={(value) =>
                                           setEditFormData({ ...editFormData, access_level: value })
                                         }
+                                        required
                                       >
                                         <SelectTrigger className="bg-[#0a0a0a] border-border">
                                           <SelectValue />
@@ -560,7 +586,9 @@ export default function EpisodesPage() {
                                       </Select>
                                     </div>
                                     <div className="space-y-2">
-                                      <Label htmlFor="edit-release-datetime">Release Date & Time</Label>
+                                      <Label htmlFor="edit-release-datetime">
+                                        Release Date & Time <span className="text-red-400">*</span>
+                                      </Label>
                                       <Input
                                         id="edit-release-datetime"
                                         type="datetime-local"
@@ -569,10 +597,13 @@ export default function EpisodesPage() {
                                           setEditFormData({ ...editFormData, release_datetime: e.target.value })
                                         }
                                         className="bg-[#0a0a0a] border-border"
+                                        required
                                       />
                                     </div>
                                     <div className="space-y-2">
-                                      <Label htmlFor="edit-clearance-level">Clearance Level</Label>
+                                      <Label htmlFor="edit-clearance-level">
+                                        Clearance Level <span className="text-red-400">*</span>
+                                      </Label>
                                       <Input
                                         id="edit-clearance-level"
                                         type="number"
@@ -585,6 +616,7 @@ export default function EpisodesPage() {
                                           })
                                         }
                                         className="bg-[#0a0a0a] border-border"
+                                        required
                                       />
                                     </div>
                                     <div className="space-y-2">
@@ -625,7 +657,9 @@ export default function EpisodesPage() {
                                     </div>
                                   </div>
                                   <div className="space-y-2">
-                                    <Label htmlFor="edit-description">Description</Label>
+                                    <Label htmlFor="edit-description">
+                                      Description <span className="text-red-400">*</span>
+                                    </Label>
                                     <Textarea
                                       id="edit-description"
                                       value={editFormData.description || ''}
@@ -633,6 +667,7 @@ export default function EpisodesPage() {
                                         setEditFormData({ ...editFormData, description: e.target.value })
                                       }
                                       className="min-h-[100px] bg-[#0a0a0a] border-border resize-none"
+                                      required
                                     />
                                   </div>
                                   <div className="grid grid-cols-2 gap-4">
@@ -687,7 +722,9 @@ export default function EpisodesPage() {
                                   </div>
                                   <div className="grid grid-cols-2 gap-4">
                                     <div className="space-y-2">
-                                      <Label htmlFor="edit-thumb-image">Thumb Image URL</Label>
+                                      <Label htmlFor="edit-thumb-image">
+                                        Thumb Image URL <span className="text-red-400">*</span>
+                                      </Label>
                                       <Input
                                         id="edit-thumb-image"
                                         value={editFormData.thumb_image_url || ''}
@@ -696,10 +733,13 @@ export default function EpisodesPage() {
                                         }
                                         placeholder="https://example.com/thumbnail.jpg"
                                         className="bg-[#0a0a0a] border-border"
+                                        required
                                       />
                                     </div>
                                     <div className="space-y-2">
-                                      <Label htmlFor="edit-banner-image">Banner Image URL</Label>
+                                      <Label htmlFor="edit-banner-image">
+                                        Banner Image URL <span className="text-red-400">*</span>
+                                      </Label>
                                       <Input
                                         id="edit-banner-image"
                                         value={editFormData.banner_image_url || ''}
@@ -708,6 +748,7 @@ export default function EpisodesPage() {
                                         }
                                         placeholder="https://example.com/banner.jpg"
                                         className="bg-[#0a0a0a] border-border"
+                                        required
                                       />
                                     </div>
                                     <div className="space-y-2">
