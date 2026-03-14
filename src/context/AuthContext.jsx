@@ -78,23 +78,22 @@ export function AuthProvider({ children }) {
       const staticEmail = process.env.NEXT_PUBLIC_STATIC_ADMIN_EMAIL;
       const staticPassword = process.env.NEXT_PUBLIC_STATIC_ADMIN_PASSWORD;
 
-      if (!staticEmail || !staticPassword) {
-        throw new Error('Server configuration error. Please contact administrator.');
-      }
+      // Only perform static check if the environment variables are actually set
+      if (staticEmail && staticPassword) {
+        // Trim and normalize email for comparison
+        const normalizedEmail = email.trim().toLowerCase();
+        const normalizedStaticEmail = staticEmail.trim().toLowerCase();
 
-      // Trim and normalize email for comparison
-      const normalizedEmail = email.trim().toLowerCase();
-      const normalizedStaticEmail = staticEmail.trim().toLowerCase();
-
-      // Validate credentials match static user before calling Supabase
-      if (normalizedEmail !== normalizedStaticEmail || password !== staticPassword) {
-        throw new Error('Invalid credentials. Access denied.');
+        // Validate credentials match static user before calling Supabase
+        if (normalizedEmail !== normalizedStaticEmail || password !== staticPassword) {
+          throw new Error('Invalid credentials. Access denied.');
+        }
       }
 
       // If credentials match, proceed with Supabase sign-in
       const { data, error } = await supabase.auth.signInWithPassword({
-        email: staticEmail, // Use the exact email from env for Supabase
-        password: staticPassword, // Use the exact password from env for Supabase
+        email: email.trim().toLowerCase(), // Use the email from the form
+        password: password, // Use the password from the form
       });
 
       if (error) {
