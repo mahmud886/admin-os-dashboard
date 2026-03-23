@@ -29,18 +29,18 @@ export async function GET(request) {
     const { data, error, count } = await query;
 
     if (error) {
-      console.error('Error fetching orders:', error);
+      console.error('Database error:', error);
       return createErrorResponse('Failed to fetch orders', 500, error.message);
     }
 
     return createResponse({
-      orders: data || [],
-      total: count || 0,
+      orders: data,
+      count,
       limit,
       offset,
     });
   } catch (error) {
-    console.error('Internal error fetching orders:', error);
+    console.error('Server error:', error);
     return createErrorResponse('Internal server error', 500, error.message);
   }
 }

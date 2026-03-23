@@ -54,10 +54,29 @@ const formatDate = (dateString) => {
 };
 
 const formatCurrency = (amount, currency = 'usd') => {
+  // Convert string to number if needed, handle NaN gracefully
+  const numericAmount = typeof amount === 'string' ? parseFloat(amount) : Number(amount);
+  const safeAmount = isNaN(numericAmount) ? 0 : numericAmount;
+
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: currency,
-  }).format(amount);
+  }).format(safeAmount);
+};
+
+const calculateTotal = (order) => {
+  if (!order) return 0;
+  // If amount_total already includes tax and shipping in the future, we might need a flag.
+  // But for now, we add metadata tax and shipping to the base amount.
+  const baseAmount =
+    typeof order.amount_total === 'string' ? parseFloat(order.amount_total) : Number(order.amount_total) || 0;
+  const tax =
+    typeof order.metadata?.tax === 'string' ? parseFloat(order.metadata.tax) : Number(order.metadata?.tax) || 0;
+  const shipping =
+    typeof order.metadata?.shipping === 'string'
+      ? parseFloat(order.metadata.shipping)
+      : Number(order.metadata?.shipping) || 0;
+  return baseAmount + tax + shipping;
 };
 
 export default function OrdersPage() {
@@ -198,7 +217,7 @@ export default function OrdersPage() {
           `"${(order.ecommerce_customers?.email || '').replace(/"/g, '""')}"`,
           `"${(order.status || '').replace(/"/g, '""')}"`,
           `"${(order.payment_status || '').replace(/"/g, '""')}"`,
-          `"${order.amount_total || 0}"`,
+          `"${calculateTotal(order)}"`,
           `"${(order.currency || 'USD').toUpperCase()}"`,
           `"${order.created_at ? new Date(order.created_at).toISOString() : ''}"`,
         ];
@@ -360,7 +379,7 @@ export default function OrdersPage() {
                               </Badge>
                             </td>
                             <td className="p-4 text-sm font-medium text-white">
-                              {formatCurrency(order.amount_total, order.currency)}
+                              {formatCurrency(calculateTotal(order), order.currency)}
                             </td>
                             <td className="p-4 text-sm text-gray-400">{formatDate(order.created_at)}</td>
                             <td className="p-4 text-right">
@@ -534,10 +553,36 @@ export default function OrdersPage() {
                     </Badge>
                   </div>
                   <div className="flex flex-col gap-1 ml-auto text-right">
-                    <span className="text-xs text-gray-500 uppercase">Total Amount</span>
-                    <span className="text-lg font-bold text-teal-400">
-                      {formatCurrency(selectedOrder.amount_total, selectedOrder.currency)}
-                    </span>
+                    <div className="text-xs text-gray-500">
+                      <span className="mr-2 uppercase">Subtotal:</span>
+                      <span className="text-white">
+                        {formatCurrency(
+                          selectedOrder.subtotal || selectedOrder.metadata?.subtotal || 0,
+                          selectedOrder.currency
+                        )}
+                      </span>
+                    </div>
+                    <div className="text-xs text-gray-500">
+                      <span className="mr-2 uppercase">Shipping:</span>
+                      <span className="text-white">
+                        {formatCurrency(
+                          selectedOrder.shipping || selectedOrder.metadata?.shipping || 0,
+                          selectedOrder.currency
+                        )}
+                      </span>
+                    </div>
+                    <div className="text-xs text-gray-500">
+                      <span className="mr-2 uppercase">Tax:</span>
+                      <span className="text-white">
+                        {formatCurrency(selectedOrder.tax || selectedOrder.metadata?.tax || 0, selectedOrder.currency)}
+                      </span>
+                    </div>
+                    <div className="pt-2 mt-1 border-t border-border">
+                      <span className="mr-2 text-xs text-gray-500 uppercase">Total Amount</span>
+                      <span className="text-lg font-bold text-teal-400">
+                        {formatCurrency(calculateTotal(selectedOrder), selectedOrder.currency)}
+                      </span>
+                    </div>
                   </div>
                 </div>
 
