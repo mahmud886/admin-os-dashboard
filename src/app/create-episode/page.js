@@ -1,60 +1,67 @@
-'use client';
+"use client";
 
-import { MainLayout } from '@/components/layout/main-layout';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Switch } from '@/components/ui/switch';
-import { Textarea } from '@/components/ui/textarea';
-import { useToast } from '@/components/ui/toast';
-import { ArrowLeft, Plus, Save, Send, Trash2 } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { MainLayout } from "@/components/layout/main-layout";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/components/ui/toast";
+import { ArrowLeft, Plus, Save, Send, Trash2 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 export default function CreateEpisodePage() {
   const router = useRouter();
   const { addToast } = useToast();
 
   // Basic Episode Information
-  const [episodeTitle, setEpisodeTitle] = useState('');
-  const [episodeDescription, setEpisodeDescription] = useState('');
-  const [episodeNumber, setEpisodeNumber] = useState('');
-  const [episodeSeason, setEpisodeSeason] = useState('');
-  const [episodeRuntime, setEpisodeRuntime] = useState('');
+  const [episodeTitle, setEpisodeTitle] = useState("");
+  const [episodeDescription, setEpisodeDescription] = useState("");
+  const [episodeNumber, setEpisodeNumber] = useState("");
+  const [episodeSeason, setEpisodeSeason] = useState("");
+  const [episodeRuntime, setEpisodeRuntime] = useState("");
   const [notify, setNotify] = useState(false);
-  const [uniqueEpisodeId, setUniqueEpisodeId] = useState('');
+  const [uniqueEpisodeId, setUniqueEpisodeId] = useState("");
 
   // Visibility & Access
-  const [visibility, setVisibility] = useState('');
-  const [accessLevel, setAccessLevel] = useState('');
-  const [releaseDateTime, setReleaseDateTime] = useState('');
-  const [clearanceLevel, setClearanceLevel] = useState('');
-  const [password, setPassword] = useState('');
+  const [visibility, setVisibility] = useState("");
+  const [accessLevel, setAccessLevel] = useState("");
+  const [releaseDateTime, setReleaseDateTime] = useState("");
+  const [clearanceLevel, setClearanceLevel] = useState("");
+  const [password, setPassword] = useState("");
   const [ageRestricted, setAgeRestricted] = useState(false);
 
   // Media Assets
-  const [thumbImageUrl, setThumbImageUrl] = useState('');
-  const [bannerImageUrl, setBannerImageUrl] = useState('');
-  const [videoUrl, setVideoUrl] = useState('');
-  const [audioUrl, setAudioUrl] = useState('');
-  const [additionalBackgroundImageUrl, setAdditionalBackgroundImageUrl] = useState('');
+  const [thumbImageUrl, setThumbImageUrl] = useState("");
+  const [bannerImageUrl, setBannerImageUrl] = useState("");
+  const [videoUrl, setVideoUrl] = useState("");
+  const [audioUrl, setAudioUrl] = useState("");
+  const [additionalBackgroundImageUrl, setAdditionalBackgroundImageUrl] =
+    useState("");
 
   // Dynamic Lists
-  const [tags, setTags] = useState(['']);
+  const [tags, setTags] = useState([""]);
 
   // Genre fields
-  const [primaryGenre, setPrimaryGenre] = useState('');
-  const [secondaryGenre, setSecondaryGenre] = useState('');
+  const [primaryGenre, setPrimaryGenre] = useState("");
+  const [secondaryGenre, setSecondaryGenre] = useState("");
 
   // Form state
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
 
   const addTag = () => {
-    setTags([...tags, '']);
+    setTags([...tags, ""]);
   };
 
   const removeTag = (index) => {
@@ -73,69 +80,84 @@ export default function CreateEpisodePage() {
 
     // Required fields
     if (!episodeTitle.trim()) {
-      errors.push('Episode title is required');
+      errors.push("Episode title is required");
     }
-    if (!episodeNumber || episodeNumber === '') {
-      errors.push('Episode number is required');
+    if (!episodeNumber || episodeNumber === "") {
+      errors.push("Episode number is required");
     }
-    if (!episodeSeason || episodeSeason === '') {
-      errors.push('Season number is required');
+    if (!episodeSeason || episodeSeason === "") {
+      errors.push("Season number is required");
     }
     if (!episodeRuntime.trim()) {
-      errors.push('Runtime is required');
+      errors.push("Runtime is required");
     }
     if (!uniqueEpisodeId.trim()) {
-      errors.push('Unique episode ID is required');
+      errors.push("Unique episode ID is required");
     }
     if (!visibility) {
-      errors.push('Visibility is required');
+      errors.push("Visibility is required");
     }
     if (!accessLevel) {
-      errors.push('Access Level is required');
+      errors.push("Access Level is required");
     }
     if (!releaseDateTime) {
-      errors.push('Release Date Time is required');
+      errors.push("Release Date Time is required");
     }
     if (!clearanceLevel) {
-      errors.push('Clearance Level is required');
+      errors.push("Clearance Level is required");
     }
     if (!episodeDescription.trim()) {
-      errors.push('Description is required');
+      errors.push("Description is required");
     }
     if (!thumbImageUrl.trim()) {
-      errors.push('Thumb Image URL is required');
+      errors.push("Thumb Image URL is required");
     }
     if (!bannerImageUrl.trim()) {
-      errors.push('Banner Image URL is required');
+      errors.push("Banner Image URL is required");
     }
 
     // Validate unique episode ID format (optional pattern check)
     if (uniqueEpisodeId && !/^[A-Z0-9\-_]+$/i.test(uniqueEpisodeId)) {
-      errors.push('Unique episode ID can only contain letters, numbers, hyphens, and underscores');
+      errors.push(
+        "Unique episode ID can only contain letters, numbers, hyphens, and underscores",
+      );
     }
 
     // Validate runtime format (MM:SS or HH:MM:SS)
-    if (episodeRuntime && !/^(\d{1,2}):([0-5][0-9])(:([0-5][0-9]))?$/.test(episodeRuntime)) {
-      errors.push('Runtime must be in format MM:SS or HH:MM:SS (e.g., 42:15 or 1:30:45)');
+    if (
+      episodeRuntime &&
+      !/^(\d{1,2}):([0-5][0-9])(:([0-5][0-9]))?$/.test(episodeRuntime)
+    ) {
+      errors.push(
+        "Runtime must be in format MM:SS or HH:MM:SS (e.g., 42:15 or 1:30:45)",
+      );
     }
 
     // Validate clearance level
-    if (clearanceLevel && (isNaN(clearanceLevel) || parseInt(clearanceLevel) < 1)) {
-      errors.push('Clearance level must be a number greater than 0');
+    if (
+      clearanceLevel &&
+      (isNaN(clearanceLevel) || parseInt(clearanceLevel) < 1)
+    ) {
+      errors.push("Clearance level must be a number greater than 0");
     }
 
     // Validate URLs if provided
     const urlFields = [
-      { name: 'Thumb Image URL', value: thumbImageUrl },
-      { name: 'Banner Image URL', value: bannerImageUrl },
-      { name: 'Video URL', value: videoUrl },
-      { name: 'Audio URL', value: audioUrl },
-      { name: 'Additional Background Image URL', value: additionalBackgroundImageUrl },
+      { name: "Thumb Image URL", value: thumbImageUrl },
+      { name: "Banner Image URL", value: bannerImageUrl },
+      { name: "Video URL", value: videoUrl },
+      { name: "Audio URL", value: audioUrl },
+      {
+        name: "Additional Background Image URL",
+        value: additionalBackgroundImageUrl,
+      },
     ];
 
     urlFields.forEach((field) => {
       if (field.value && !/^https?:\/\/.+/.test(field.value)) {
-        errors.push(`${field.name} must be a valid URL starting with http:// or https://`);
+        errors.push(
+          `${field.name} must be a valid URL starting with http:// or https://`,
+        );
       }
     });
 
@@ -144,13 +166,13 @@ export default function CreateEpisodePage() {
 
   const handleSubmit = async (isDraft = false) => {
     // Clear previous errors
-    setError('');
+    setError("");
     setSuccess(false);
 
     // Validate form
     const validationErrors = validateForm();
     if (validationErrors.length > 0) {
-      setError(validationErrors.join('. '));
+      setError(validationErrors.join(". "));
       return;
     }
 
@@ -165,9 +187,11 @@ export default function CreateEpisodePage() {
         season_number: parseInt(episodeSeason),
         runtime: episodeRuntime.trim() || null,
         unique_episode_id: uniqueEpisodeId.trim(),
-        visibility: visibility || 'DRAFT',
-        access_level: accessLevel || 'free',
-        release_datetime: releaseDateTime ? new Date(releaseDateTime).toISOString() : null,
+        visibility: visibility || "DRAFT",
+        access_level: accessLevel || "free",
+        release_datetime: releaseDateTime
+          ? new Date(releaseDateTime).toISOString()
+          : null,
         clearance_level: clearanceLevel ? parseInt(clearanceLevel) : 1,
         password: password.trim() || null,
         notify: notify || false,
@@ -176,19 +200,21 @@ export default function CreateEpisodePage() {
         banner_image_url: bannerImageUrl.trim() || null,
         video_url: videoUrl.trim() || null,
         audio_url: audioUrl.trim() || null,
-        additional_background_image_url: additionalBackgroundImageUrl.trim() || null,
-        tags: tags.filter((tag) => tag.trim() !== ''),
+        additional_background_image_url:
+          additionalBackgroundImageUrl.trim() || null,
+        tags: tags.filter((tag) => tag.trim() !== ""),
         primary_genre: primaryGenre || null,
-        secondary_genre: secondaryGenre === 'none' ? null : secondaryGenre || null,
-        status: isDraft ? 'DRAFT' : 'PUBLISHED',
+        secondary_genre:
+          secondaryGenre === "none" ? null : secondaryGenre || null,
+        status: isDraft ? "DRAFT" : "PUBLISHED",
         isDraft,
       };
 
       // Submit to API
-      const response = await fetch('/api/episodes', {
-        method: 'POST',
+      const response = await fetch("/api/episodes", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(episodeData),
       });
@@ -196,17 +222,17 @@ export default function CreateEpisodePage() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to create episode');
+        throw new Error(data.error || "Failed to create episode");
       }
 
       // Success
       setSuccess(true);
-      setError('');
+      setError("");
 
       // Show success toast
       addToast({
-        variant: 'success',
-        title: 'Episode Created Successfully!',
+        variant: "success",
+        title: "Episode Created Successfully!",
         description: isDraft
           ? `"${episodeTitle}" has been saved as a draft.`
           : `"${episodeTitle}" has been published successfully.`,
@@ -218,18 +244,19 @@ export default function CreateEpisodePage() {
 
       // Redirect to episodes page after a short delay
       setTimeout(() => {
-        router.push('/episodes');
+        router.push("/episodes");
       }, 1500);
     } catch (err) {
-      console.error('Error creating episode:', err);
-      const errorMessage = err.message || 'Failed to create episode. Please try again.';
+      console.error("Error creating episode:", err);
+      const errorMessage =
+        err.message || "Failed to create episode. Please try again.";
       setError(errorMessage);
       setSuccess(false);
 
       // Show error toast
       addToast({
-        variant: 'error',
-        title: 'Failed to Create Episode',
+        variant: "error",
+        title: "Failed to Create Episode",
         description: errorMessage,
         duration: 5000,
       });
@@ -239,26 +266,26 @@ export default function CreateEpisodePage() {
   };
 
   const resetForm = () => {
-    setEpisodeTitle('');
-    setEpisodeDescription('');
-    setEpisodeNumber('');
-    setEpisodeSeason('');
-    setEpisodeRuntime('');
+    setEpisodeTitle("");
+    setEpisodeDescription("");
+    setEpisodeNumber("");
+    setEpisodeSeason("");
+    setEpisodeRuntime("");
     setNotify(false);
-    setUniqueEpisodeId('');
-    setVisibility('');
-    setAccessLevel('');
-    setReleaseDateTime('');
-    setClearanceLevel('');
+    setUniqueEpisodeId("");
+    setVisibility("");
+    setAccessLevel("");
+    setReleaseDateTime("");
+    setClearanceLevel("");
     setAgeRestricted(false);
-    setThumbImageUrl('');
-    setBannerImageUrl('');
-    setVideoUrl('');
-    setAudioUrl('');
-    setAdditionalBackgroundImageUrl('');
-    setTags(['']);
-    setPrimaryGenre('');
-    setSecondaryGenre('none');
+    setThumbImageUrl("");
+    setBannerImageUrl("");
+    setVideoUrl("");
+    setAudioUrl("");
+    setAdditionalBackgroundImageUrl("");
+    setTags([""]);
+    setPrimaryGenre("");
+    setSecondaryGenre("none");
   };
 
   return (
@@ -268,7 +295,7 @@ export default function CreateEpisodePage() {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => router.push('/episodes')}
+            onClick={() => router.push("/episodes")}
             className="text-gray-400 hover:text-teal-400"
           >
             <ArrowLeft className="mr-2 w-4 h-4" />
@@ -276,7 +303,9 @@ export default function CreateEpisodePage() {
           </Button>
         </div>
         <div className="flex flex-col gap-4 justify-between items-start sm:flex-row sm:items-center">
-          <h1 className="text-2xl font-bold text-teal-400 sm:text-3xl lg:text-4xl">CREATE EPISODE</h1>
+          <h1 className="text-2xl font-bold text-teal-400 sm:text-3xl lg:text-4xl">
+            CREATE EPISODE
+          </h1>
           <div className="flex gap-2 items-center w-full sm:w-auto">
             <Button
               variant="outline"
@@ -288,7 +317,11 @@ export default function CreateEpisodePage() {
               <span className="hidden sm:inline">SAVE DRAFT</span>
               <span className="sm:hidden">SAVE</span>
             </Button>
-            <Button onClick={() => handleSubmit(false)} className="flex-1 sm:flex-initial" disabled={isSubmitting}>
+            <Button
+              onClick={() => handleSubmit(false)}
+              className="flex-1 sm:flex-initial"
+              disabled={isSubmitting}
+            >
               <Send className="mr-2 w-4 h-4" />
               <span className="hidden sm:inline">DEPLOY LIVE</span>
               <span className="sm:hidden">DEPLOY</span>
@@ -308,7 +341,9 @@ export default function CreateEpisodePage() {
         {success && (
           <div className="p-4 text-sm text-green-400 rounded-md border bg-green-950/30 border-green-500/50">
             <div className="mb-1 font-semibold">Success!</div>
-            <div>Episode created successfully. Redirecting to episodes page...</div>
+            <div>
+              Episode created successfully. Redirecting to episodes page...
+            </div>
           </div>
         )}
 
@@ -333,7 +368,9 @@ export default function CreateEpisodePage() {
                   autoFocus
                   autoComplete="off"
                 />
-                <p className="text-xs text-gray-500">Enter a descriptive title for this episode</p>
+                <p className="text-xs text-gray-500">
+                  Enter a descriptive title for this episode
+                </p>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="episode-description" className="text-gray-300">
@@ -348,7 +385,9 @@ export default function CreateEpisodePage() {
                   required
                   autoComplete="off"
                 />
-                <p className="text-xs text-gray-500">Describe the episode's storyline and content</p>
+                <p className="text-xs text-gray-500">
+                  Describe the episode's storyline and content
+                </p>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
@@ -366,7 +405,9 @@ export default function CreateEpisodePage() {
                     required
                     autoComplete="off"
                   />
-                  <p className="text-xs text-gray-500">Which episode number in this season?</p>
+                  <p className="text-xs text-gray-500">
+                    Which episode number in this season?
+                  </p>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="season-number" className="text-gray-300">
@@ -383,7 +424,9 @@ export default function CreateEpisodePage() {
                     required
                     autoComplete="off"
                   />
-                  <p className="text-xs text-gray-500">Which season does this episode belong to?</p>
+                  <p className="text-xs text-gray-500">
+                    Which season does this episode belong to?
+                  </p>
                 </div>
               </div>
               <div className="space-y-2">
@@ -399,7 +442,9 @@ export default function CreateEpisodePage() {
                   required
                   autoComplete="off"
                 />
-                <p className="text-xs text-gray-500">Format: MM:SS (e.g., 42:15) or HH:MM:SS (e.g., 1:30:45)</p>
+                <p className="text-xs text-gray-500">
+                  Format: MM:SS (e.g., 42:15) or HH:MM:SS (e.g., 1:30:45)
+                </p>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="episode-id" className="text-gray-300">
@@ -415,7 +460,8 @@ export default function CreateEpisodePage() {
                   autoComplete="off"
                 />
                 <p className="text-xs text-gray-500">
-                  Create a unique ID like EP-S01-E001 (Season 1, Episode 1). Must be unique across all episodes.
+                  Create a unique ID like EP-S01-E001 (Season 1, Episode 1).
+                  Must be unique across all episodes.
                 </p>
               </div>
             </CardContent>
@@ -423,43 +469,75 @@ export default function CreateEpisodePage() {
 
           <Card className="bg-[#111111] border-border">
             <CardHeader>
-              <CardTitle className="text-teal-400">PUBLISHING & VISIBILITY</CardTitle>
+              <CardTitle className="text-teal-400">
+                PUBLISHING & VISIBILITY
+              </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="visibility" className="text-gray-300">
                   VISIBILITY STATUS <span className="text-red-400">*</span>
                 </Label>
-                <Select value={visibility} onValueChange={setVisibility} required>
+                <Select
+                  value={visibility}
+                  onValueChange={setVisibility}
+                  required
+                >
                   <SelectTrigger className="bg-[#0a0a0a] border-border focus:ring-2 focus:ring-teal-400 focus:border-teal-400">
                     <SelectValue placeholder="Choose visibility status..." />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="DRAFT">DRAFT - Hidden, work in progress</SelectItem>
-                    <SelectItem value="AVAILABLE">AVAILABLE - Live and accessible</SelectItem>
-                    <SelectItem value="FEATURED">FEATURED - Highlighted episode</SelectItem>
-                    <SelectItem value="UPCOMING">UPCOMING - Scheduled for release</SelectItem>
-                    <SelectItem value="LOCKED">LOCKED - Requires clearance</SelectItem>
-                    <SelectItem value="ARCHIVED">ARCHIVED - No longer active</SelectItem>
+                    <SelectItem value="DRAFT">
+                      DRAFT - Hidden, work in progress
+                    </SelectItem>
+                    <SelectItem value="AVAILABLE">
+                      AVAILABLE - Live and accessible
+                    </SelectItem>
+                    <SelectItem value="FEATURED">
+                      FEATURED - Highlighted episode
+                    </SelectItem>
+                    <SelectItem value="UPCOMING">
+                      UPCOMING - Scheduled for release
+                    </SelectItem>
+                    <SelectItem value="LOCKED">
+                      LOCKED - Requires clearance
+                    </SelectItem>
+                    <SelectItem value="ARCHIVED">
+                      ARCHIVED - No longer active
+                    </SelectItem>
                   </SelectContent>
                 </Select>
-                <p className="text-xs text-gray-500">Control who can see this episode. Default: DRAFT</p>
+                <p className="text-xs text-gray-500">
+                  Control who can see this episode. Default: DRAFT
+                </p>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="access-level" className="text-gray-300">
                   ACCESS LEVEL <span className="text-red-400">*</span>
                 </Label>
-                <Select value={accessLevel} onValueChange={setAccessLevel} required>
+                <Select
+                  value={accessLevel}
+                  onValueChange={setAccessLevel}
+                  required
+                >
                   <SelectTrigger className="bg-[#0a0a0a] border-border focus:ring-2 focus:ring-teal-400 focus:border-teal-400">
                     <SelectValue placeholder="Choose access level..." />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="free">FREE - Available to all users</SelectItem>
-                    <SelectItem value="premium">PREMIUM - Requires premium subscription</SelectItem>
-                    <SelectItem value="vip">VIP EXCLUSIVE - VIP members only</SelectItem>
+                    <SelectItem value="free">
+                      FREE - Available to all users
+                    </SelectItem>
+                    <SelectItem value="premium">
+                      PREMIUM - Requires premium subscription
+                    </SelectItem>
+                    <SelectItem value="vip">
+                      VIP EXCLUSIVE - VIP members only
+                    </SelectItem>
                   </SelectContent>
                 </Select>
-                <p className="text-xs text-gray-500">Who can access this episode? Default: FREE</p>
+                <p className="text-xs text-gray-500">
+                  Who can access this episode? Default: FREE
+                </p>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="release-datetime" className="text-gray-300">
@@ -494,7 +572,9 @@ export default function CreateEpisodePage() {
                   autoComplete="off"
                   required
                 />
-                <p className="text-xs text-gray-500">Optional: Click to open calendar and time picker</p>
+                <p className="text-xs text-gray-500">
+                  Optional: Click to open calendar and time picker
+                </p>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="clearance-level" className="text-gray-300">
@@ -511,7 +591,9 @@ export default function CreateEpisodePage() {
                   autoComplete="off"
                   required
                 />
-                <p className="text-xs text-gray-500">Security clearance required (1-5). Default: 1</p>
+                <p className="text-xs text-gray-500">
+                  Security clearance required (1-5). Default: 1
+                </p>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="password" className="text-gray-300">
@@ -525,25 +607,45 @@ export default function CreateEpisodePage() {
                   className="bg-[#0a0a0a] border-border focus:ring-2 focus:ring-teal-400 focus:border-teal-400 focus:outline-none"
                   autoComplete="off"
                 />
-                <p className="text-xs text-gray-500">Users will need this password to access the episode</p>
+                <p className="text-xs text-gray-500">
+                  Users will need this password to access the episode
+                </p>
               </div>
               <div className="flex justify-between items-center pt-2 border-t border-border/50">
                 <div className="space-y-1">
-                  <Label htmlFor="notify" className="text-base font-medium text-teal-400">
+                  <Label
+                    htmlFor="notify"
+                    className="text-base font-medium text-teal-400"
+                  >
                     NOTIFY USERS
                   </Label>
-                  <p className="text-xs text-gray-500">Send notification when episode goes live</p>
+                  <p className="text-xs text-gray-500">
+                    Send notification when episode goes live
+                  </p>
                 </div>
-                <Switch id="notify" checked={notify} onCheckedChange={setNotify} />
+                <Switch
+                  id="notify"
+                  checked={notify}
+                  onCheckedChange={setNotify}
+                />
               </div>
               <div className="flex justify-between items-center">
                 <div className="space-y-1">
-                  <Label htmlFor="age-restriction" className="text-base font-medium text-teal-400">
+                  <Label
+                    htmlFor="age-restriction"
+                    className="text-base font-medium text-teal-400"
+                  >
                     AGE RESTRICTED
                   </Label>
-                  <p className="text-xs text-gray-500">Require age verification to access</p>
+                  <p className="text-xs text-gray-500">
+                    Require age verification to access
+                  </p>
                 </div>
-                <Switch id="age-restriction" checked={ageRestricted} onCheckedChange={setAgeRestricted} />
+                <Switch
+                  id="age-restriction"
+                  checked={ageRestricted}
+                  onCheckedChange={setAgeRestricted}
+                />
               </div>
             </CardContent>
           </Card>
@@ -567,7 +669,9 @@ export default function CreateEpisodePage() {
                 className="bg-[#0a0a0a] border-border focus:ring-2 focus:ring-teal-400 focus:border-teal-400 focus:outline-none"
                 autoComplete="off"
               />
-              <p className="text-xs text-gray-500">Small image shown in episode lists (recommended: 400x300px)</p>
+              <p className="text-xs text-gray-500">
+                Small image shown in episode lists (recommended: 400x300px)
+              </p>
             </div>
             <div className="space-y-2">
               <Label htmlFor="banner-image-url" className="text-gray-300">
@@ -581,7 +685,9 @@ export default function CreateEpisodePage() {
                 className="bg-[#0a0a0a] border-border focus:ring-2 focus:ring-teal-400 focus:border-teal-400 focus:outline-none"
                 autoComplete="off"
               />
-              <p className="text-xs text-gray-500">Large header image for episode page (recommended: 1920x1080px)</p>
+              <p className="text-xs text-gray-500">
+                Large header image for episode page (recommended: 1920x1080px)
+              </p>
             </div>
             <div className="space-y-2">
               <Label htmlFor="video-url" className="text-gray-300">
@@ -595,7 +701,9 @@ export default function CreateEpisodePage() {
                 className="bg-[#0a0a0a] border-border focus:ring-2 focus:ring-teal-400 focus:border-teal-400 focus:outline-none"
                 autoComplete="off"
               />
-              <p className="text-xs text-gray-500">Direct link to episode video file (MP4, WebM, etc.)</p>
+              <p className="text-xs text-gray-500">
+                Direct link to episode video file (MP4, WebM, etc.)
+              </p>
             </div>
             <div className="space-y-2">
               <Label htmlFor="audio-url" className="text-gray-300">
@@ -609,21 +717,30 @@ export default function CreateEpisodePage() {
                 className="bg-[#0a0a0a] border-border focus:ring-2 focus:ring-teal-400 focus:border-teal-400 focus:outline-none"
                 autoComplete="off"
               />
-              <p className="text-xs text-gray-500">Direct link to episode audio file (MP3, WAV, etc.)</p>
+              <p className="text-xs text-gray-500">
+                Direct link to episode audio file (MP3, WAV, etc.)
+              </p>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="additional-background-image-url" className="text-gray-300">
+              <Label
+                htmlFor="additional-background-image-url"
+                className="text-gray-300"
+              >
                 ADDITIONAL BACKGROUND IMAGE URL
               </Label>
               <Input
                 id="additional-background-image-url"
                 placeholder="https://yoursite.com/images/backgrounds/episode-1-bg.jpg"
                 value={additionalBackgroundImageUrl}
-                onChange={(e) => setAdditionalBackgroundImageUrl(e.target.value)}
+                onChange={(e) =>
+                  setAdditionalBackgroundImageUrl(e.target.value)
+                }
                 className="bg-[#0a0a0a] border-border focus:ring-2 focus:ring-teal-400 focus:border-teal-400 focus:outline-none"
                 autoComplete="off"
               />
-              <p className="text-xs text-gray-500">Optional background image for enhanced visual experience</p>
+              <p className="text-xs text-gray-500">
+                Optional background image for enhanced visual experience
+              </p>
             </div>
           </CardContent>
         </Card>
@@ -657,12 +774,17 @@ export default function CreateEpisodePage() {
                   )}
                 </div>
               ))}
-              <Button variant="outline" onClick={addTag} className="w-full border-2 border-dashed">
+              <Button
+                variant="outline"
+                onClick={addTag}
+                className="w-full border-2 border-dashed"
+              >
                 <Plus className="mr-2 w-4 h-4" />
                 ADD TAG
               </Button>
               <p className="text-xs text-gray-500">
-                Add tags to help users find this episode (e.g., action, mystery, cyberpunk)
+                Add tags to help users find this episode (e.g., action, mystery,
+                cyberpunk)
               </p>
             </div>
             <div className="space-y-2">
@@ -683,18 +805,25 @@ export default function CreateEpisodePage() {
                   <SelectItem value="action">ACTION</SelectItem>
                 </SelectContent>
               </Select>
-              <p className="text-xs text-gray-500">Main genre category for this episode</p>
+              <p className="text-xs text-gray-500">
+                Main genre category for this episode
+              </p>
             </div>
             <div className="space-y-2">
               <Label htmlFor="secondary-genre" className="text-gray-300">
                 SECONDARY GENRE
               </Label>
-              <Select value={secondaryGenre || 'none'} onValueChange={setSecondaryGenre}>
+              <Select
+                value={secondaryGenre || "none"}
+                onValueChange={setSecondaryGenre}
+              >
                 <SelectTrigger className="bg-[#0a0a0a] border-border focus:ring-2 focus:ring-teal-400 focus:border-teal-400">
                   <SelectValue placeholder="Choose secondary genre (optional)..." />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="none">NONE - No secondary genre</SelectItem>
+                  <SelectItem value="none">
+                    NONE - No secondary genre
+                  </SelectItem>
                   <SelectItem value="cyberpunk">CYBERPUNK</SelectItem>
                   <SelectItem value="sci-fi">SCIENCE FICTION</SelectItem>
                   <SelectItem value="fantasy">FANTASY</SelectItem>
@@ -704,7 +833,9 @@ export default function CreateEpisodePage() {
                   <SelectItem value="action">ACTION</SelectItem>
                 </SelectContent>
               </Select>
-              <p className="text-xs text-gray-500">Optional: Additional genre category</p>
+              <p className="text-xs text-gray-500">
+                Optional: Additional genre category
+              </p>
             </div>
           </CardContent>
         </Card>
@@ -729,7 +860,11 @@ export default function CreateEpisodePage() {
               </>
             )}
           </Button>
-          <Button onClick={() => handleSubmit(false)} className="min-w-[140px]" disabled={isSubmitting}>
+          <Button
+            onClick={() => handleSubmit(false)}
+            className="min-w-[140px]"
+            disabled={isSubmitting}
+          >
             {isSubmitting ? (
               <>
                 <div className="mr-2 w-4 h-4 rounded-full border-2 border-white animate-spin border-t-transparent"></div>

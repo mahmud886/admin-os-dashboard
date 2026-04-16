@@ -1,20 +1,29 @@
-'use client';
+"use client";
 
-import { ChartRow } from '@/components/dashboard/chart-row';
-import { GoogleAnalyticsKPI } from '@/components/dashboard/google-analytics-kpi';
-import { GoogleAnalyticsStatus } from '@/components/dashboard/google-analytics-status';
-import { MetricsReferrals } from '@/components/dashboard/metrics-referrals';
-import { PlatformDistribution } from '@/components/dashboard/platform-distribution';
-import { SocialMediaStats } from '@/components/dashboard/social-media-stats';
-import { TopPerformingPolls } from '@/components/dashboard/top-performing-polls';
-import { TopReferrers } from '@/components/dashboard/top-referrers';
-import { TrafficSources } from '@/components/dashboard/traffic-sources';
-import { VisitLocation } from '@/components/dashboard/visit-location';
+import { ChartRow } from "@/components/dashboard/chart-row";
+import { GoogleAnalyticsKPI } from "@/components/dashboard/google-analytics-kpi";
+import { GoogleAnalyticsStatus } from "@/components/dashboard/google-analytics-status";
+import { MetricsReferrals } from "@/components/dashboard/metrics-referrals";
+import { PlatformDistribution } from "@/components/dashboard/platform-distribution";
+import { SocialMediaStats } from "@/components/dashboard/social-media-stats";
+import { TopPerformingPolls } from "@/components/dashboard/top-performing-polls";
+import { TopReferrers } from "@/components/dashboard/top-referrers";
+import { TrafficSources } from "@/components/dashboard/traffic-sources";
+import { VisitLocation } from "@/components/dashboard/visit-location";
 
-export function DashboardAnalytics({ analyticsData, gaData, timeframe, onRefresh }) {
+export function DashboardAnalytics({
+  analyticsData,
+  gaData,
+  timeframe,
+  onRefresh,
+}) {
   return (
     <>
-      <GoogleAnalyticsKPI gaData={gaData} analyticsData={analyticsData} onRefresh={onRefresh} />
+      <GoogleAnalyticsKPI
+        gaData={gaData}
+        analyticsData={analyticsData}
+        onRefresh={onRefresh}
+      />
       <GoogleAnalyticsStatus gaData={gaData} />
       <VisitLocation gaData={gaData} />
       <SocialMediaStats analyticsData={analyticsData} />

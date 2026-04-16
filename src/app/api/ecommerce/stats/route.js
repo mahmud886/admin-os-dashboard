@@ -1,5 +1,5 @@
-import { createErrorResponse, createResponse } from '@/lib/db-helpers';
-import { createClient } from '@/lib/supabase-server';
+import { createErrorResponse, createResponse } from "@/lib/db-helpers";
+import { createClient } from "@/lib/supabase-server";
 
 export async function GET() {
   try {
@@ -7,15 +7,15 @@ export async function GET() {
 
     // Fetch total orders
     const { count: ordersCount, error: ordersError } = await supabase
-      .from('ecommerce_orders')
-      .select('*', { count: 'exact', head: true });
+      .from("ecommerce_orders")
+      .select("*", { count: "exact", head: true });
 
     if (ordersError) throw ordersError;
 
     // Fetch total customers
     const { count: customersCount, error: customersError } = await supabase
-      .from('ecommerce_customers')
-      .select('*', { count: 'exact', head: true });
+      .from("ecommerce_customers")
+      .select("*", { count: "exact", head: true });
 
     if (customersError) throw customersError;
 
@@ -24,19 +24,22 @@ export async function GET() {
     // We'll fetch all paid orders amount for now (assuming not huge dataset yet) or use a raw query if possible (not exposed here).
     // Better approach: create a view or RPC, but for now we'll fetch the amount column.
     const { data: revenueData, error: revenueError } = await supabase
-      .from('ecommerce_orders')
-      .select('amount_total')
-      .eq('payment_status', 'paid');
+      .from("ecommerce_orders")
+      .select("amount_total")
+      .eq("payment_status", "paid");
 
     if (revenueError) throw revenueError;
 
-    const totalRevenue = revenueData.reduce((sum, order) => sum + (parseFloat(order.amount_total) || 0), 0);
+    const totalRevenue = revenueData.reduce(
+      (sum, order) => sum + (parseFloat(order.amount_total) || 0),
+      0,
+    );
 
     // Fetch recent orders
     const { data: recentOrders, error: recentError } = await supabase
-      .from('ecommerce_orders')
-      .select('*, ecommerce_customers(name, email)')
-      .order('created_at', { ascending: false })
+      .from("ecommerce_orders")
+      .select("*, ecommerce_customers(name, email)")
+      .order("created_at", { ascending: false })
       .limit(5);
 
     if (recentError) throw recentError;
@@ -50,7 +53,7 @@ export async function GET() {
       recent_orders: recentOrders || [],
     });
   } catch (error) {
-    console.error('Error fetching ecommerce stats:', error);
-    return createErrorResponse('Internal server error', 500, error.message);
+    console.error("Error fetching ecommerce stats:", error);
+    return createErrorResponse("Internal server error", 500, error.message);
   }
 }

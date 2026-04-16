@@ -249,7 +249,7 @@ Code Push → Build Process → Deployment Creation → Deployment Available
 
    // ✅ Good: Validate early
    if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
-     throw new Error('Missing NEXT_PUBLIC_SUPABASE_URL');
+     throw new Error("Missing NEXT_PUBLIC_SUPABASE_URL");
    }
    ```
 
@@ -308,10 +308,10 @@ Code Push → Build Process → Deployment Creation → Deployment Available
 
    ```javascript
    // ❌ Bad: Hardcoded preview URL
-   const apiUrl = 'https://my-app-abc123.vercel.app/api';
+   const apiUrl = "https://my-app-abc123.vercel.app/api";
 
    // ✅ Good: Use environment variable
-   const apiUrl = process.env.NEXT_PUBLIC_API_URL || '/api';
+   const apiUrl = process.env.NEXT_PUBLIC_API_URL || "/api";
    ```
 
 2. **No Error Handling for Missing Env Vars**
@@ -323,7 +323,7 @@ Code Push → Build Process → Deployment Creation → Deployment Available
    // ✅ Good: Fail fast with clear error
    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
    if (!supabaseUrl) {
-     throw new Error('NEXT_PUBLIC_SUPABASE_URL is required');
+     throw new Error("NEXT_PUBLIC_SUPABASE_URL is required");
    }
    ```
 

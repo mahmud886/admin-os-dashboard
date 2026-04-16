@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { createClient } from '@/lib/supabase-client';
-import { useRouter } from 'next/navigation';
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createClient } from "@/lib/supabase-client";
+import { useRouter } from "next/navigation";
+import { createContext, useContext, useEffect, useState } from "react";
 
 const AuthContext = createContext(undefined);
 
@@ -18,7 +18,7 @@ export function AuthProvider({ children }) {
     try {
       return createClient();
     } catch (error) {
-      console.error('Supabase client initialization error:', error);
+      console.error("Supabase client initialization error:", error);
       setConfigError(error.message);
       return null;
     }
@@ -41,7 +41,7 @@ export function AuthProvider({ children }) {
         setSession(session);
         setUser(session?.user ?? null);
       } catch (error) {
-        console.error('Error getting session:', error);
+        console.error("Error getting session:", error);
         setUser(null);
         setSession(null);
       } finally {
@@ -70,7 +70,10 @@ export function AuthProvider({ children }) {
   const signIn = async (email, password) => {
     try {
       if (!supabase) {
-        throw new Error(configError || 'Supabase client not initialized. Please check your environment variables.');
+        throw new Error(
+          configError ||
+            "Supabase client not initialized. Please check your environment variables.",
+        );
       }
 
       // Validate against static credentials before calling Supabase
@@ -85,8 +88,11 @@ export function AuthProvider({ children }) {
         const normalizedStaticEmail = staticEmail.trim().toLowerCase();
 
         // Validate credentials match static user before calling Supabase
-        if (normalizedEmail !== normalizedStaticEmail || password !== staticPassword) {
-          throw new Error('Invalid credentials. Access denied.');
+        if (
+          normalizedEmail !== normalizedStaticEmail ||
+          password !== staticPassword
+        ) {
+          throw new Error("Invalid credentials. Access denied.");
         }
       }
 
@@ -98,10 +104,10 @@ export function AuthProvider({ children }) {
 
       if (error) {
         // Provide more helpful error messages
-        if (error.message.includes('Invalid login credentials')) {
+        if (error.message.includes("Invalid login credentials")) {
           throw new Error(
-            'Invalid login credentials. The user does not exist in Supabase Auth or the password is incorrect. ' +
-              'Please create the user in your Supabase Dashboard: Authentication → Users → Add User'
+            "Invalid login credentials. The user does not exist in Supabase Auth or the password is incorrect. " +
+              "Please create the user in your Supabase Dashboard: Authentication → Users → Add User",
           );
         }
         throw error;
@@ -113,7 +119,7 @@ export function AuthProvider({ children }) {
     } catch (error) {
       return {
         success: false,
-        error: error.message || 'An error occurred during sign-in',
+        error: error.message || "An error occurred during sign-in",
       };
     }
   };
@@ -121,7 +127,7 @@ export function AuthProvider({ children }) {
   const signOut = async () => {
     try {
       if (!supabase) {
-        throw new Error('Supabase client not initialized');
+        throw new Error("Supabase client not initialized");
       }
 
       const { error } = await supabase.auth.signOut();
@@ -129,9 +135,9 @@ export function AuthProvider({ children }) {
 
       setSession(null);
       setUser(null);
-      router.push('/login');
+      router.push("/login");
     } catch (error) {
-      console.error('Error signing out:', error);
+      console.error("Error signing out:", error);
       throw error;
     }
   };
@@ -152,7 +158,7 @@ export function AuthProvider({ children }) {
 export function useAuth() {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 }

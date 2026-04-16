@@ -1,50 +1,64 @@
-'use client';
+"use client";
 
-import RichTextEditor from '@/components/editor/rich-text-editor';
-import { MainLayout } from '@/components/layout/main-layout';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { useAuth } from '@/context/AuthContext';
-import { ArrowLeft, Loader2, Save, Trash2 } from 'lucide-react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { use, useEffect, useState } from 'react';
+import RichTextEditor from "@/components/editor/rich-text-editor";
+import { MainLayout } from "@/components/layout/main-layout";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { ArrowLeft, Loader2, Save, Trash2 } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { use, useEffect, useState } from "react";
+
+const formatDateTimeLocal = (date) => {
+  if (!date) return "";
+
+  const normalized = new Date(date);
+  if (Number.isNaN(normalized.getTime())) return "";
+
+  const pad = (value) => String(value).padStart(2, "0");
+  return `${normalized.getFullYear()}-${pad(normalized.getMonth() + 1)}-${pad(
+    normalized.getDate(),
+  )}T${pad(normalized.getHours())}:${pad(normalized.getMinutes())}`;
+};
 
 export default function EditMediaNewsPage({ params }) {
   const router = useRouter();
   const { id } = use(params);
-  const { user } = useAuth();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState({
-    title: '',
-    slug: '',
-    excerpt: '',
-    coverImage: '',
-    tags: '',
-    content: '',
-    source: '',
-    sourceUrl: '',
+    title: "",
+    slug: "",
+    excerpt: "",
+    coverImage: "",
+    tags: "",
+    content: "",
+    source: "",
+    sourceUrl: "",
+    publishedAt: "",
   });
 
   useEffect(() => {
     async function fetchArticle() {
       try {
         const res = await fetch(`/api/media-news/${id}`);
-        if (!res.ok) throw new Error('Article not found');
+        if (!res.ok) throw new Error("Article not found");
         const data = await res.json();
         setFormData({
           ...data,
-          tags: Array.isArray(data.tags) ? data.tags.join(', ') : data.tags || '',
-          source: data.source || '',
-          sourceUrl: data.sourceUrl || '',
+          tags: Array.isArray(data.tags)
+            ? data.tags.join(", ")
+            : data.tags || "",
+          source: data.source || "",
+          sourceUrl: data.sourceUrl || "",
+          publishedAt: formatDateTimeLocal(data.publishedAt),
         });
       } catch (error) {
-        console.error('Error fetching article:', error);
-        router.push('/admin/media-news');
+        console.error("Error fetching article:", error);
+        router.push("/admin/media-news");
       } finally {
         setLoading(false);
       }
@@ -69,48 +83,51 @@ export default function EditMediaNewsPage({ params }) {
       const payload = {
         ...formData,
         tags: formData.tags
-          .split(',')
+          .split(",")
           .map((tag) => tag.trim())
           .filter(Boolean),
+        publishedAt: formData.publishedAt
+          ? new Date(formData.publishedAt).toISOString()
+          : null,
       };
 
       const res = await fetch(`/api/media-news/${id}`, {
-        method: 'PUT',
+        method: "PUT",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(payload),
       });
 
       if (!res.ok) {
-        throw new Error('Failed to update media news');
+        throw new Error("Failed to update media news");
       }
 
-      router.push('/admin/media-news');
+      router.push("/admin/media-news");
       router.refresh();
     } catch (error) {
-      console.error('Error updating media news:', error);
-      alert('Failed to update media news entry');
+      console.error("Error updating media news:", error);
+      alert("Failed to update media news entry");
     } finally {
       setSaving(false);
     }
   };
 
   const handleDelete = async () => {
-    if (!confirm('Are you sure you want to delete this entry?')) return;
+    if (!confirm("Are you sure you want to delete this entry?")) return;
     setSaving(true);
     try {
       const res = await fetch(`/api/media-news/${id}`, {
-        method: 'DELETE',
+        method: "DELETE",
       });
 
-      if (!res.ok) throw new Error('Failed to delete');
+      if (!res.ok) throw new Error("Failed to delete");
 
-      router.push('/admin/media-news');
+      router.push("/admin/media-news");
       router.refresh();
     } catch (error) {
-      console.error('Error deleting media news:', error);
-      alert('Failed to delete entry');
+      console.error("Error deleting media news:", error);
+      alert("Failed to delete entry");
       setSaving(false);
     }
   };
@@ -130,7 +147,10 @@ export default function EditMediaNewsPage({ params }) {
       <div className="px-6 space-y-6 w-full max-w-none">
         <div className="flex justify-between items-center">
           <Link href="/admin/media-news">
-            <Button variant="ghost" className="pl-0 text-gray-400 hover:text-teal-400">
+            <Button
+              variant="ghost"
+              className="pl-0 text-gray-400 hover:text-teal-400"
+            >
               <ArrowLeft className="mr-2 w-4 h-4" />
               CANCEL
             </Button>
@@ -150,7 +170,11 @@ export default function EditMediaNewsPage({ params }) {
               disabled={saving || !formData.title || !formData.content}
               className="font-semibold text-black bg-teal-500 hover:bg-teal-600"
             >
-              {saving ? <Loader2 className="mr-2 w-4 h-4 animate-spin" /> : <Save className="mr-2 w-4 h-4" />}
+              {saving ? (
+                <Loader2 className="mr-2 w-4 h-4 animate-spin" />
+              ) : (
+                <Save className="mr-2 w-4 h-4" />
+              )}
               SAVE CHANGES
             </Button>
           </div>
@@ -182,6 +206,20 @@ export default function EditMediaNewsPage({ params }) {
                       className="bg-[#1a1a1a] border-gray-800 text-white focus:border-teal-500"
                     />
                   </div>
+
+                  <div className="space-y-2">
+                    <Label className="text-gray-400">PUBLISHED AT</Label>
+                    <Input
+                      name="publishedAt"
+                      type="datetime-local"
+                      value={formData.publishedAt}
+                      onChange={handleChange}
+                      className="bg-[#1a1a1a] border-gray-800 text-white focus:border-teal-500"
+                    />
+                    <p className="text-xs text-gray-500">
+                      Update the display date for this media entry.
+                    </p>
+                  </div>
                   <div className="space-y-2">
                     <Label className="text-gray-400">SOURCE URL</Label>
                     <Input
@@ -197,7 +235,10 @@ export default function EditMediaNewsPage({ params }) {
                 <div className="space-y-2">
                   <Label className="text-gray-400">CONTENT</Label>
                   <div className="min-h-[400px] border border-gray-800 rounded-md overflow-hidden">
-                    <RichTextEditor content={formData.content} onChange={handleContentChange} />
+                    <RichTextEditor
+                      content={formData.content}
+                      onChange={handleContentChange}
+                    />
                   </div>
                 </div>
               </CardContent>
@@ -242,7 +283,11 @@ export default function EditMediaNewsPage({ params }) {
 
                 {formData.coverImage && (
                   <div className="relative aspect-video rounded-md overflow-hidden bg-[#1a1a1a]">
-                    <img src={formData.coverImage} alt="Preview" className="object-cover w-full h-full" />
+                    <img
+                      src={formData.coverImage}
+                      alt="Preview"
+                      className="object-cover w-full h-full"
+                    />
                   </div>
                 )}
 

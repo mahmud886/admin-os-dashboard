@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { MapPin } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { MapPin } from "lucide-react";
 
 export function VisitLocation({ gaData }) {
   const locations = gaData?.visitLocation ?? [];
@@ -20,8 +20,8 @@ export function VisitLocation({ gaData }) {
       <CardContent>
         {locations.length === 0 ? (
           <p className="text-sm text-gray-500">
-            No location data yet. Configure GA4 Data API with GA4_PROPERTY_ID and service account to see countries and
-            cities.
+            No location data yet. Configure GA4 Data API with GA4_PROPERTY_ID
+            and service account to see countries and cities.
           </p>
         ) : (
           <ul className="space-y-2 max-h-64 overflow-y-auto">
@@ -32,9 +32,11 @@ export function VisitLocation({ gaData }) {
               >
                 <span className="font-medium text-white">
                   {loc.country}
-                  {loc.city ? `, ${loc.city}` : ''}
+                  {loc.city ? `, ${loc.city}` : ""}
                 </span>
-                <span className="text-teal-400">{loc.users?.toLocaleString() ?? 0} users</span>
+                <span className="text-teal-400">
+                  {loc.users?.toLocaleString() ?? 0} users
+                </span>
               </li>
             ))}
           </ul>

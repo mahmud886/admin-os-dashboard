@@ -10,8 +10,8 @@ import {
   createResponse,
   getAuthenticatedUser,
   validateRequiredFields,
-} from '@/lib/db-helpers';
-import { createClient } from '@/lib/supabase-server';
+} from "@/lib/db-helpers";
+import { createClient } from "@/lib/supabase-server";
 
 // GET - Fetch all polls
 export async function GET(request) {
@@ -20,30 +20,30 @@ export async function GET(request) {
     const { searchParams } = new URL(request.url);
 
     // Query parameters
-    const episodeId = searchParams.get('episode_id');
-    const status = searchParams.get('status');
-    const limit = parseInt(searchParams.get('limit') || '100');
-    const offset = parseInt(searchParams.get('offset') || '0');
+    const episodeId = searchParams.get("episode_id");
+    const status = searchParams.get("status");
+    const limit = parseInt(searchParams.get("limit") || "100");
+    const offset = parseInt(searchParams.get("offset") || "0");
 
     // Build query with related episode and options
     let query = supabase
-      .from('polls')
+      .from("polls")
       .select(
         `
         *,
         episodes(id, title, episode_number, season_number),
         poll_options(*)
       `,
-        { count: 'exact' }
+        { count: "exact" },
       )
-      .order('created_at', { ascending: false });
+      .order("created_at", { ascending: false });
 
     // Apply filters
     if (episodeId) {
-      query = query.eq('episode_id', episodeId);
+      query = query.eq("episode_id", episodeId);
     }
     if (status) {
-      query = query.eq('status', status);
+      query = query.eq("status", status);
     }
 
     // Apply pagination
@@ -52,7 +52,7 @@ export async function GET(request) {
     const { data, error, count } = await query;
 
     if (error) {
-      return createErrorResponse('Failed to fetch polls', 500, error.message);
+      return createErrorResponse("Failed to fetch polls", 500, error.message);
     }
 
     return createResponse({
@@ -62,7 +62,7 @@ export async function GET(request) {
       offset,
     });
   } catch (error) {
-    return createErrorResponse('Internal server error', 500, error.message);
+    return createErrorResponse("Internal server error", 500, error.message);
   }
 }
 
@@ -72,44 +72,57 @@ export async function POST(request) {
     // Check authentication
     const { user, error: authError } = await getAuthenticatedUser();
     if (authError || !user) {
-      return createErrorResponse('Unauthorized', 401, 'Authentication required');
+      return createErrorResponse(
+        "Unauthorized",
+        401,
+        "Authentication required",
+      );
     }
 
     const body = await request.json();
 
     // Validate required fields
-    const required = ['episode_id', 'title', 'options'];
+    const required = ["episode_id", "title", "options"];
     const missing = validateRequiredFields(body, required);
     if (missing) {
-      return createErrorResponse(`Missing required fields: ${missing.join(', ')}`, 400);
+      return createErrorResponse(
+        `Missing required fields: ${missing.join(", ")}`,
+        400,
+      );
     }
 
     // Validate options
     if (!Array.isArray(body.options) || body.options.length < 2) {
-      return createErrorResponse('Poll must have at least 2 options', 400);
+      return createErrorResponse("Poll must have at least 2 options", 400);
     }
 
     const supabase = await createClient();
 
     // Verify episode exists
     const { data: episode, error: episodeError } = await supabase
-      .from('episodes')
-      .select('id')
-      .eq('id', body.episode_id)
+      .from("episodes")
+      .select("id")
+      .eq("id", body.episode_id)
       .single();
 
     if (episodeError || !episode) {
-      return createErrorResponse('Episode not found', 404);
+      return createErrorResponse("Episode not found", 404);
     }
 
     // Calculate dates
     const startsAt = body.starts_at ? new Date(body.starts_at) : new Date();
     const durationDays = parseInt(body.duration_days) || 7;
-    const endsAt = body.ends_at ? new Date(body.ends_at) : calculatePollEndDate(startsAt, durationDays);
+    const endsAt = body.ends_at
+      ? new Date(body.ends_at)
+      : calculatePollEndDate(startsAt, durationDays);
 
     // Ensure endsAt is a Date object
     if (!(endsAt instanceof Date) || isNaN(endsAt.getTime())) {
-      return createErrorResponse('Invalid end date calculation', 500, 'Failed to calculate poll end date');
+      return createErrorResponse(
+        "Invalid end date calculation",
+        500,
+        "Failed to calculate poll end date",
+      );
     }
 
     // Prepare poll data
@@ -118,17 +131,25 @@ export async function POST(request) {
       title: body.title,
       description: body.description || null,
       duration_days: durationDays,
-      status: body.status || body.isDraft === false ? 'LIVE' : 'DRAFT',
+      status: body.status || body.isDraft === false ? "LIVE" : "DRAFT",
       starts_at: startsAt.toISOString(),
       ends_at: endsAt.toISOString(),
       created_by: user.id,
     };
 
     // Insert poll
-    const { data: poll, error: pollError } = await supabase.from('polls').insert([pollData]).select().single();
+    const { data: poll, error: pollError } = await supabase
+      .from("polls")
+      .insert([pollData])
+      .select()
+      .single();
 
     if (pollError) {
-      return createErrorResponse('Failed to create poll', 500, pollError.message);
+      return createErrorResponse(
+        "Failed to create poll",
+        500,
+        pollError.message,
+      );
     }
 
     // Prepare poll options
@@ -142,42 +163,53 @@ export async function POST(request) {
     }));
 
     // Insert poll options
-    const { data: options, error: optionsError } = await supabase.from('poll_options').insert(pollOptions).select();
+    const { data: options, error: optionsError } = await supabase
+      .from("poll_options")
+      .insert(pollOptions)
+      .select();
 
     if (optionsError) {
       // Rollback: delete the poll if options failed
-      await supabase.from('polls').delete().eq('id', poll.id);
-      return createErrorResponse('Failed to create poll options', 500, optionsError.message);
+      await supabase.from("polls").delete().eq("id", poll.id);
+      return createErrorResponse(
+        "Failed to create poll options",
+        500,
+        optionsError.message,
+      );
     }
 
     // Fetch complete poll with options
     const { data: completePoll, error: fetchError } = await supabase
-      .from('polls')
+      .from("polls")
       .select(
         `
         *,
         episodes(id, title, episode_number, season_number),
         poll_options(*)
-      `
+      `,
       )
-      .eq('id', poll.id)
+      .eq("id", poll.id)
       .single();
 
     if (fetchError) {
-      return createErrorResponse('Poll created but failed to fetch complete data', 201, {
-        poll,
-        options,
-      });
+      return createErrorResponse(
+        "Poll created but failed to fetch complete data",
+        201,
+        {
+          poll,
+          options,
+        },
+      );
     }
 
     return createResponse(
       {
-        message: 'Poll created successfully',
+        message: "Poll created successfully",
         poll: completePoll,
       },
-      201
+      201,
     );
   } catch (error) {
-    return createErrorResponse('Internal server error', 500, error.message);
+    return createErrorResponse("Internal server error", 500, error.message);
   }
 }

@@ -78,28 +78,30 @@ The updated API now includes:
 
    ```javascript
    // Uses count: "exact" instead of fetching all polls
-   const { count: totalPolls } = await supabase.from('polls').select('*', { count: 'exact', head: true });
+   const { count: totalPolls } = await supabase
+     .from("polls")
+     .select("*", { count: "exact", head: true });
    ```
 
 2. **Better Referrer Domain Extraction**
 
    ```javascript
    // Extracts domain from full URL
-   const domain = new URL(referrer).hostname.replace('www.', '');
+   const domain = new URL(referrer).hostname.replace("www.", "");
    ```
 
 3. **Error Code Handling**
 
    ```javascript
    // Checks for PostgreSQL error code 42P01 (table doesn't exist)
-   if (error.code === '42P01') {
+   if (error.code === "42P01") {
      // Handle gracefully
    }
    ```
 
 4. **Force Dynamic Rendering**
    ```javascript
-   export const dynamic = 'force-dynamic';
+   export const dynamic = "force-dynamic";
    export const revalidate = 0;
    ```
 

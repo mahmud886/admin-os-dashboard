@@ -1,19 +1,19 @@
-import { createErrorResponse, createResponse } from '@/lib/db-helpers';
-import { createClient } from '@/lib/supabase-server';
+import { createErrorResponse, createResponse } from "@/lib/db-helpers";
+import { createClient } from "@/lib/supabase-server";
 
 export async function GET(request) {
   try {
     const supabase = await createClient();
     const { searchParams } = new URL(request.url);
 
-    const limit = parseInt(searchParams.get('limit') || '50');
-    const offset = parseInt(searchParams.get('offset') || '0');
-    const search = searchParams.get('search');
+    const limit = parseInt(searchParams.get("limit") || "50");
+    const offset = parseInt(searchParams.get("offset") || "0");
+    const search = searchParams.get("search");
 
     let query = supabase
-      .from('ecommerce_customers')
-      .select('*', { count: 'exact' })
-      .order('created_at', { ascending: false });
+      .from("ecommerce_customers")
+      .select("*", { count: "exact" })
+      .order("created_at", { ascending: false });
 
     if (search) {
       query = query.or(`email.ilike.%${search}%,name.ilike.%${search}%`);
@@ -24,8 +24,12 @@ export async function GET(request) {
     const { data, error, count } = await query;
 
     if (error) {
-      console.error('Error fetching customers:', error);
-      return createErrorResponse('Failed to fetch customers', 500, error.message);
+      console.error("Error fetching customers:", error);
+      return createErrorResponse(
+        "Failed to fetch customers",
+        500,
+        error.message,
+      );
     }
 
     return createResponse({
@@ -35,7 +39,7 @@ export async function GET(request) {
       offset,
     });
   } catch (error) {
-    console.error('Internal error fetching customers:', error);
-    return createErrorResponse('Internal server error', 500, error.message);
+    console.error("Internal error fetching customers:", error);
+    return createErrorResponse("Internal server error", 500, error.message);
   }
 }

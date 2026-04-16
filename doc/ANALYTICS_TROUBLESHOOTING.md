@@ -38,16 +38,16 @@ To track actual shares, use the `/api/analytics/shares` endpoint:
 
 ```javascript
 // Example: Track a share
-await fetch('/api/analytics/shares', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
+await fetch("/api/analytics/shares", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
   body: JSON.stringify({
-    poll_id: 'your-poll-id',
-    platform: 'facebook',
+    poll_id: "your-poll-id",
+    platform: "facebook",
     referrer: window.location.href,
-    utm_source: new URLSearchParams(window.location.search).get('utm_source'),
-    utm_medium: 'web',
-    utm_campaign: 'promo',
+    utm_source: new URLSearchParams(window.location.search).get("utm_source"),
+    utm_medium: "web",
+    utm_campaign: "promo",
   }),
 });
 ```

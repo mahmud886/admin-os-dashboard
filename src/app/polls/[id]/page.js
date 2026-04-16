@@ -1,40 +1,40 @@
-'use client';
+"use client";
 
-import { MainLayout } from '@/components/layout/main-layout';
-import { PollDetailsShimmer } from '@/components/shimmer/poll-details-shimmer';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
-import { useToast } from '@/components/ui/toast';
-import { ArrowLeft, CheckCircle2 } from 'lucide-react';
-import { useParams, useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { MainLayout } from "@/components/layout/main-layout";
+import { PollDetailsShimmer } from "@/components/shimmer/poll-details-shimmer";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { useToast } from "@/components/ui/toast";
+import { ArrowLeft, CheckCircle2 } from "lucide-react";
+import { useParams, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 const getStatusBadgeColor = (status) => {
   switch (status) {
-    case 'LIVE':
-      return 'border-green-500 bg-green-500/50 text-green-400 hover:bg-green-500';
-    case 'DRAFT':
-      return 'border-gray-500 bg-gray-500/50 text-gray-400 hover:bg-gray-500';
-    case 'ENDED':
-      return 'border-orange-500 bg-orange-500/50 text-orange-400 hover:bg-orange-500';
-    case 'ARCHIVED':
-      return 'border-purple-500 bg-purple-500/50 text-purple-400 hover:bg-purple-500';
+    case "LIVE":
+      return "border-green-500 bg-green-500/50 text-green-400 hover:bg-green-500";
+    case "DRAFT":
+      return "border-gray-500 bg-gray-500/50 text-gray-400 hover:bg-gray-500";
+    case "ENDED":
+      return "border-orange-500 bg-orange-500/50 text-orange-400 hover:bg-orange-500";
+    case "ARCHIVED":
+      return "border-purple-500 bg-purple-500/50 text-purple-400 hover:bg-purple-500";
     default:
-      return 'border-gray-500 bg-gray-500/50 text-gray-400 hover:bg-gray-500';
+      return "border-gray-500 bg-gray-500/50 text-gray-400 hover:bg-gray-500";
   }
 };
 
 const formatDate = (dateString) => {
-  if (!dateString) return 'N/A';
+  if (!dateString) return "N/A";
   const date = new Date(dateString);
-  return date.toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
+  return date.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
   });
 };
 
@@ -57,14 +57,14 @@ export default function PollDetailsPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to fetch poll');
+        throw new Error(data.error || "Failed to fetch poll");
       }
 
       setPoll(data.poll);
       setError(null);
     } catch (err) {
-      console.error('Error fetching poll:', err);
-      setError(err.message || 'Failed to load poll');
+      console.error("Error fetching poll:", err);
+      setError(err.message || "Failed to load poll");
       setPoll(null);
     } finally {
       setLoading(false);
@@ -80,7 +80,10 @@ export default function PollDetailsPage() {
   // Calculate total votes
   const getTotalVotes = (poll) => {
     if (!poll?.poll_options || poll.poll_options.length === 0) return 0;
-    return poll.poll_options.reduce((total, option) => total + (option.vote_count || 0), 0);
+    return poll.poll_options.reduce(
+      (total, option) => total + (option.vote_count || 0),
+      0,
+    );
   };
 
   // Calculate percentage for each option
@@ -101,7 +104,9 @@ export default function PollDetailsPage() {
       const updatedPoll = {
         ...poll,
         poll_options: poll.poll_options.map((opt) =>
-          opt.id === option.id ? { ...opt, vote_count: (opt.vote_count || 0) + 1 } : opt
+          opt.id === option.id
+            ? { ...opt, vote_count: (opt.vote_count || 0) + 1 }
+            : opt,
         ),
       };
       setPoll(updatedPoll);
@@ -116,9 +121,9 @@ export default function PollDetailsPage() {
       }));
 
       const response = await fetch(`/api/polls/${poll.id}`, {
-        method: 'PUT',
+        method: "PUT",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           options: options,
@@ -128,7 +133,7 @@ export default function PollDetailsPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to update vote');
+        throw new Error(data.error || "Failed to update vote");
       }
 
       // Refresh poll to get latest data
@@ -136,20 +141,20 @@ export default function PollDetailsPage() {
 
       // Show success toast
       addToast({
-        variant: 'success',
-        title: 'Vote Added!',
+        variant: "success",
+        title: "Vote Added!",
         description: `Vote added to "${option.name}"`,
         duration: 2000,
       });
     } catch (err) {
-      console.error('Error updating vote:', err);
+      console.error("Error updating vote:", err);
       // Revert optimistic update
       await fetchPoll();
 
       addToast({
-        variant: 'error',
-        title: 'Failed to Update Vote',
-        description: err.message || 'Please try again',
+        variant: "error",
+        title: "Failed to Update Vote",
+        description: err.message || "Please try again",
         duration: 3000,
       });
     } finally {
@@ -169,8 +174,10 @@ export default function PollDetailsPage() {
     return (
       <MainLayout breadcrumb="SYSTEM CONSOLE / POLLS / DETAILS">
         <div className="flex flex-col items-center justify-center min-h-[calc(100vh-10rem)]">
-          <div className="mb-4 text-red-400">Error: {error || 'Poll not found'}</div>
-          <Button onClick={() => router.push('/polls')} variant="outline">
+          <div className="mb-4 text-red-400">
+            Error: {error || "Poll not found"}
+          </div>
+          <Button onClick={() => router.push("/polls")} variant="outline">
             Back to Polls
           </Button>
         </div>
@@ -180,18 +187,22 @@ export default function PollDetailsPage() {
 
   const totalVotes = getTotalVotes(poll);
   const sortedOptions = poll.poll_options
-    ? [...poll.poll_options].sort((a, b) => (a.display_order || 0) - (b.display_order || 0))
+    ? [...poll.poll_options].sort(
+        (a, b) => (a.display_order || 0) - (b.display_order || 0),
+      )
     : [];
 
   return (
-    <MainLayout breadcrumb={`SYSTEM CONSOLE / POLLS / ${poll.title?.toUpperCase() || 'DETAILS'}`}>
+    <MainLayout
+      breadcrumb={`SYSTEM CONSOLE / POLLS / ${poll.title?.toUpperCase() || "DETAILS"}`}
+    >
       <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center gap-4">
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => router.push('/polls')}
+            onClick={() => router.push("/polls")}
             className="text-gray-400 hover:text-teal-400"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
@@ -204,21 +215,33 @@ export default function PollDetailsPage() {
           <CardHeader>
             <div className="flex items-start justify-between">
               <div className="flex-1">
-                <CardTitle className="text-3xl text-teal-400 mb-2">{poll.title}</CardTitle>
-                {poll.description && <p className="text-gray-300 mt-2 whitespace-pre-wrap">{poll.description}</p>}
+                <CardTitle className="text-3xl text-teal-400 mb-2">
+                  {poll.title}
+                </CardTitle>
+                {poll.description && (
+                  <p className="text-gray-300 mt-2 whitespace-pre-wrap">
+                    {poll.description}
+                  </p>
+                )}
               </div>
-              <Badge className={`${getStatusBadgeColor(poll.status)} text-sm`}>{poll.status}</Badge>
+              <Badge className={`${getStatusBadgeColor(poll.status)} text-sm`}>
+                {poll.status}
+              </Badge>
             </div>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 border-t border-border">
               <div>
                 <Label className="text-gray-400">Total Votes</Label>
-                <p className="text-2xl font-bold text-teal-400 mt-1">{totalVotes}</p>
+                <p className="text-2xl font-bold text-teal-400 mt-1">
+                  {totalVotes}
+                </p>
               </div>
               <div>
                 <Label className="text-gray-400">Duration</Label>
-                <p className="text-white mt-1">{poll.duration_days || 7} days</p>
+                <p className="text-white mt-1">
+                  {poll.duration_days || 7} days
+                </p>
               </div>
               <div>
                 <Label className="text-gray-400">Start Date</Label>
@@ -232,9 +255,9 @@ export default function PollDetailsPage() {
                 <div className="col-span-2 md:col-span-4">
                   <Label className="text-gray-400">Episode</Label>
                   <p className="text-teal-400 mt-1">
-                    {poll.episodes.title || 'N/A'}
+                    {poll.episodes.title || "N/A"}
                     {poll.episodes.episode_number &&
-                      ` (S${poll.episodes.season_number || '?'} EP${poll.episodes.episode_number})`}
+                      ` (S${poll.episodes.season_number || "?"} EP${poll.episodes.episode_number})`}
                   </p>
                 </div>
               )}
@@ -246,11 +269,15 @@ export default function PollDetailsPage() {
         <Card className="bg-[#111111] border-border">
           <CardHeader>
             <CardTitle className="text-teal-400">POLL OPTIONS</CardTitle>
-            <p className="text-sm text-gray-400 mt-1">Click on an option to vote</p>
+            <p className="text-sm text-gray-400 mt-1">
+              Click on an option to vote
+            </p>
           </CardHeader>
           <CardContent className="space-y-4">
             {sortedOptions.length === 0 ? (
-              <p className="text-gray-400 text-center py-8">No options available</p>
+              <p className="text-gray-400 text-center py-8">
+                No options available
+              </p>
             ) : (
               sortedOptions.map((option, index) => {
                 const percentage = getOptionPercentage(option, totalVotes);
@@ -271,7 +298,7 @@ export default function PollDetailsPage() {
                             alt={option.name}
                             className="object-cover w-full h-full"
                             onError={(e) => {
-                              e.target.style.display = 'none';
+                              e.target.style.display = "none";
                             }}
                           />
                         </div>
@@ -285,7 +312,11 @@ export default function PollDetailsPage() {
                             {option.name}
                           </h3>
                         </div>
-                        {option.description && <p className="text-sm text-gray-400 ml-11">{option.description}</p>}
+                        {option.description && (
+                          <p className="text-sm text-gray-400 ml-11">
+                            {option.description}
+                          </p>
+                        )}
                         {totalVotes > 0 && (
                           <div className="mt-3 ml-11">
                             <div className="w-full bg-teal-400/10 rounded-full h-2 overflow-hidden">
@@ -294,13 +325,17 @@ export default function PollDetailsPage() {
                                 style={{ width: `${percentage}%` }}
                               />
                             </div>
-                            <p className="text-xs text-gray-400 mt-1">{percentage}% of votes</p>
+                            <p className="text-xs text-gray-400 mt-1">
+                              {percentage}% of votes
+                            </p>
                           </div>
                         )}
                       </div>
                       <div className="flex items-center gap-3 shrink-0">
                         <div className="text-right">
-                          <div className="text-2xl font-bold text-teal-400">{option.vote_count || 0}</div>
+                          <div className="text-2xl font-bold text-teal-400">
+                            {option.vote_count || 0}
+                          </div>
                           <div className="text-xs text-gray-400">votes</div>
                         </div>
                         {isUpdating ? (
@@ -337,12 +372,16 @@ export default function PollDetailsPage() {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label className="text-gray-400">Poll ID</Label>
-                <p className="mt-1 font-mono text-xs text-teal-400 break-all">{poll.id}</p>
+                <p className="mt-1 font-mono text-xs text-teal-400 break-all">
+                  {poll.id}
+                </p>
               </div>
               <div>
                 <Label className="text-gray-400">Status</Label>
                 <div className="mt-1">
-                  <Badge className={getStatusBadgeColor(poll.status)}>{poll.status}</Badge>
+                  <Badge className={getStatusBadgeColor(poll.status)}>
+                    {poll.status}
+                  </Badge>
                 </div>
               </div>
               <div>

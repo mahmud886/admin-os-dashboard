@@ -4,8 +4,8 @@
  * Track a poll share event
  */
 
-import { createErrorResponse, createResponse } from '@/lib/db-helpers';
-import { createClient } from '@/lib/supabase-server';
+import { createErrorResponse, createResponse } from "@/lib/db-helpers";
+import { createClient } from "@/lib/supabase-server";
 
 export async function POST(request) {
   try {
@@ -13,18 +13,31 @@ export async function POST(request) {
     const body = await request.json();
 
     // Extract data from request
-    const { poll_id, platform, referrer, utm_source, utm_medium, utm_campaign, ip_address, user_agent } = body;
+    const {
+      poll_id,
+      platform,
+      referrer,
+      utm_source,
+      utm_medium,
+      utm_campaign,
+      ip_address,
+      user_agent,
+    } = body;
 
     // Validate required fields
     if (!poll_id || !platform) {
-      return createErrorResponse('poll_id and platform are required', 400);
+      return createErrorResponse("poll_id and platform are required", 400);
     }
 
     // Verify poll exists
-    const { data: poll, error: pollError } = await supabase.from('polls').select('id').eq('id', poll_id).single();
+    const { data: poll, error: pollError } = await supabase
+      .from("polls")
+      .select("id")
+      .eq("id", poll_id)
+      .single();
 
     if (pollError || !poll) {
-      return createErrorResponse('Poll not found', 404);
+      return createErrorResponse("Poll not found", 404);
     }
 
     // Try to detect which table exists: poll_shares or social_media_clicks
@@ -45,25 +58,29 @@ export async function POST(request) {
     let shareError = null;
 
     const { data: pollSharesData, error: pollSharesError } = await supabase
-      .from('poll_shares')
+      .from("poll_shares")
       .insert([shareData])
       .select()
       .single();
 
     if (!pollSharesError) {
       share = pollSharesData;
-      tableName = 'poll_shares';
-    } else if (pollSharesError.message?.includes('does not exist') || pollSharesError.code === '42P01') {
+      tableName = "poll_shares";
+    } else if (
+      pollSharesError.message?.includes("does not exist") ||
+      pollSharesError.code === "42P01"
+    ) {
       // Try social_media_clicks if poll_shares doesn't exist
-      const { data: socialClicksData, error: socialClicksError } = await supabase
-        .from('social_media_clicks')
-        .insert([shareData])
-        .select()
-        .single();
+      const { data: socialClicksData, error: socialClicksError } =
+        await supabase
+          .from("social_media_clicks")
+          .insert([shareData])
+          .select()
+          .single();
 
       if (!socialClicksError) {
         share = socialClicksData;
-        tableName = 'social_media_clicks';
+        tableName = "social_media_clicks";
       } else {
         shareError = socialClicksError;
       }
@@ -73,30 +90,37 @@ export async function POST(request) {
 
     if (shareError) {
       // If table doesn't exist, return success but log warning
-      if (shareError.message?.includes('does not exist') || shareError.code === '42P01') {
+      if (
+        shareError.message?.includes("does not exist") ||
+        shareError.code === "42P01"
+      ) {
         console.warn(
-          'Shares table does not exist. Run migration: supabase/migrations/create_shares_table.sql or create_social_media_clicks_table.sql'
+          "Shares table does not exist. Run migration: supabase/migrations/create_shares_table.sql or create_social_media_clicks_table.sql",
         );
         return createResponse(
           {
-            message: 'Share tracked (table not yet created)',
+            message: "Share tracked (table not yet created)",
             share: shareData,
           },
-          201
+          201,
         );
       }
-      return createErrorResponse('Failed to track share', 500, shareError.message);
+      return createErrorResponse(
+        "Failed to track share",
+        500,
+        shareError.message,
+      );
     }
 
     return createResponse(
       {
-        message: 'Share tracked successfully',
+        message: "Share tracked successfully",
         share,
       },
-      201
+      201,
     );
   } catch (error) {
-    console.error('Share tracking error:', error);
-    return createErrorResponse('Internal server error', 500, error.message);
+    console.error("Share tracking error:", error);
+    return createErrorResponse("Internal server error", 500, error.message);
   }
 }

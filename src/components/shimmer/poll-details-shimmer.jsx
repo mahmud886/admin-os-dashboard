@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export function PollDetailsShimmer() {
   return (
@@ -37,8 +37,14 @@ export function PollDetailsShimmer() {
           </CardHeader>
           <CardContent className="space-y-4">
             {[1, 2, 3, 4].map((index) => (
-              <div key={index} className="relative p-4 rounded-md border border-border bg-[#0a0a0a] overflow-hidden">
-                <div className="absolute inset-0 bg-teal-900/20" style={{ width: `${index * 25}%` }}></div>
+              <div
+                key={index}
+                className="relative p-4 rounded-md border border-border bg-[#0a0a0a] overflow-hidden"
+              >
+                <div
+                  className="absolute inset-0 bg-teal-900/20"
+                  style={{ width: `${index * 25}%` }}
+                ></div>
                 <div className="relative flex items-center justify-between z-10">
                   <div className="flex-1">
                     <div className="h-6 w-40 bg-teal-400/10 rounded animate-pulse mb-2"></div>

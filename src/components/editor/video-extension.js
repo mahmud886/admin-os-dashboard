@@ -1,9 +1,9 @@
-import { Node, mergeAttributes } from '@tiptap/core';
+import { Node, mergeAttributes } from "@tiptap/core";
 
 export const Video = Node.create({
-  name: 'video',
+  name: "video",
 
-  group: 'block',
+  group: "block",
 
   selectable: true,
 
@@ -22,21 +22,21 @@ export const Video = Node.create({
   parseHTML() {
     return [
       {
-        tag: 'video',
+        tag: "video",
       },
     ];
   },
 
   renderHTML({ HTMLAttributes }) {
     return [
-      'div',
-      { class: 'video-wrapper' },
+      "div",
+      { class: "video-wrapper" },
       [
-        'video',
+        "video",
         mergeAttributes(this.options.HTMLAttributes, HTMLAttributes, {
           controls: true,
-          preload: 'metadata',
-          class: 'w-full rounded-lg border border-border',
+          preload: "metadata",
+          class: "w-full rounded-lg border border-border",
         }),
       ],
     ];

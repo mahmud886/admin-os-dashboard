@@ -77,7 +77,7 @@ paths:
             default: 0
             minimum: 0
       responses:
-        '200':
+        "200":
           description: Successful response
           content:
             application/json:
@@ -87,7 +87,7 @@ paths:
                   episodes:
                     type: array
                     items:
-                      $ref: '#/components/schemas/Episode'
+                      $ref: "#/components/schemas/Episode"
                   total:
                     type: integer
                     description: Total number of episodes
@@ -97,8 +97,8 @@ paths:
                   offset:
                     type: integer
                     description: Pagination offset
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
     post:
       tags:
@@ -113,41 +113,41 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/EpisodeInput'
+              $ref: "#/components/schemas/EpisodeInput"
             examples:
               basic:
                 value:
-                  title: 'The Beginning'
+                  title: "The Beginning"
                   episode_number: 1
                   season_number: 1
-                  unique_episode_id: 'EP-S01-E001'
-                  visibility: 'DRAFT'
+                  unique_episode_id: "EP-S01-E001"
+                  visibility: "DRAFT"
               complete:
                 value:
-                  title: 'The Beginning'
-                  description: 'The story begins...'
+                  title: "The Beginning"
+                  description: "The story begins..."
                   episode_number: 1
                   season_number: 1
-                  runtime: '42:15'
-                  unique_episode_id: 'EP-S01-E001'
-                  visibility: 'AVAILABLE'
-                  access_level: 'free'
-                  release_datetime: '2024-12-31T00:00:00Z'
+                  runtime: "42:15"
+                  unique_episode_id: "EP-S01-E001"
+                  visibility: "AVAILABLE"
+                  access_level: "free"
+                  release_datetime: "2024-12-31T00:00:00Z"
                   clearance_level: 1
                   notify: false
                   age_restricted: false
-                  thumb_image_url: 'https://example.com/thumb.jpg'
-                  banner_image_url: 'https://example.com/banner.jpg'
-                  video_url: 'https://example.com/video.mp4'
-                  audio_url: 'https://example.com/audio.mp3'
-                  additional_background_image_url: 'https://example.com/bg.jpg'
-                  tags: ['cyberpunk', 'sci-fi', 'action']
-                  primary_genre: 'cyberpunk'
-                  secondary_genre: 'sci-fi'
-                  status: 'DRAFT'
+                  thumb_image_url: "https://example.com/thumb.jpg"
+                  banner_image_url: "https://example.com/banner.jpg"
+                  video_url: "https://example.com/video.mp4"
+                  audio_url: "https://example.com/audio.mp3"
+                  additional_background_image_url: "https://example.com/bg.jpg"
+                  tags: ["cyberpunk", "sci-fi", "action"]
+                  primary_genre: "cyberpunk"
+                  secondary_genre: "sci-fi"
+                  status: "DRAFT"
                   isDraft: true
       responses:
-        '201':
+        "201":
           description: Episode created successfully
           content:
             application/json:
@@ -156,21 +156,21 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: 'Episode created successfully'
+                    example: "Episode created successfully"
                   episode:
-                    $ref: '#/components/schemas/Episode'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '409':
+                    $ref: "#/components/schemas/Episode"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "409":
           description: Conflict - Episode with unique ID already exists
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                $ref: "#/components/schemas/Error"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   /episodes/{id}:
     get:
@@ -188,7 +188,7 @@ paths:
             type: string
             format: uuid
       responses:
-        '200':
+        "200":
           description: Successful response
           content:
             application/json:
@@ -196,11 +196,11 @@ paths:
                 type: object
                 properties:
                   episode:
-                    $ref: '#/components/schemas/Episode'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                    $ref: "#/components/schemas/Episode"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
     put:
       tags:
@@ -226,9 +226,9 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/EpisodeInput'
+              $ref: "#/components/schemas/EpisodeInput"
       responses:
-        '200':
+        "200":
           description: Episode updated successfully
           content:
             application/json:
@@ -237,21 +237,21 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: 'Episode updated successfully'
+                    example: "Episode updated successfully"
                   episode:
-                    $ref: '#/components/schemas/Episode'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '409':
+                    $ref: "#/components/schemas/Episode"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
           description: Conflict - Episode with unique ID already exists
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                $ref: "#/components/schemas/Error"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
     delete:
       tags:
@@ -272,7 +272,7 @@ paths:
             type: string
             format: uuid
       responses:
-        '200':
+        "200":
           description: Episode deleted successfully
           content:
             application/json:
@@ -281,13 +281,13 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: 'Episode deleted successfully'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                    example: "Episode deleted successfully"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   /polls:
     get:
@@ -331,7 +331,7 @@ paths:
             default: 0
             minimum: 0
       responses:
-        '200':
+        "200":
           description: Successful response
           content:
             application/json:
@@ -341,7 +341,7 @@ paths:
                   polls:
                     type: array
                     items:
-                      $ref: '#/components/schemas/Poll'
+                      $ref: "#/components/schemas/Poll"
                   total:
                     type: integer
                     description: Total number of polls
@@ -351,8 +351,8 @@ paths:
                   offset:
                     type: integer
                     description: Pagination offset
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
     post:
       tags:
@@ -371,45 +371,45 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PollInput'
+              $ref: "#/components/schemas/PollInput"
             examples:
               basic:
                 value:
-                  episode_id: '550e8400-e29b-41d4-a716-446655440000'
-                  title: 'What should happen next?'
-                  description: 'Vote for the next action in the story'
+                  episode_id: "550e8400-e29b-41d4-a716-446655440000"
+                  title: "What should happen next?"
+                  description: "Vote for the next action in the story"
                   duration_days: 7
-                  status: 'DRAFT'
+                  status: "DRAFT"
                   isDraft: true
                   options:
-                    - name: 'Option A'
-                      description: 'Description for option A'
+                    - name: "Option A"
+                      description: "Description for option A"
                       count: 0
-                    - name: 'Option B'
-                      description: 'Description for option B'
+                    - name: "Option B"
+                      description: "Description for option B"
                       count: 0
               live:
                 value:
-                  episode_id: '550e8400-e29b-41d4-a716-446655440000'
-                  title: 'Who should survive?'
-                  description: 'Choose which character survives'
+                  episode_id: "550e8400-e29b-41d4-a716-446655440000"
+                  title: "Who should survive?"
+                  description: "Choose which character survives"
                   duration_days: 14
-                  status: 'LIVE'
+                  status: "LIVE"
                   isDraft: false
-                  starts_at: '2024-12-31T00:00:00Z'
-                  ends_at: '2025-01-14T00:00:00Z'
+                  starts_at: "2024-12-31T00:00:00Z"
+                  ends_at: "2025-01-14T00:00:00Z"
                   options:
-                    - name: 'Character A'
-                      description: 'The protagonist'
+                    - name: "Character A"
+                      description: "The protagonist"
                       count: 0
-                    - name: 'Character B'
-                      description: 'The antagonist'
+                    - name: "Character B"
+                      description: "The antagonist"
                       count: 0
-                    - name: 'Character C'
-                      description: 'The sidekick'
+                    - name: "Character C"
+                      description: "The sidekick"
                       count: 0
       responses:
-        '201':
+        "201":
           description: Poll created successfully
           content:
             application/json:
@@ -418,21 +418,21 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: 'Poll created successfully'
+                    example: "Poll created successfully"
                   poll:
-                    $ref: '#/components/schemas/Poll'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
+                    $ref: "#/components/schemas/Poll"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
           description: Episode not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                $ref: "#/components/schemas/Error"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   /polls/{id}:
     get:
@@ -450,7 +450,7 @@ paths:
             type: string
             format: uuid
       responses:
-        '200':
+        "200":
           description: Successful response
           content:
             application/json:
@@ -458,11 +458,11 @@ paths:
                 type: object
                 properties:
                   poll:
-                    $ref: '#/components/schemas/Poll'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                    $ref: "#/components/schemas/Poll"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
     put:
       tags:
@@ -489,9 +489,9 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PollInput'
+              $ref: "#/components/schemas/PollInput"
       responses:
-        '200':
+        "200":
           description: Poll updated successfully
           content:
             application/json:
@@ -500,15 +500,15 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: 'Poll updated successfully'
+                    example: "Poll updated successfully"
                   poll:
-                    $ref: '#/components/schemas/Poll'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                    $ref: "#/components/schemas/Poll"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
     delete:
       tags:
@@ -529,7 +529,7 @@ paths:
             type: string
             format: uuid
       responses:
-        '200':
+        "200":
           description: Poll deleted successfully
           content:
             application/json:
@@ -538,13 +538,13 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: 'Poll deleted successfully'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                    example: "Poll deleted successfully"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
 components:
   securitySchemes:
@@ -823,7 +823,7 @@ components:
         poll_options:
           type: array
           items:
-            $ref: '#/components/schemas/PollOption'
+            $ref: "#/components/schemas/PollOption"
           description: Array of poll options
       required:
         - id
@@ -868,7 +868,7 @@ components:
         options:
           type: array
           items:
-            $ref: '#/components/schemas/PollOptionInput'
+            $ref: "#/components/schemas/PollOptionInput"
           minItems: 2
           description: Array of poll options (minimum 2 required for creation)
       required:
@@ -960,37 +960,37 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Error'
+            $ref: "#/components/schemas/Error"
           example:
-            error: 'Missing required fields: title, episode_number'
-            details: 'The following required fields are missing: title, episode_number'
+            error: "Missing required fields: title, episode_number"
+            details: "The following required fields are missing: title, episode_number"
 
     Unauthorized:
       description: Unauthorized - authentication required
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Error'
+            $ref: "#/components/schemas/Error"
           example:
-            error: 'Unauthorized'
-            details: 'Authentication required'
+            error: "Unauthorized"
+            details: "Authentication required"
 
     NotFound:
       description: Resource not found
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Error'
+            $ref: "#/components/schemas/Error"
           example:
-            error: 'Episode not found'
-            details: 'Episode with ID 550e8400-e29b-41d4-a716-446655440000 does not exist'
+            error: "Episode not found"
+            details: "Episode with ID 550e8400-e29b-41d4-a716-446655440000 does not exist"
 
     InternalServerError:
       description: Internal server error
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Error'
+            $ref: "#/components/schemas/Error"
           example:
-            error: 'Internal server error'
-            details: 'An unexpected error occurred'
+            error: "Internal server error"
+            details: "An unexpected error occurred"

@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import { MainLayout } from '@/components/layout/main-layout';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Calendar, ExternalLink, Pencil } from 'lucide-react';
-import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { MainLayout } from "@/components/layout/main-layout";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Calendar, ExternalLink, Pencil } from "lucide-react";
+import Link from "next/link";
+import { useEffect, useState } from "react";
 
 export default function MediaNewsPage() {
   const [news, setNews] = useState([]);
@@ -14,11 +14,11 @@ export default function MediaNewsPage() {
   useEffect(() => {
     async function fetchNews() {
       try {
-        const res = await fetch('/api/media-news');
+        const res = await fetch("/api/media-news");
         const data = await res.json();
         setNews(data);
       } catch (error) {
-        console.error('Failed to fetch media news:', error);
+        console.error("Failed to fetch media news:", error);
       } finally {
         setLoading(false);
       }
@@ -30,16 +30,23 @@ export default function MediaNewsPage() {
     <MainLayout breadcrumb="SYSTEM CONSOLE / MEDIA NEWS">
       <div className="space-y-8">
         <div className="flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-teal-400 sm:text-3xl lg:text-4xl">MEDIA NEWS</h1>
+          <h1 className="text-2xl font-bold text-teal-400 sm:text-3xl lg:text-4xl">
+            MEDIA NEWS
+          </h1>
           <Link href="/admin/media-news/create">
-            <Button className="font-semibold text-black bg-teal-500 hover:bg-teal-600">NEW ENTRY</Button>
+            <Button className="font-semibold text-black bg-teal-500 hover:bg-teal-600">
+              NEW ENTRY
+            </Button>
           </Link>
         </div>
 
         {loading ? (
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="h-96 rounded-lg bg-[#1a1a1a] animate-pulse"></div>
+              <div
+                key={i}
+                className="h-96 rounded-lg bg-[#1a1a1a] animate-pulse"
+              ></div>
             ))}
           </div>
         ) : (
@@ -50,7 +57,10 @@ export default function MediaNewsPage() {
                 className="bg-[#111111] border-border overflow-hidden hover:border-teal-500/50 transition-colors group"
               >
                 <div className="aspect-video relative overflow-hidden bg-[#1a1a1a]">
-                  <Link href={`/admin/media-news/${article.slug || article.id}`} className="block w-full h-full">
+                  <Link
+                    href={`/admin/media-news/${article.slug || article.id}`}
+                    className="block w-full h-full"
+                  >
                     {article.coverImage ? (
                       <img
                         src={article.coverImage}
@@ -59,7 +69,9 @@ export default function MediaNewsPage() {
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#1a1a1a] to-[#0a0a0a]">
-                        <div className="font-mono text-xs tracking-widest text-gray-700 uppercase">No Image</div>
+                        <div className="font-mono text-xs tracking-widest text-gray-700 uppercase">
+                          No Image
+                        </div>
                       </div>
                     )}
                   </Link>
@@ -89,11 +101,14 @@ export default function MediaNewsPage() {
                   <div className="flex justify-between items-center text-xs text-gray-500">
                     <div className="flex items-center">
                       <Calendar className="mr-2 w-3 h-3" />
-                      {new Date(article.publishedAt).toLocaleDateString('en-US', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric',
-                      })}
+                      {new Date(article.publishedAt).toLocaleDateString(
+                        "en-US",
+                        {
+                          year: "numeric",
+                          month: "long",
+                          day: "numeric",
+                        },
+                      )}
                     </div>
                     {article.source && (
                       <span className="text-teal-500 font-medium uppercase tracking-wider text-[10px]">
@@ -101,12 +116,17 @@ export default function MediaNewsPage() {
                       </span>
                     )}
                   </div>
-                  <Link href={`/admin/media-news/${article.slug || article.id}`} className="block">
+                  <Link
+                    href={`/admin/media-news/${article.slug || article.id}`}
+                    className="block"
+                  >
                     <h2 className="text-xl font-bold text-gray-100 transition-colors group-hover:text-teal-400 line-clamp-2">
                       {article.title}
                     </h2>
                   </Link>
-                  <p className="text-sm leading-relaxed text-gray-400 line-clamp-3">{article.excerpt}</p>
+                  <p className="text-sm leading-relaxed text-gray-400 line-clamp-3">
+                    {article.excerpt}
+                  </p>
 
                   {article.sourceUrl && (
                     <a

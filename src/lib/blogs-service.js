@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase-server';
+import { createClient } from "@/lib/supabase-server";
 
 function mapToModel(record) {
   if (!record) return null;
@@ -12,7 +12,7 @@ function mapToModel(record) {
     tags: record.tags || [],
     author: record.author,
     isPasswordProtected: record.is_password_protected || false,
-    accessPassword: record.access_password || '',
+    accessPassword: record.access_password || "",
     publishedAt: record.published_at,
     createdAt: record.created_at,
     updatedAt: record.updated_at,
@@ -37,10 +37,13 @@ function mapToDB(model) {
 export const blogsService = {
   getAll: async () => {
     const supabase = await createClient();
-    const { data, error } = await supabase.from('blogs').select('*').order('published_at', { ascending: false });
+    const { data, error } = await supabase
+      .from("blogs")
+      .select("*")
+      .order("published_at", { ascending: false });
 
     if (error) {
-      console.error('Error fetching blogs:', error);
+      console.error("Error fetching blogs:", error);
       return [];
     }
     return data.map(mapToModel);
@@ -48,7 +51,11 @@ export const blogsService = {
 
   getById: async (id) => {
     const supabase = await createClient();
-    const { data, error } = await supabase.from('blogs').select('*').eq('id', id).single();
+    const { data, error } = await supabase
+      .from("blogs")
+      .select("*")
+      .eq("id", id)
+      .single();
 
     if (error) return null;
     return mapToModel(data);
@@ -56,7 +63,11 @@ export const blogsService = {
 
   getBySlug: async (slug) => {
     const supabase = await createClient();
-    const { data, error } = await supabase.from('blogs').select('*').eq('slug', slug).single();
+    const { data, error } = await supabase
+      .from("blogs")
+      .select("*")
+      .eq("slug", slug)
+      .single();
 
     if (error) return null;
     return mapToModel(data);
@@ -71,7 +82,11 @@ export const blogsService = {
       dbData.published_at = blogData.publishedAt;
     }
 
-    const { data, error } = await supabase.from('blogs').insert(dbData).select().single();
+    const { data, error } = await supabase
+      .from("blogs")
+      .insert(dbData)
+      .select()
+      .single();
 
     if (error) throw error;
     return mapToModel(data);
@@ -81,7 +96,12 @@ export const blogsService = {
     const supabase = await createClient();
     const dbData = mapToDB(blogData);
 
-    const { data, error } = await supabase.from('blogs').update(dbData).eq('id', id).select().single();
+    const { data, error } = await supabase
+      .from("blogs")
+      .update(dbData)
+      .eq("id", id)
+      .select()
+      .single();
 
     if (error) throw error;
     return mapToModel(data);
@@ -89,7 +109,7 @@ export const blogsService = {
 
   delete: async (id) => {
     const supabase = await createClient();
-    const { error } = await supabase.from('blogs').delete().eq('id', id);
+    const { error } = await supabase.from("blogs").delete().eq("id", id);
 
     if (error) return false;
     return true;

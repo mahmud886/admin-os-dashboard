@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import { MainLayout } from '@/components/layout/main-layout';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { ArrowRight, Calendar, Pencil } from 'lucide-react';
-import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { MainLayout } from "@/components/layout/main-layout";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { ArrowRight, Calendar, Pencil } from "lucide-react";
+import Link from "next/link";
+import { useEffect, useState } from "react";
 
 export default function BlogsPage() {
   const [blogs, setBlogs] = useState([]);
@@ -14,11 +14,11 @@ export default function BlogsPage() {
   useEffect(() => {
     async function fetchBlogs() {
       try {
-        const res = await fetch('/api/blogs');
+        const res = await fetch("/api/blogs");
         const data = await res.json();
         setBlogs(data);
       } catch (error) {
-        console.error('Failed to fetch blogs:', error);
+        console.error("Failed to fetch blogs:", error);
       } finally {
         setLoading(false);
       }
@@ -30,16 +30,23 @@ export default function BlogsPage() {
     <MainLayout breadcrumb="SYSTEM CONSOLE / BLOGS">
       <div className="space-y-8">
         <div className="flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-teal-400 sm:text-3xl lg:text-4xl">SPORE LOG</h1>
+          <h1 className="text-2xl font-bold text-teal-400 sm:text-3xl lg:text-4xl">
+            SPORE LOG
+          </h1>
           <Link href="/admin/blogs/create">
-            <Button className="font-semibold text-black bg-teal-500 hover:bg-teal-600">NEW ENTRY</Button>
+            <Button className="font-semibold text-black bg-teal-500 hover:bg-teal-600">
+              NEW ENTRY
+            </Button>
           </Link>
         </div>
 
         {loading ? (
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="h-96 rounded-lg bg-[#1a1a1a] animate-pulse"></div>
+              <div
+                key={i}
+                className="h-96 rounded-lg bg-[#1a1a1a] animate-pulse"
+              ></div>
             ))}
           </div>
         ) : (
@@ -58,7 +65,9 @@ export default function BlogsPage() {
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#1a1a1a] to-[#0a0a0a]">
-                      <div className="font-mono text-xs tracking-widest text-gray-700 uppercase">No Image</div>
+                      <div className="font-mono text-xs tracking-widest text-gray-700 uppercase">
+                        No Image
+                      </div>
                     </div>
                   )}
                   <div className="flex absolute top-4 left-4 gap-2">
@@ -86,16 +95,18 @@ export default function BlogsPage() {
                 <CardContent className="p-6 space-y-4">
                   <div className="flex items-center text-xs text-gray-500">
                     <Calendar className="mr-2 w-3 h-3" />
-                    {new Date(blog.publishedAt).toLocaleDateString('en-US', {
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
+                    {new Date(blog.publishedAt).toLocaleDateString("en-US", {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
                     })}
                   </div>
                   <h2 className="text-xl font-bold text-gray-100 transition-colors group-hover:text-teal-400">
                     {blog.title}
                   </h2>
-                  <p className="text-sm leading-relaxed text-gray-400 line-clamp-3">{blog.excerpt}</p>
+                  <p className="text-sm leading-relaxed text-gray-400 line-clamp-3">
+                    {blog.excerpt}
+                  </p>
                   <Link
                     href={`/admin/blogs/${blog.slug || blog.id}`}
                     className="inline-flex items-center mt-2 text-sm font-medium text-teal-400 hover:text-teal-300"

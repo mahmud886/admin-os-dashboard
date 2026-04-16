@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase-server';
+import { createClient } from "@/lib/supabase-server";
 
 function mapToModel(record) {
   if (!record) return null;
@@ -20,7 +20,7 @@ function mapToModel(record) {
 }
 
 function mapToDB(model) {
-  return {
+  const dbData = {
     slug: model.slug,
     title: model.title,
     excerpt: model.excerpt,
@@ -31,15 +31,28 @@ function mapToDB(model) {
     tags: model.tags,
     author: model.author,
   };
+
+  if (
+    model.publishedAt !== undefined &&
+    model.publishedAt !== null &&
+    model.publishedAt !== ""
+  ) {
+    dbData.published_at = model.publishedAt;
+  }
+
+  return dbData;
 }
 
 export const mediaNewsService = {
   getAll: async () => {
     const supabase = await createClient();
-    const { data, error } = await supabase.from('media_news').select('*').order('published_at', { ascending: false });
+    const { data, error } = await supabase
+      .from("media_news")
+      .select("*")
+      .order("published_at", { ascending: false });
 
     if (error) {
-      console.error('Error fetching media news:', error);
+      console.error("Error fetching media news:", error);
       return [];
     }
     return data.map(mapToModel);
@@ -47,7 +60,11 @@ export const mediaNewsService = {
 
   getById: async (id) => {
     const supabase = await createClient();
-    const { data, error } = await supabase.from('media_news').select('*').eq('id', id).single();
+    const { data, error } = await supabase
+      .from("media_news")
+      .select("*")
+      .eq("id", id)
+      .single();
 
     if (error) return null;
     return mapToModel(data);
@@ -55,7 +72,11 @@ export const mediaNewsService = {
 
   getBySlug: async (slug) => {
     const supabase = await createClient();
-    const { data, error } = await supabase.from('media_news').select('*').eq('slug', slug).single();
+    const { data, error } = await supabase
+      .from("media_news")
+      .select("*")
+      .eq("slug", slug)
+      .single();
 
     if (error) return null;
     return mapToModel(data);
@@ -65,11 +86,11 @@ export const mediaNewsService = {
     const supabase = await createClient();
     const dbData = mapToDB(newsData);
 
-    if (newsData.publishedAt) {
-      dbData.published_at = newsData.publishedAt;
-    }
-
-    const { data, error } = await supabase.from('media_news').insert(dbData).select().single();
+    const { data, error } = await supabase
+      .from("media_news")
+      .insert(dbData)
+      .select()
+      .single();
 
     if (error) throw error;
     return mapToModel(data);
@@ -79,10 +100,12 @@ export const mediaNewsService = {
     const supabase = await createClient();
     const dbData = mapToDB(newsData);
 
-    // Update published_at to current time on edit
-    dbData.published_at = new Date().toISOString();
-
-    const { data, error } = await supabase.from('media_news').update(dbData).eq('id', id).select().single();
+    const { data, error } = await supabase
+      .from("media_news")
+      .update(dbData)
+      .eq("id", id)
+      .select()
+      .single();
 
     if (error) throw error;
     return mapToModel(data);
@@ -90,7 +113,7 @@ export const mediaNewsService = {
 
   delete: async (id) => {
     const supabase = await createClient();
-    const { error } = await supabase.from('media_news').delete().eq('id', id);
+    const { error } = await supabase.from("media_news").delete().eq("id", id);
 
     if (error) return false;
     return true;

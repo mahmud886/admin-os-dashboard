@@ -150,16 +150,18 @@ NEXT_PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX
 ### Track a Share
 
 ```javascript
-await fetch('/api/analytics/shares', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
+await fetch("/api/analytics/shares", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
   body: JSON.stringify({
-    poll_id: 'poll-uuid',
-    platform: 'facebook',
+    poll_id: "poll-uuid",
+    platform: "facebook",
     referrer: window.location.href,
-    utm_source: new URLSearchParams(window.location.search).get('utm_source'),
-    utm_medium: new URLSearchParams(window.location.search).get('utm_medium'),
-    utm_campaign: new URLSearchParams(window.location.search).get('utm_campaign'),
+    utm_source: new URLSearchParams(window.location.search).get("utm_source"),
+    utm_medium: new URLSearchParams(window.location.search).get("utm_medium"),
+    utm_campaign: new URLSearchParams(window.location.search).get(
+      "utm_campaign",
+    ),
   }),
 });
 ```

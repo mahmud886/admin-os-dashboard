@@ -1,14 +1,14 @@
-'use client';
+"use client";
 
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent } from "@/components/ui/card";
 
 export function GoogleAnalyticsStatus({ gaData }) {
   if (!gaData) return null;
 
   if (gaData.configured) {
     const hasMetrics =
-      typeof gaData.activeUsers === 'number' ||
-      typeof gaData.totalVisits === 'number' ||
+      typeof gaData.activeUsers === "number" ||
+      typeof gaData.totalVisits === "number" ||
       (gaData.visitLocation && gaData.visitLocation.length > 0);
 
     return (
@@ -19,22 +19,30 @@ export function GoogleAnalyticsStatus({ gaData }) {
               ✓
             </div>
             <div className="flex-1">
-              <h3 className="mb-2 text-lg font-bold text-white">Google Analytics Connected</h3>
+              <h3 className="mb-2 text-lg font-bold text-white">
+                Google Analytics Connected
+              </h3>
               <div className="grid grid-cols-1 gap-4 text-sm sm:grid-cols-2 md:grid-cols-4">
                 <div>
                   <p className="text-white/50">Measurement ID</p>
-                  <p className="font-mono font-bold text-teal-400">{gaData.measurementId}</p>
+                  <p className="font-mono font-bold text-teal-400">
+                    {gaData.measurementId}
+                  </p>
                 </div>
                 <div>
                   <p className="text-white/50">Active Users (Live)</p>
                   <p className="text-xl font-bold text-teal-400">
-                    {hasMetrics ? (gaData.activeUsers ?? 0).toLocaleString() : '—'}
+                    {hasMetrics
+                      ? (gaData.activeUsers ?? 0).toLocaleString()
+                      : "—"}
                   </p>
                 </div>
                 <div>
                   <p className="text-white/50">Total Visits (30d)</p>
                   <p className="text-xl font-bold text-teal-400">
-                    {hasMetrics ? (gaData.totalVisits ?? 0).toLocaleString() : '—'}
+                    {hasMetrics
+                      ? (gaData.totalVisits ?? 0).toLocaleString()
+                      : "—"}
                   </p>
                 </div>
                 <div>
@@ -62,13 +70,20 @@ export function GoogleAnalyticsStatus({ gaData }) {
             ⚠️
           </div>
           <div className="flex-1">
-            <h3 className="mb-2 text-lg font-bold text-white">Google Analytics Not Configured</h3>
+            <h3 className="mb-2 text-lg font-bold text-white">
+              Google Analytics Not Configured
+            </h3>
             <p className="mb-3 text-white/70">
-              Add your Google Analytics Measurement ID to track active users, page views, and real-time data.
+              Add your Google Analytics Measurement ID to track active users,
+              page views, and real-time data.
             </p>
             <div className="rounded-lg border border-amber-500/30 bg-black/50 p-4">
-              <p className="mb-2 font-mono text-sm text-teal-400">NEXT_PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX</p>
-              <p className="text-xs text-white/50">Add this to your .env.local file and restart the dev server</p>
+              <p className="mb-2 font-mono text-sm text-teal-400">
+                NEXT_PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX
+              </p>
+              <p className="text-xs text-white/50">
+                Add this to your .env.local file and restart the dev server
+              </p>
             </div>
           </div>
         </div>

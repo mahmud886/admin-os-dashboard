@@ -1,12 +1,16 @@
-import { blogsService } from '@/lib/blogs-service';
-import { ArrowLeft, Calendar, User } from 'lucide-react';
-import Link from 'next/link';
-import { notFound } from 'next/navigation';
-import './preview.css';
+import { blogsService } from "@/lib/blogs-service";
+import { ArrowLeft, Calendar, User } from "lucide-react";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import "./preview.css";
 
 // Wrapper component to simulate layout
 function Wrapper({ children }) {
-  return <div className="px-4 mx-auto w-full max-w-7xl sm:px-6 lg:px-8">{children}</div>;
+  return (
+    <div className="px-4 mx-auto w-full max-w-7xl sm:px-6 lg:px-8">
+      {children}
+    </div>
+  );
 }
 
 export default async function BlogPreviewPage({ params }) {
@@ -37,7 +41,10 @@ export default async function BlogPreviewPage({ params }) {
             href={`/admin/blogs/${blog.id}/edit`}
             className="inline-flex gap-2 items-center mb-8 font-mono text-sm transition-colors text-white/80 hover:text-primary group"
           >
-            <ArrowLeft size={16} className="transition-transform group-hover:-translate-x-1" />
+            <ArrowLeft
+              size={16}
+              className="transition-transform group-hover:-translate-x-1"
+            />
             <span>RETURN TO EDIT</span>
           </Link>
 
@@ -49,16 +56,16 @@ export default async function BlogPreviewPage({ params }) {
               <div className="flex flex-wrap gap-4 items-center mb-6 font-mono text-xs tracking-wider uppercase text-white/40">
                 <span className="flex gap-2 items-center">
                   <Calendar size={14} />
-                  {new Date(blog.publishedAt).toLocaleDateString('en-US', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
+                  {new Date(blog.publishedAt).toLocaleDateString("en-US", {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
                   })}
                 </span>
                 <span className="w-1 h-1 rounded-full bg-white/20" />
                 <span className="flex gap-2 items-center text-primary">
                   <User size={14} />
-                  {blog.author || 'SPORE FALL'}
+                  {blog.author || "SPORE FALL"}
                 </span>
               </div>
 
@@ -110,9 +117,12 @@ export default async function BlogPreviewPage({ params }) {
             {/* Footer / Share / Navigation */}
             <div className="pt-12 mt-20 border-t border-white/10">
               <div className="p-8 text-center rounded-xl border bg-white/5 border-white/10">
-                <h3 className="mb-4 text-xl font-bold text-primary">Join the Discussion</h3>
+                <h3 className="mb-4 text-xl font-bold text-primary">
+                  Join the Discussion
+                </h3>
                 <p className="mb-6 text-white/60 font-body">
-                  Share your thoughts on the Spore protocol and connect with other survivors.
+                  Share your thoughts on the Spore protocol and connect with
+                  other survivors.
                 </p>
               </div>
             </div>

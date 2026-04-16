@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import {
   BarChart3,
   Book,
@@ -16,24 +16,28 @@ import {
   ShoppingCart,
   Users,
   X,
-} from 'lucide-react';
+} from "lucide-react";
 
-import Image from 'next/image';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { useState } from 'react';
+import Image from "next/image";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useState } from "react";
 
 const navigation = [
-  { name: 'DASHBOARD', href: '/dashboard', icon: LayoutDashboard },
-  { name: 'CREATE POLL', href: '/create-poll', icon: PlusCircle },
-  { name: 'CREATE EPISODE', href: '/create-episode', icon: BookOpen },
-  { name: 'EPISODE MANAGEMENT', href: '/episodes', icon: Book },
-  { name: 'POLL MANAGEMENT', href: '/polls', icon: BarChart3 },
-  { name: 'E-MAIL LIST', href: '/emails', icon: Users },
-  { name: 'SUPPORTER DONATIONS', href: '/supporter-donations', icon: CreditCard },
-  { name: 'BLOGS MANAGEMENT', href: '/admin/blogs', icon: Newspaper },
-  { name: 'MEDIA NEWS', href: '/admin/media-news', icon: Radio },
-  { name: 'ECOMMERCE', href: '/ecommerce/orders', icon: ShoppingCart },
+  { name: "DASHBOARD", href: "/dashboard", icon: LayoutDashboard },
+  { name: "CREATE POLL", href: "/create-poll", icon: PlusCircle },
+  { name: "CREATE EPISODE", href: "/create-episode", icon: BookOpen },
+  { name: "EPISODE MANAGEMENT", href: "/episodes", icon: Book },
+  { name: "POLL MANAGEMENT", href: "/polls", icon: BarChart3 },
+  { name: "E-MAIL LIST", href: "/emails", icon: Users },
+  {
+    name: "SUPPORTER DONATIONS",
+    href: "/supporter-donations",
+    icon: CreditCard,
+  },
+  { name: "BLOGS MANAGEMENT", href: "/admin/blogs", icon: Newspaper },
+  { name: "MEDIA NEWS", href: "/admin/media-news", icon: Radio },
+  { name: "ECOMMERCE", href: "/ecommerce/orders", icon: ShoppingCart },
   // { name: 'CONTENT MANAGER', href: '/content', icon: FileText },
   // { name: 'PRODUCT STORE', href: '/products', icon: Package },
 ];
@@ -57,9 +61,9 @@ export function Sidebar() {
       {/* Sidebar */}
       <div
         className={cn(
-          'fixed left-0 top-0 h-screen w-64 bg-[#0a0a0a] border-r border-border flex flex-col z-40 transition-transform duration-300',
-          'lg:translate-x-0',
-          isOpen ? 'translate-x-0' : '-translate-x-full'
+          "fixed left-0 top-0 h-screen w-64 bg-[#0a0a0a] border-r border-border flex flex-col z-40 transition-transform duration-300",
+          "lg:translate-x-0",
+          isOpen ? "translate-x-0" : "-translate-x-full",
         )}
       >
         <div className="p-6 border-b border-border">
@@ -75,7 +79,8 @@ export function Sidebar() {
               />
             </div>
             <h1 className="text-2xl font-bold">
-              <span className="text-white">SPORE</span> <span className="text-yellow-400">FALL</span>
+              <span className="text-white">SPORE</span>{" "}
+              <span className="text-yellow-400">FALL</span>
             </h1>
           </div>
         </div>
@@ -89,13 +94,18 @@ export function Sidebar() {
                 href={item.href}
                 onClick={() => setIsOpen(false)}
                 className={cn(
-                  'flex relative gap-3 items-center px-4 py-3 text-sm font-medium rounded-md transition-colors',
+                  "flex relative gap-3 items-center px-4 py-3 text-sm font-medium rounded-md transition-colors",
                   isActive
-                    ? 'text-teal-400 border-l-4 border-teal-400 bg-teal-900/30'
-                    : 'text-gray-400 hover:bg-accent hover:text-accent-foreground'
+                    ? "text-teal-400 border-l-4 border-teal-400 bg-teal-900/30"
+                    : "text-gray-400 hover:bg-accent hover:text-accent-foreground",
                 )}
               >
-                <Icon className={cn('w-5 h-5', isActive ? 'text-teal-400' : 'text-gray-400')} />
+                <Icon
+                  className={cn(
+                    "w-5 h-5",
+                    isActive ? "text-teal-400" : "text-gray-400",
+                  )}
+                />
                 <span>{item.name}</span>
               </Link>
             );
@@ -114,7 +124,12 @@ export function Sidebar() {
       </div>
 
       {/* Overlay for mobile */}
-      {isOpen && <div className="fixed inset-0 z-30 bg-black/50 lg:hidden" onClick={() => setIsOpen(false)} />}
+      {isOpen && (
+        <div
+          className="fixed inset-0 z-30 bg-black/50 lg:hidden"
+          onClick={() => setIsOpen(false)}
+        />
+      )}
     </>
   );
 }

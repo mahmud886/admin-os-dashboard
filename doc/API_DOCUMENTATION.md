@@ -416,18 +416,18 @@ All errors follow this format:
 ### Create Episode
 
 ```javascript
-const response = await fetch('/api/episodes', {
-  method: 'POST',
+const response = await fetch("/api/episodes", {
+  method: "POST",
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   },
   body: JSON.stringify({
-    title: 'The Beginning',
+    title: "The Beginning",
     episode_number: 1,
     season_number: 1,
-    unique_episode_id: 'EP-S01-E001',
-    visibility: 'DRAFT',
-    tags: ['cyberpunk', 'sci-fi'],
+    unique_episode_id: "EP-S01-E001",
+    visibility: "DRAFT",
+    tags: ["cyberpunk", "sci-fi"],
   }),
 });
 
@@ -437,20 +437,20 @@ const data = await response.json();
 ### Create Poll with Dynamic Options
 
 ```javascript
-const response = await fetch('/api/polls', {
-  method: 'POST',
+const response = await fetch("/api/polls", {
+  method: "POST",
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   },
   body: JSON.stringify({
-    episode_id: 'episode-uuid',
-    title: 'What should happen next?',
-    description: 'Vote for the next action',
+    episode_id: "episode-uuid",
+    title: "What should happen next?",
+    description: "Vote for the next action",
     duration_days: 7,
     options: [
-      { name: 'Option A', description: 'Description A', count: 0 },
-      { name: 'Option B', description: 'Description B', count: 0 },
-      { name: 'Option C', description: 'Description C', count: 0 },
+      { name: "Option A", description: "Description A", count: 0 },
+      { name: "Option B", description: "Description B", count: 0 },
+      { name: "Option C", description: "Description C", count: 0 },
     ],
     isDraft: false,
   }),

@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Book, BookOpen, ExternalLink } from 'lucide-react';
-import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Book, BookOpen, ExternalLink } from "lucide-react";
+import Link from "next/link";
+import { useEffect, useState } from "react";
 
 export function EpisodeStatsCard() {
   const [stats, setStats] = useState({
@@ -21,22 +21,25 @@ export function EpisodeStatsCard() {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const response = await fetch('/api/episodes');
+        const response = await fetch("/api/episodes");
         const data = await response.json();
 
         if (response.ok && data.episodes) {
           const episodes = data.episodes;
           setStats({
             total: episodes.length,
-            available: episodes.filter((e) => e.visibility === 'AVAILABLE').length,
-            draft: episodes.filter((e) => e.visibility === 'DRAFT').length,
-            upcoming: episodes.filter((e) => e.visibility === 'UPCOMING').length,
-            featured: episodes.filter((e) => e.visibility === 'FEATURED').length,
+            available: episodes.filter((e) => e.visibility === "AVAILABLE")
+              .length,
+            draft: episodes.filter((e) => e.visibility === "DRAFT").length,
+            upcoming: episodes.filter((e) => e.visibility === "UPCOMING")
+              .length,
+            featured: episodes.filter((e) => e.visibility === "FEATURED")
+              .length,
             loading: false,
           });
         }
       } catch (error) {
-        console.error('Error fetching episodes stats:', error);
+        console.error("Error fetching episodes stats:", error);
         setStats((prev) => ({ ...prev, loading: false }));
       }
     };
@@ -50,7 +53,9 @@ export function EpisodeStatsCard() {
       <Card className="bg-[#111111] border-border hover:border-teal-400/50 transition-colors">
         <CardHeader className="pb-2">
           <div className="flex justify-between items-center">
-            <CardTitle className="text-sm font-medium text-gray-400">TOTAL EPISODES</CardTitle>
+            <CardTitle className="text-sm font-medium text-gray-400">
+              TOTAL EPISODES
+            </CardTitle>
             <Book className="w-5 h-5 text-teal-400" />
           </div>
         </CardHeader>
@@ -64,7 +69,11 @@ export function EpisodeStatsCard() {
               )}
             </div>
             <Link href="/episodes">
-              <Button variant="ghost" size="sm" className="text-gray-400 hover:text-teal-400">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-gray-400 hover:text-teal-400"
+              >
                 VIEW ALL
                 <ExternalLink className="ml-2 w-4 h-4" />
               </Button>
@@ -74,11 +83,15 @@ export function EpisodeStatsCard() {
             <div className="mt-2 space-y-1">
               <div className="flex justify-between items-center text-xs">
                 <span className="text-gray-500">Available:</span>
-                <span className="font-medium text-green-400">{stats.available}</span>
+                <span className="font-medium text-green-400">
+                  {stats.available}
+                </span>
               </div>
               <div className="flex justify-between items-center text-xs">
                 <span className="text-gray-500">Featured:</span>
-                <span className="font-medium text-purple-400">{stats.featured}</span>
+                <span className="font-medium text-purple-400">
+                  {stats.featured}
+                </span>
               </div>
               <div className="flex justify-between items-center text-xs">
                 <span className="text-gray-500">Draft:</span>
@@ -86,7 +99,9 @@ export function EpisodeStatsCard() {
               </div>
               <div className="flex justify-between items-center text-xs">
                 <span className="text-gray-500">Upcoming:</span>
-                <span className="font-medium text-orange-400">{stats.upcoming}</span>
+                <span className="font-medium text-orange-400">
+                  {stats.upcoming}
+                </span>
               </div>
             </div>
           )}
@@ -97,7 +112,9 @@ export function EpisodeStatsCard() {
       <Card className="bg-[#111111] border-border hover:border-teal-400/50 transition-colors">
         <CardHeader className="pb-2">
           <div className="flex justify-between items-center">
-            <CardTitle className="text-sm font-medium text-gray-400">AVAILABLE EPISODES</CardTitle>
+            <CardTitle className="text-sm font-medium text-gray-400">
+              AVAILABLE EPISODES
+            </CardTitle>
             <BookOpen className="w-5 h-5 text-green-400" />
           </div>
         </CardHeader>
@@ -110,9 +127,15 @@ export function EpisodeStatsCard() {
                 stats.available
               )}
             </div>
-            <Badge className="text-green-400 border-green-500 bg-green-500/50 hover:bg-green-500">LIVE</Badge>
+            <Badge className="text-green-400 border-green-500 bg-green-500/50 hover:bg-green-500">
+              LIVE
+            </Badge>
           </div>
-          {!stats.loading && <p className="mt-2 text-xs text-gray-500">Currently accessible episodes</p>}
+          {!stats.loading && (
+            <p className="mt-2 text-xs text-gray-500">
+              Currently accessible episodes
+            </p>
+          )}
         </CardContent>
       </Card>
     </>

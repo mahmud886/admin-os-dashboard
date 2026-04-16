@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { Sidebar } from './sidebar';
-import { Header } from './header';
+import { Sidebar } from "./sidebar";
+import { Header } from "./header";
 
 export function MainLayout({ children, title, breadcrumb }) {
   return (

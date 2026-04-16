@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { createBrowserClient } from '@supabase/ssr';
+import { createBrowserClient } from "@supabase/ssr";
 
 let supabaseClient = null;
 
@@ -11,18 +11,20 @@ export function createClient() {
   }
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY;
+  const supabaseAnonKey =
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY;
 
   // Validate environment variables
   if (!supabaseUrl || !supabaseAnonKey) {
     const missing = [];
-    if (!supabaseUrl) missing.push('NEXT_PUBLIC_SUPABASE_URL');
-    if (!supabaseAnonKey) missing.push('NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY');
+    if (!supabaseUrl) missing.push("NEXT_PUBLIC_SUPABASE_URL");
+    if (!supabaseAnonKey)
+      missing.push("NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY");
 
     throw new Error(
-      `Missing required environment variables: ${missing.join(', ')}. ` +
-        'Please check your .env.local file and ensure these variables are set. ' +
-        'See https://supabase.com/dashboard/project/_/settings/api'
+      `Missing required environment variables: ${missing.join(", ")}. ` +
+        "Please check your .env.local file and ensure these variables are set. " +
+        "See https://supabase.com/dashboard/project/_/settings/api",
     );
   }
 

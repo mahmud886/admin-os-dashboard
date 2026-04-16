@@ -4,8 +4,13 @@
  * POST /api/episodes - Create a new episode
  */
 
-import { createErrorResponse, createResponse, getAuthenticatedUser, validateRequiredFields } from '@/lib/db-helpers';
-import { createClient } from '@/lib/supabase-server';
+import {
+  createErrorResponse,
+  createResponse,
+  getAuthenticatedUser,
+  validateRequiredFields,
+} from "@/lib/db-helpers";
+import { createClient } from "@/lib/supabase-server";
 
 // GET - Fetch all episodes
 export async function GET(request) {
@@ -14,27 +19,30 @@ export async function GET(request) {
     const { searchParams } = new URL(request.url);
 
     // Query parameters
-    const visibility = searchParams.get('visibility');
-    const accessLevel = searchParams.get('access_level');
-    const status = searchParams.get('status');
-    const limit = parseInt(searchParams.get('limit') || '100');
-    const offset = parseInt(searchParams.get('offset') || '0');
+    const visibility = searchParams.get("visibility");
+    const accessLevel = searchParams.get("access_level");
+    const status = searchParams.get("status");
+    const limit = parseInt(searchParams.get("limit") || "100");
+    const offset = parseInt(searchParams.get("offset") || "0");
 
     // Build query
-    let query = supabase.from('episodes').select('*', { count: 'exact' }).order('created_at', { ascending: false });
+    let query = supabase
+      .from("episodes")
+      .select("*", { count: "exact" })
+      .order("created_at", { ascending: false });
 
     // Check authentication for sensitive data
     const { user } = await getAuthenticatedUser();
 
     // Apply filters
     if (visibility) {
-      query = query.eq('visibility', visibility);
+      query = query.eq("visibility", visibility);
     }
     if (accessLevel) {
-      query = query.eq('access_level', accessLevel);
+      query = query.eq("access_level", accessLevel);
     }
     if (status) {
-      query = query.eq('status', status);
+      query = query.eq("status", status);
     }
 
     // Apply pagination
@@ -43,7 +51,11 @@ export async function GET(request) {
     const { data, error, count } = await query;
 
     if (error) {
-      return createErrorResponse('Failed to fetch episodes', 500, error.message);
+      return createErrorResponse(
+        "Failed to fetch episodes",
+        500,
+        error.message,
+      );
     }
 
     // If not authenticated, do not expose passwords
@@ -63,7 +75,7 @@ export async function GET(request) {
       offset,
     });
   } catch (error) {
-    return createErrorResponse('Internal server error', 500, error.message);
+    return createErrorResponse("Internal server error", 500, error.message);
   }
 }
 
@@ -73,16 +85,28 @@ export async function POST(request) {
     // Check authentication
     const { user, error: authError } = await getAuthenticatedUser();
     if (authError || !user) {
-      return createErrorResponse('Unauthorized', 401, 'Authentication required');
+      return createErrorResponse(
+        "Unauthorized",
+        401,
+        "Authentication required",
+      );
     }
 
     const body = await request.json();
 
     // Validate required fields
-    const required = ['title', 'episode_number', 'season_number', 'unique_episode_id'];
+    const required = [
+      "title",
+      "episode_number",
+      "season_number",
+      "unique_episode_id",
+    ];
     const missing = validateRequiredFields(body, required);
     if (missing) {
-      return createErrorResponse(`Missing required fields: ${missing.join(', ')}`, 400);
+      return createErrorResponse(
+        `Missing required fields: ${missing.join(", ")}`,
+        400,
+      );
     }
 
     const supabase = await createClient();
@@ -96,8 +120,8 @@ export async function POST(request) {
       season_number: parseInt(body.season_number),
       runtime: body.runtime || null,
       unique_episode_id: body.unique_episode_id,
-      visibility: body.visibility || 'DRAFT',
-      access_level: body.access_level || 'free',
+      visibility: body.visibility || "DRAFT",
+      access_level: body.access_level || "free",
       release_datetime: body.release_datetime || null,
       clearance_level: parseInt(body.clearance_level) || 1,
       notify: body.notify || false,
@@ -106,33 +130,49 @@ export async function POST(request) {
       banner_image_url: body.banner_image_url || null,
       video_url: body.video_url || null,
       audio_url: body.audio_url || null,
-      additional_background_image_url: body.additional_background_image_url || null,
-      tags: body.tags && Array.isArray(body.tags) ? body.tags.filter((tag) => tag.trim() !== '') : [],
+      additional_background_image_url:
+        body.additional_background_image_url || null,
+      tags:
+        body.tags && Array.isArray(body.tags)
+          ? body.tags.filter((tag) => tag.trim() !== "")
+          : [],
       primary_genre: body.primary_genre || null,
       secondary_genre: body.secondary_genre || null,
-      status: body.status || body.isDraft === false ? 'PUBLISHED' : 'DRAFT',
+      status: body.status || body.isDraft === false ? "PUBLISHED" : "DRAFT",
       created_by: user.id,
     };
 
     // Insert episode
-    const { data, error } = await supabase.from('episodes').insert([episodeData]).select().single();
+    const { data, error } = await supabase
+      .from("episodes")
+      .insert([episodeData])
+      .select()
+      .single();
 
     if (error) {
       // Handle unique constraint violation
-      if (error.code === '23505') {
-        return createErrorResponse('Episode with this unique ID already exists', 409, error.message);
+      if (error.code === "23505") {
+        return createErrorResponse(
+          "Episode with this unique ID already exists",
+          409,
+          error.message,
+        );
       }
-      return createErrorResponse('Failed to create episode', 500, error.message);
+      return createErrorResponse(
+        "Failed to create episode",
+        500,
+        error.message,
+      );
     }
 
     return createResponse(
       {
-        message: 'Episode created successfully',
+        message: "Episode created successfully",
         episode: data,
       },
-      201
+      201,
     );
   } catch (error) {
-    return createErrorResponse('Internal server error', 500, error.message);
+    return createErrorResponse("Internal server error", 500, error.message);
   }
 }

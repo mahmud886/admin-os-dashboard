@@ -66,16 +66,16 @@ This will create sample share records with:
 ### Track a Share via API
 
 ```javascript
-await fetch('/api/analytics/shares', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
+await fetch("/api/analytics/shares", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
   body: JSON.stringify({
-    poll_id: 'your-poll-uuid',
-    platform: 'facebook', // Required
+    poll_id: "your-poll-uuid",
+    platform: "facebook", // Required
     referrer: window.location.href, // Optional
-    utm_source: 'email', // Optional
-    utm_medium: 'web', // Optional
-    utm_campaign: 'promo', // Optional
+    utm_source: "email", // Optional
+    utm_medium: "web", // Optional
+    utm_campaign: "promo", // Optional
   }),
 });
 ```
@@ -87,16 +87,16 @@ Add this to your poll sharing buttons:
 ```javascript
 const trackShare = async (pollId, platform) => {
   const urlParams = new URLSearchParams(window.location.search);
-  await fetch('/api/analytics/shares', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+  await fetch("/api/analytics/shares", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       poll_id: pollId,
       platform: platform,
       referrer: document.referrer || window.location.href,
-      utm_source: urlParams.get('utm_source'),
-      utm_medium: urlParams.get('utm_medium'),
-      utm_campaign: urlParams.get('utm_campaign'),
+      utm_source: urlParams.get("utm_source"),
+      utm_medium: urlParams.get("utm_medium"),
+      utm_campaign: urlParams.get("utm_campaign"),
     }),
   });
 };

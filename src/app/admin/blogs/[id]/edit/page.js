@@ -1,19 +1,19 @@
-'use client';
+"use client";
 
-import RichTextEditor from '@/components/editor/rich-text-editor';
-import { MainLayout } from '@/components/layout/main-layout';
-import { BlogPreviewModal } from '@/components/preview/blog-preview-modal';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
-import { Textarea } from '@/components/ui/textarea';
-import { useAuth } from '@/context/AuthContext';
-import { ArrowLeft, Eye, Loader2, Save, Trash2 } from 'lucide-react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { use, useEffect, useState } from 'react';
+import RichTextEditor from "@/components/editor/rich-text-editor";
+import { MainLayout } from "@/components/layout/main-layout";
+import { BlogPreviewModal } from "@/components/preview/blog-preview-modal";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { Textarea } from "@/components/ui/textarea";
+import { useAuth } from "@/context/AuthContext";
+import { ArrowLeft, Eye, Loader2, Save, Trash2 } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { use, useEffect, useState } from "react";
 
 export default function EditBlogPage({ params }) {
   const router = useRouter();
@@ -22,31 +22,33 @@ export default function EditBlogPage({ params }) {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState({
-    title: '',
-    slug: '',
-    excerpt: '',
-    coverImage: '',
-    tags: '',
-    content: '',
+    title: "",
+    slug: "",
+    excerpt: "",
+    coverImage: "",
+    tags: "",
+    content: "",
     isPasswordProtected: false,
-    accessPassword: '',
+    accessPassword: "",
   });
 
   useEffect(() => {
     async function fetchBlog() {
       try {
         const res = await fetch(`/api/blogs/${id}`);
-        if (!res.ok) throw new Error('Blog not found');
+        if (!res.ok) throw new Error("Blog not found");
         const data = await res.json();
         setFormData({
           ...data,
-          tags: Array.isArray(data.tags) ? data.tags.join(', ') : data.tags || '',
+          tags: Array.isArray(data.tags)
+            ? data.tags.join(", ")
+            : data.tags || "",
           isPasswordProtected: data.isPasswordProtected || false,
-          accessPassword: data.accessPassword || '',
+          accessPassword: data.accessPassword || "",
         });
       } catch (error) {
-        console.error('Error fetching blog:', error);
-        router.push('/admin/blogs');
+        console.error("Error fetching blog:", error);
+        router.push("/admin/blogs");
       } finally {
         setLoading(false);
       }
@@ -75,46 +77,46 @@ export default function EditBlogPage({ params }) {
       const payload = {
         ...formData,
         tags: formData.tags
-          .split(',')
+          .split(",")
           .map((tag) => tag.trim())
           .filter(Boolean),
       };
 
       const res = await fetch(`/api/blogs/${id}`, {
-        method: 'PUT',
+        method: "PUT",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(payload),
       });
 
       if (!res.ok) {
-        throw new Error('Failed to update blog');
+        throw new Error("Failed to update blog");
       }
 
-      router.push('/admin/blogs');
+      router.push("/admin/blogs");
       router.refresh();
     } catch (error) {
-      console.error('Error updating blog:', error);
-      alert('Failed to update blog post');
+      console.error("Error updating blog:", error);
+      alert("Failed to update blog post");
     } finally {
       setSaving(false);
     }
   };
 
   const handleDelete = async () => {
-    if (!confirm('Are you sure you want to delete this blog post?')) return;
+    if (!confirm("Are you sure you want to delete this blog post?")) return;
     setSaving(true);
     try {
       const res = await fetch(`/api/blogs/${id}`, {
-        method: 'DELETE',
+        method: "DELETE",
       });
-      if (!res.ok) throw new Error('Failed to delete blog');
-      router.push('/admin/blogs');
+      if (!res.ok) throw new Error("Failed to delete blog");
+      router.push("/admin/blogs");
       router.refresh();
     } catch (error) {
-      console.error('Error deleting blog:', error);
-      alert('Failed to delete blog post');
+      console.error("Error deleting blog:", error);
+      alert("Failed to delete blog post");
       setSaving(false);
     }
   };
@@ -134,15 +136,25 @@ export default function EditBlogPage({ params }) {
       <div className="px-6 space-y-6 w-full max-w-none">
         <div className="flex justify-between items-center">
           <Link href="/admin/blogs">
-            <Button variant="ghost" className="pl-0 text-gray-400 hover:text-teal-400">
+            <Button
+              variant="ghost"
+              className="pl-0 text-gray-400 hover:text-teal-400"
+            >
               <ArrowLeft className="mr-2 w-4 h-4" />
               CANCEL
             </Button>
           </Link>
           <div className="flex gap-2">
             <BlogPreviewModal blog={formData} />
-            <Link href={`/admin/blogs/${id}/preview`} target="_blank" rel="noopener noreferrer">
-              <Button variant="outline" className="text-teal-400 border-teal-500/30 hover:bg-teal-500/10">
+            <Link
+              href={`/admin/blogs/${id}/preview`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <Button
+                variant="outline"
+                className="text-teal-400 border-teal-500/30 hover:bg-teal-500/10"
+              >
                 <Eye className="mr-2 w-4 h-4" />
                 PREVIEW
               </Button>
@@ -161,7 +173,11 @@ export default function EditBlogPage({ params }) {
               disabled={saving || !formData.title || !formData.content}
               className="font-semibold text-black bg-teal-500 hover:bg-teal-600"
             >
-              {saving ? <Loader2 className="mr-2 w-4 h-4 animate-spin" /> : <Save className="mr-2 w-4 h-4" />}
+              {saving ? (
+                <Loader2 className="mr-2 w-4 h-4 animate-spin" />
+              ) : (
+                <Save className="mr-2 w-4 h-4" />
+              )}
               SAVE CHANGES
             </Button>
           </div>
@@ -184,7 +200,10 @@ export default function EditBlogPage({ params }) {
 
                 <div className="space-y-2">
                   <Label className="text-gray-400">CONTENT</Label>
-                  <RichTextEditor content={formData.content} onChange={handleContentChange} />
+                  <RichTextEditor
+                    content={formData.content}
+                    onChange={handleContentChange}
+                  />
                 </div>
               </CardContent>
             </Card>
@@ -232,7 +251,11 @@ export default function EditBlogPage({ params }) {
 
                 {formData.coverImage && (
                   <div className="overflow-hidden rounded-lg border border-border aspect-video">
-                    <img src={formData.coverImage} alt="Preview" className="object-cover w-full h-full" />
+                    <img
+                      src={formData.coverImage}
+                      alt="Preview"
+                      className="object-cover w-full h-full"
+                    />
                   </div>
                 )}
 
@@ -254,7 +277,10 @@ export default function EditBlogPage({ params }) {
                       checked={formData.isPasswordProtected}
                       onCheckedChange={handleSwitchChange}
                     />
-                    <Label htmlFor="password-protection" className="text-gray-300 cursor-pointer">
+                    <Label
+                      htmlFor="password-protection"
+                      className="text-gray-300 cursor-pointer"
+                    >
                       Password Protected
                     </Label>
                   </div>

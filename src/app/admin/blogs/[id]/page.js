@@ -1,15 +1,18 @@
-import { blogsService } from '@/lib/blogs-service';
-import { MainLayout } from '@/components/layout/main-layout';
-import { Button } from '@/components/ui/button';
-import Link from 'next/link';
-import { ArrowLeft, Calendar, User, Pencil } from 'lucide-react';
-import { notFound } from 'next/navigation';
+import { blogsService } from "@/lib/blogs-service";
+import { MainLayout } from "@/components/layout/main-layout";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { ArrowLeft, Calendar, User, Pencil } from "lucide-react";
+import { notFound } from "next/navigation";
 
 export default async function BlogDetailPage({ params }) {
   const { id } = await params;
   let blog = await blogsService.getBySlug(id);
 
-  if (!blog && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)) {
+  if (
+    !blog &&
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)
+  ) {
     blog = await blogsService.getById(id);
   }
 
@@ -18,11 +21,16 @@ export default async function BlogDetailPage({ params }) {
   }
 
   return (
-    <MainLayout breadcrumb={`SYSTEM CONSOLE / BLOGS / ${blog.title.toUpperCase()}`}>
+    <MainLayout
+      breadcrumb={`SYSTEM CONSOLE / BLOGS / ${blog.title.toUpperCase()}`}
+    >
       <div className="w-full max-w-none px-6 space-y-8">
         <div className="flex justify-between items-center">
           <Link href="/admin/blogs">
-            <Button variant="ghost" className="pl-0 text-gray-400 hover:text-teal-400">
+            <Button
+              variant="ghost"
+              className="pl-0 text-gray-400 hover:text-teal-400"
+            >
               <ArrowLeft className="w-4 h-4 mr-2" />
               BACK TO LOGS
             </Button>
@@ -40,7 +48,13 @@ export default async function BlogDetailPage({ params }) {
 
         <div className="space-y-6">
           <div className="relative aspect-[21/9] w-full overflow-hidden rounded-xl border border-border bg-[#1a1a1a]">
-            {blog.coverImage && <img src={blog.coverImage} alt={blog.title} className="object-cover w-full h-full" />}
+            {blog.coverImage && (
+              <img
+                src={blog.coverImage}
+                alt={blog.title}
+                className="object-cover w-full h-full"
+              />
+            )}
             <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] to-transparent opacity-60"></div>
             <div className="absolute bottom-6 left-6 right-6">
               <div className="flex gap-2 mb-4">
@@ -67,10 +81,10 @@ export default async function BlogDetailPage({ params }) {
               </div>
               <div className="flex items-center">
                 <Calendar className="w-4 h-4 mr-2 text-teal-400" />
-                {new Date(blog.publishedAt).toLocaleDateString('en-US', {
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric',
+                {new Date(blog.publishedAt).toLocaleDateString("en-US", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
                 })}
               </div>
             </div>

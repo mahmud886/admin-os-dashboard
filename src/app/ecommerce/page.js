@@ -1,26 +1,32 @@
-'use client';
+"use client";
 
-import { MainLayout } from '@/components/layout/main-layout';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowUpRight, DollarSign, Package, ShoppingCart, Users } from 'lucide-react';
-import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { MainLayout } from "@/components/layout/main-layout";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  ArrowUpRight,
+  DollarSign,
+  Package,
+  ShoppingCart,
+  Users,
+} from "lucide-react";
+import Link from "next/link";
+import { useEffect, useState } from "react";
 
 const formatCurrency = (amount) => {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
   }).format(amount);
 };
 
 const formatDate = (dateString) => {
-  if (!dateString) return 'N/A';
-  return new Date(dateString).toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
+  if (!dateString) return "N/A";
+  return new Date(dateString).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
   });
 };
 
@@ -32,7 +38,7 @@ export default function EcommerceDashboard() {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const response = await fetch('/api/ecommerce/stats');
+        const response = await fetch("/api/ecommerce/stats");
         const data = await response.json();
         if (data.stats) {
           setStats(data.stats);
@@ -41,7 +47,7 @@ export default function EcommerceDashboard() {
           setRecentOrders(data.recent_orders);
         }
       } catch (error) {
-        console.error('Error fetching stats:', error);
+        console.error("Error fetching stats:", error);
       } finally {
         setLoading(false);
       }
@@ -50,44 +56,56 @@ export default function EcommerceDashboard() {
     fetchStats();
   }, []);
 
-  console.log('Recent Orders:', recentOrders);
+  console.log("Recent Orders:", recentOrders);
 
   return (
     <MainLayout breadcrumb="ECOMMERCE / OVERVIEW">
       <div className="space-y-6">
-        <h1 className="text-2xl font-bold text-teal-400 sm:text-3xl lg:text-4xl">STORE OVERVIEW</h1>
+        <h1 className="text-2xl font-bold text-teal-400 sm:text-3xl lg:text-4xl">
+          STORE OVERVIEW
+        </h1>
 
         {/* Stats Grid */}
         <div className="grid gap-4 md:grid-cols-3">
           <Card className="bg-[#111111] border-border">
             <CardHeader className="flex flex-row justify-between items-center pb-2 space-y-0">
-              <CardTitle className="text-sm font-medium text-gray-400">TOTAL REVENUE</CardTitle>
+              <CardTitle className="text-sm font-medium text-gray-400">
+                TOTAL REVENUE
+              </CardTitle>
               <DollarSign className="w-4 h-4 text-teal-400" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-white">
-                {loading ? '...' : formatCurrency(stats?.total_revenue || 0)}
+                {loading ? "..." : formatCurrency(stats?.total_revenue || 0)}
               </div>
               <p className="mt-1 text-xs text-gray-500">Lifetime revenue</p>
             </CardContent>
           </Card>
           <Card className="bg-[#111111] border-border">
             <CardHeader className="flex flex-row justify-between items-center pb-2 space-y-0">
-              <CardTitle className="text-sm font-medium text-gray-400">TOTAL ORDERS</CardTitle>
+              <CardTitle className="text-sm font-medium text-gray-400">
+                TOTAL ORDERS
+              </CardTitle>
               <ShoppingCart className="w-4 h-4 text-teal-400" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-white">{loading ? '...' : stats?.total_orders || 0}</div>
+              <div className="text-2xl font-bold text-white">
+                {loading ? "..." : stats?.total_orders || 0}
+              </div>
               <p className="mt-1 text-xs text-gray-500">All time orders</p>
             </CardContent>
           </Card>
           <Card className="bg-[#111111] border-border">
             <CardHeader className="flex flex-row justify-between items-center pb-2 space-y-0">
-              <CardTitle className="text-sm font-medium text-gray-400">CUSTOMERS</CardTitle>
+              <CardTitle className="text-sm font-medium text-gray-400">
+                CUSTOMERS
+              </CardTitle>
               <Users className="w-4 h-4 text-teal-400" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-white">{loading ? '...' : stats?.total_customers || 0}</div>
+              <div className="text-2xl font-bold text-white">
+                {loading ? "..." : stats?.total_customers || 0}
+              </div>
               <p className="mt-1 text-xs text-gray-500">Registered customers</p>
             </CardContent>
           </Card>
@@ -109,9 +127,13 @@ export default function EcommerceDashboard() {
             <CardContent>
               <div className="space-y-4">
                 {loading ? (
-                  <div className="py-4 text-center text-gray-500">Loading recent activity...</div>
+                  <div className="py-4 text-center text-gray-500">
+                    Loading recent activity...
+                  </div>
                 ) : recentOrders.length === 0 ? (
-                  <div className="py-4 text-center text-gray-500">No recent orders found.</div>
+                  <div className="py-4 text-center text-gray-500">
+                    No recent orders found.
+                  </div>
                 ) : (
                   recentOrders.map((order) => (
                     <div
@@ -123,13 +145,21 @@ export default function EcommerceDashboard() {
                           <Package className="w-5 h-5 text-teal-400" />
                         </div>
                         <div>
-                          <p className="text-sm font-medium text-white">{order.order_number}</p>
-                          <p className="text-xs text-gray-500">{order.ecommerce_customers?.email || 'Guest'}</p>
+                          <p className="text-sm font-medium text-white">
+                            {order.order_number}
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            {order.ecommerce_customers?.email || "Guest"}
+                          </p>
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className="text-sm font-medium text-white">{formatCurrency(order.amount_total)}</p>
-                        <p className="text-xs text-gray-500">{formatDate(order.created_at)}</p>
+                        <p className="text-sm font-medium text-white">
+                          {formatCurrency(order.amount_total)}
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          {formatDate(order.created_at)}
+                        </p>
                       </div>
                     </div>
                   ))

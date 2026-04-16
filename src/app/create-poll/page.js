@@ -1,52 +1,59 @@
-'use client';
+"use client";
 
-import { MainLayout } from '@/components/layout/main-layout';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
-import { useToast } from '@/components/ui/toast';
-import { ArrowLeft, Plus, Save, Send, Trash2 } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { MainLayout } from "@/components/layout/main-layout";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/components/ui/toast";
+import { ArrowLeft, Plus, Save, Send, Trash2 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 export default function CreatePollPage() {
   const router = useRouter();
   const { addToast } = useToast();
   const [episodes, setEpisodes] = useState([]);
   const [episodesLoading, setEpisodesLoading] = useState(true);
-  const [episodeName, setEpisodeName] = useState('');
-  const [pollTitle, setPollTitle] = useState('');
-  const [pollDescription, setPollDescription] = useState('');
-  const [pollDuration, setPollDuration] = useState('');
+  const [episodeName, setEpisodeName] = useState("");
+  const [pollTitle, setPollTitle] = useState("");
+  const [pollDescription, setPollDescription] = useState("");
+  const [pollDuration, setPollDuration] = useState("");
   const [options, setOptions] = useState([
-    { name: '', description: '', image_url: '', count: 0 },
-    { name: '', description: '', image_url: '', count: 0 },
+    { name: "", description: "", image_url: "", count: 0 },
+    { name: "", description: "", image_url: "", count: 0 },
   ]);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   // Fetch episodes from API
   useEffect(() => {
     const fetchEpisodes = async () => {
       try {
         setEpisodesLoading(true);
-        const response = await fetch('/api/episodes');
+        const response = await fetch("/api/episodes");
         const data = await response.json();
 
         if (!response.ok) {
-          throw new Error(data.error || 'Failed to fetch episodes');
+          throw new Error(data.error || "Failed to fetch episodes");
         }
 
         setEpisodes(data.episodes || []);
       } catch (err) {
-        console.error('Error fetching episodes:', err);
+        console.error("Error fetching episodes:", err);
         addToast({
-          variant: 'error',
-          title: 'Failed to Load Episodes',
-          description: err.message || 'Could not load episodes. Please refresh the page.',
+          variant: "error",
+          title: "Failed to Load Episodes",
+          description:
+            err.message || "Could not load episodes. Please refresh the page.",
           duration: 5000,
         });
       } finally {
@@ -58,7 +65,10 @@ export default function CreatePollPage() {
   }, [addToast]);
 
   const addOption = () => {
-    setOptions([...options, { name: '', description: '', image_url: '', count: 0 }]);
+    setOptions([
+      ...options,
+      { name: "", description: "", image_url: "", count: 0 },
+    ]);
   };
 
   const removeOption = (index) => {
@@ -75,20 +85,20 @@ export default function CreatePollPage() {
 
   const handleSubmit = async (isDraft = false) => {
     // Clear previous errors
-    setError('');
+    setError("");
 
     // Validation
     if (!episodeName) {
-      setError('Please select an episode');
+      setError("Please select an episode");
       return;
     }
     if (!pollTitle.trim()) {
-      setError('Poll title is required');
+      setError("Poll title is required");
       return;
     }
-    const validOptions = options.filter((opt) => opt.name.trim() !== '');
+    const validOptions = options.filter((opt) => opt.name.trim() !== "");
     if (validOptions.length < 2) {
-      setError('At least 2 options are required');
+      setError("At least 2 options are required");
       return;
     }
 
@@ -101,7 +111,7 @@ export default function CreatePollPage() {
         title: pollTitle.trim(),
         description: pollDescription.trim() || null,
         duration_days: parseInt(pollDuration) || 7,
-        status: isDraft ? 'DRAFT' : 'LIVE',
+        status: isDraft ? "DRAFT" : "LIVE",
         isDraft,
         options: validOptions.map((opt) => ({
           name: opt.name.trim(),
@@ -112,10 +122,10 @@ export default function CreatePollPage() {
       };
 
       // Submit to API
-      const response = await fetch('/api/polls', {
-        method: 'POST',
+      const response = await fetch("/api/polls", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(pollData),
       });
@@ -123,13 +133,13 @@ export default function CreatePollPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to create poll');
+        throw new Error(data.error || "Failed to create poll");
       }
 
       // Show success toast
       addToast({
-        variant: 'success',
-        title: 'Poll Created Successfully!',
+        variant: "success",
+        title: "Poll Created Successfully!",
         description: isDraft
           ? `"${pollTitle}" has been saved as a draft.`
           : `"${pollTitle}" has been published successfully.`,
@@ -138,17 +148,18 @@ export default function CreatePollPage() {
 
       // Redirect to polls page
       setTimeout(() => {
-        router.push('/polls');
+        router.push("/polls");
       }, 1500);
     } catch (err) {
-      console.error('Error creating poll:', err);
-      const errorMessage = err.message || 'Failed to create poll. Please try again.';
+      console.error("Error creating poll:", err);
+      const errorMessage =
+        err.message || "Failed to create poll. Please try again.";
       setError(errorMessage);
 
       // Show error toast
       addToast({
-        variant: 'error',
-        title: 'Failed to Create Poll',
+        variant: "error",
+        title: "Failed to Create Poll",
         description: errorMessage,
         duration: 5000,
       });
@@ -164,7 +175,7 @@ export default function CreatePollPage() {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => router.push('/polls')}
+            onClick={() => router.push("/polls")}
             className="text-gray-400 hover:text-teal-400"
           >
             <ArrowLeft className="mr-2 w-4 h-4" />
@@ -172,7 +183,9 @@ export default function CreatePollPage() {
           </Button>
         </div>
         <div className="flex flex-col gap-4 justify-between items-start sm:flex-row sm:items-center">
-          <h1 className="text-2xl font-bold text-teal-400 uppercase sm:text-3xl lg:text-4xl">Create Poll</h1>
+          <h1 className="text-2xl font-bold text-teal-400 uppercase sm:text-3xl lg:text-4xl">
+            Create Poll
+          </h1>
           <div className="flex gap-2 items-center w-full sm:w-auto">
             <Button
               variant="outline"
@@ -232,12 +245,22 @@ export default function CreatePollPage() {
               <Label htmlFor="episode">
                 SELECT EPISODE <span className="text-red-400">*</span>
               </Label>
-              <Select value={episodeName} onValueChange={setEpisodeName} disabled={episodesLoading}>
+              <Select
+                value={episodeName}
+                onValueChange={setEpisodeName}
+                disabled={episodesLoading}
+              >
                 <SelectTrigger
                   id="episode"
                   className="bg-[#0a0a0a] border-border focus:ring-2 focus:ring-teal-400 focus:border-teal-400"
                 >
-                  <SelectValue placeholder={episodesLoading ? 'Loading episodes...' : 'Choose an episode...'} />
+                  <SelectValue
+                    placeholder={
+                      episodesLoading
+                        ? "Loading episodes..."
+                        : "Choose an episode..."
+                    }
+                  />
                 </SelectTrigger>
                 <SelectContent>
                   {episodes.length === 0 && !episodesLoading ? (
@@ -247,14 +270,17 @@ export default function CreatePollPage() {
                   ) : (
                     episodes.map((episode) => (
                       <SelectItem key={episode.id} value={episode.id}>
-                        {episode.title || 'Untitled'}
-                        {episode.episode_number && ` - S${episode.season_number || '?'} EP${episode.episode_number}`}
+                        {episode.title || "Untitled"}
+                        {episode.episode_number &&
+                          ` - S${episode.season_number || "?"} EP${episode.episode_number}`}
                       </SelectItem>
                     ))
                   )}
                 </SelectContent>
               </Select>
-              <p className="text-xs text-gray-500">Select the episode this poll is associated with</p>
+              <p className="text-xs text-gray-500">
+                Select the episode this poll is associated with
+              </p>
             </div>
           </CardContent>
         </Card>
@@ -275,7 +301,9 @@ export default function CreatePollPage() {
                 autoComplete="off"
                 required
               />
-              <p className="mt-2 text-xs text-gray-400">Enter a clear and engaging poll question or title</p>
+              <p className="mt-2 text-xs text-gray-400">
+                Enter a clear and engaging poll question or title
+              </p>
             </CardContent>
           </Card>
 
@@ -293,7 +321,9 @@ export default function CreatePollPage() {
                 min="1"
                 autoComplete="off"
               />
-              <p className="mt-2 text-xs text-gray-400">Number of days the poll will be active (default: 7 days)</p>
+              <p className="mt-2 text-xs text-gray-400">
+                Number of days the poll will be active (default: 7 days)
+              </p>
             </CardContent>
           </Card>
         </div>
@@ -324,9 +354,14 @@ export default function CreatePollPage() {
           </CardHeader>
           <CardContent className="space-y-6">
             {options.map((option, index) => (
-              <div key={index} className="space-y-4 p-4 border border-border rounded-md bg-[#0a0a0a]">
+              <div
+                key={index}
+                className="space-y-4 p-4 border border-border rounded-md bg-[#0a0a0a]"
+              >
                 <div className="flex justify-between items-center">
-                  <Label className="text-sm font-medium text-teal-400">OPTION {index + 1}</Label>
+                  <Label className="text-sm font-medium text-teal-400">
+                    OPTION {index + 1}
+                  </Label>
                   {options.length > 2 && (
                     <Button
                       variant="ghost"
@@ -340,33 +375,46 @@ export default function CreatePollPage() {
                 </div>
                 <div className="space-y-3">
                   <div>
-                    <Label htmlFor={`option-name-${index}`} className="block mb-1 text-xs text-gray-400">
+                    <Label
+                      htmlFor={`option-name-${index}`}
+                      className="block mb-1 text-xs text-gray-400"
+                    >
                       Option Name
                     </Label>
                     <Input
                       id={`option-name-${index}`}
                       placeholder={`e.g., Option ${index + 1} name`}
                       value={option.name}
-                      onChange={(e) => updateOption(index, 'name', e.target.value)}
+                      onChange={(e) =>
+                        updateOption(index, "name", e.target.value)
+                      }
                       className="bg-[#0a0a0a] border-border focus:ring-2 focus:ring-teal-400 focus:border-teal-400 focus:outline-none"
                       autoComplete="off"
                     />
                   </div>
                   <div>
-                    <Label htmlFor={`option-desc-${index}`} className="block mb-1 text-xs text-gray-400">
+                    <Label
+                      htmlFor={`option-desc-${index}`}
+                      className="block mb-1 text-xs text-gray-400"
+                    >
                       Option Description
                     </Label>
                     <Textarea
                       id={`option-desc-${index}`}
                       placeholder={`Optional: Describe this option in detail...`}
                       value={option.description}
-                      onChange={(e) => updateOption(index, 'description', e.target.value)}
+                      onChange={(e) =>
+                        updateOption(index, "description", e.target.value)
+                      }
                       className="min-h-[80px] bg-[#0a0a0a] border-border resize-none focus:ring-2 focus:ring-teal-400 focus:border-teal-400 focus:outline-none"
                       autoComplete="off"
                     />
                   </div>
                   <div>
-                    <Label htmlFor={`option-image-${index}`} className="block mb-1 text-xs text-gray-400">
+                    <Label
+                      htmlFor={`option-image-${index}`}
+                      className="block mb-1 text-xs text-gray-400"
+                    >
                       Option Image URL
                     </Label>
                     <div className="flex gap-4 items-start">
@@ -374,8 +422,10 @@ export default function CreatePollPage() {
                         <Input
                           id={`option-image-${index}`}
                           placeholder="https://..."
-                          value={option.image_url || ''}
-                          onChange={(e) => updateOption(index, 'image_url', e.target.value)}
+                          value={option.image_url || ""}
+                          onChange={(e) =>
+                            updateOption(index, "image_url", e.target.value)
+                          }
                           className="bg-[#0a0a0a] border-border focus:ring-2 focus:ring-teal-400 focus:border-teal-400 focus:outline-none"
                           autoComplete="off"
                         />
@@ -388,7 +438,7 @@ export default function CreatePollPage() {
                             alt={`Option ${index + 1}`}
                             className="object-cover w-full h-full"
                             onError={(e) => {
-                              e.target.style.display = 'none';
+                              e.target.style.display = "none";
                             }}
                           />
                         </div>
@@ -396,7 +446,10 @@ export default function CreatePollPage() {
                     </div>
                   </div>
                   <div>
-                    <Label htmlFor={`option-count-${index}`} className="block mb-1 text-xs text-gray-400">
+                    <Label
+                      htmlFor={`option-count-${index}`}
+                      className="block mb-1 text-xs text-gray-400"
+                    >
                       Initial Vote Count
                     </Label>
                     <Input
@@ -404,17 +457,29 @@ export default function CreatePollPage() {
                       type="number"
                       placeholder="0"
                       value={option.count}
-                      onChange={(e) => updateOption(index, 'count', parseInt(e.target.value) || 0)}
+                      onChange={(e) =>
+                        updateOption(
+                          index,
+                          "count",
+                          parseInt(e.target.value) || 0,
+                        )
+                      }
                       className="bg-[#0a0a0a] border-border focus:ring-2 focus:ring-teal-400 focus:border-teal-400 focus:outline-none"
                       min="0"
                       autoComplete="off"
                     />
-                    <p className="mt-1 text-xs text-gray-500">Optional: Set initial vote count</p>
+                    <p className="mt-1 text-xs text-gray-500">
+                      Optional: Set initial vote count
+                    </p>
                   </div>
                 </div>
               </div>
             ))}
-            <Button variant="outline" onClick={addOption} className="w-full border-2 border-dashed">
+            <Button
+              variant="outline"
+              onClick={addOption}
+              className="w-full border-2 border-dashed"
+            >
               <Plus className="mr-2 w-4 h-4" />
               ADD OPTION
             </Button>

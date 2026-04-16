@@ -1,15 +1,18 @@
-import { MainLayout } from '@/components/layout/main-layout';
-import { Button } from '@/components/ui/button';
-import { mediaNewsService } from '@/lib/media-news-service';
-import { ArrowLeft, Calendar, Pencil, User } from 'lucide-react';
-import Link from 'next/link';
-import { notFound } from 'next/navigation';
+import { MainLayout } from "@/components/layout/main-layout";
+import { Button } from "@/components/ui/button";
+import { mediaNewsService } from "@/lib/media-news-service";
+import { ArrowLeft, Calendar, Pencil, User } from "lucide-react";
+import Link from "next/link";
+import { notFound } from "next/navigation";
 
 export default async function MediaNewsDetailPage({ params }) {
   const { id } = await params;
   let article = await mediaNewsService.getBySlug(id);
 
-  if (!article && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)) {
+  if (
+    !article &&
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)
+  ) {
     article = await mediaNewsService.getById(id);
   }
 
@@ -18,11 +21,16 @@ export default async function MediaNewsDetailPage({ params }) {
   }
 
   return (
-    <MainLayout breadcrumb={`SYSTEM CONSOLE / MEDIA NEWS / ${article.title.toUpperCase()}`}>
+    <MainLayout
+      breadcrumb={`SYSTEM CONSOLE / MEDIA NEWS / ${article.title.toUpperCase()}`}
+    >
       <div className="px-6 space-y-8 w-full max-w-none">
         <div className="flex justify-between items-center">
           <Link href="/admin/media-news">
-            <Button variant="ghost" className="pl-0 text-gray-400 hover:text-teal-400">
+            <Button
+              variant="ghost"
+              className="pl-0 text-gray-400 hover:text-teal-400"
+            >
               <ArrowLeft className="mr-2 w-4 h-4" />
               BACK TO LIST
             </Button>
@@ -41,10 +49,16 @@ export default async function MediaNewsDetailPage({ params }) {
         <div className="space-y-6">
           <div className="relative aspect-[21/9] w-full overflow-hidden rounded-xl border border-border bg-[#1a1a1a]">
             {article.coverImage ? (
-              <img src={article.coverImage} alt={article.title} className="object-cover w-full h-full" />
+              <img
+                src={article.coverImage}
+                alt={article.title}
+                className="object-cover w-full h-full"
+              />
             ) : (
               <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#1a1a1a] to-[#0a0a0a]">
-                <div className="font-mono text-xl tracking-widest text-gray-700 uppercase">No Image Available</div>
+                <div className="font-mono text-xl tracking-widest text-gray-700 uppercase">
+                  No Image Available
+                </div>
               </div>
             )}
             <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] to-transparent opacity-60"></div>
@@ -69,14 +83,14 @@ export default async function MediaNewsDetailPage({ params }) {
             <div className="flex gap-6 items-center text-sm text-gray-400">
               <div className="flex items-center">
                 <User className="mr-2 w-4 h-4 text-teal-400" />
-                {article.author || 'Admin'}
+                {article.author || "Admin"}
               </div>
               <div className="flex items-center">
                 <Calendar className="mr-2 w-4 h-4 text-teal-400" />
-                {new Date(article.publishedAt).toLocaleDateString('en-US', {
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric',
+                {new Date(article.publishedAt).toLocaleDateString("en-US", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
                 })}
               </div>
             </div>

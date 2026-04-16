@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { LogOut, Settings, User } from 'lucide-react';
-import { useAuth } from '@/hooks/useAuth';
-import { Button } from '@/components/ui/button';
+import { LogOut, Settings, User } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,8 +10,8 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { useState } from 'react';
+} from "@/components/ui/dropdown-menu";
+import { useState } from "react";
 
 export function Header({ title, breadcrumb }) {
   const { user, signOut, loading } = useAuth();
@@ -22,7 +22,7 @@ export function Header({ title, breadcrumb }) {
     try {
       await signOut();
     } catch (error) {
-      console.error('Error signing out:', error);
+      console.error("Error signing out:", error);
       setIsLoggingOut(false);
     }
   };
@@ -31,7 +31,9 @@ export function Header({ title, breadcrumb }) {
   if (loading) {
     return (
       <header className="fixed top-0 left-0 lg:left-64 right-0 h-16 bg-[#0a0a0a] border-b border-border flex items-center justify-between px-4 lg:px-6 z-40">
-        <div className="text-xs lg:text-sm text-gray-400 truncate">{breadcrumb && <span>{breadcrumb}</span>}</div>
+        <div className="text-xs lg:text-sm text-gray-400 truncate">
+          {breadcrumb && <span>{breadcrumb}</span>}
+        </div>
         <div className="flex items-center gap-2 lg:gap-4">
           <Button
             variant="ghost"
@@ -54,7 +56,9 @@ export function Header({ title, breadcrumb }) {
 
   return (
     <header className="fixed top-0 left-0 lg:left-64 right-0 h-16 bg-[#0a0a0a] border-b border-border flex items-center justify-between px-4 lg:px-6 z-40">
-      <div className="text-xs lg:text-sm text-gray-400 truncate">{breadcrumb && <span>{breadcrumb}</span>}</div>
+      <div className="text-xs lg:text-sm text-gray-400 truncate">
+        {breadcrumb && <span>{breadcrumb}</span>}
+      </div>
       <div className="flex items-center gap-2 lg:gap-4">
         <Button
           variant="ghost"
@@ -76,8 +80,12 @@ export function Header({ title, breadcrumb }) {
           <DropdownMenuContent align="end" className="w-56">
             <DropdownMenuLabel className="font-normal">
               <div className="flex flex-col space-y-1">
-                <p className="text-sm font-medium leading-none text-gray-200">Admin User</p>
-                <p className="text-xs leading-none text-gray-400 truncate">{user?.email || 'Not logged in'}</p>
+                <p className="text-sm font-medium leading-none text-gray-200">
+                  Admin User
+                </p>
+                <p className="text-xs leading-none text-gray-400 truncate">
+                  {user?.email || "Not logged in"}
+                </p>
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
@@ -87,7 +95,7 @@ export function Header({ title, breadcrumb }) {
               className="text-red-400 focus:text-red-300"
             >
               <LogOut className="mr-2 h-4 w-4" />
-              {isLoggingOut ? 'Signing out...' : 'Sign Out'}
+              {isLoggingOut ? "Signing out..." : "Sign Out"}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

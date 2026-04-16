@@ -1,6 +1,6 @@
-import { createServerClient } from '@supabase/ssr';
-import type { NextRequest } from 'next/server';
-import { NextResponse } from 'next/server';
+import { createServerClient } from "@supabase/ssr";
+import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 
 export async function middleware(request: NextRequest) {
   let response = NextResponse.next({
@@ -18,14 +18,18 @@ export async function middleware(request: NextRequest) {
           return request.cookies.getAll();
         },
         setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) => request.cookies.set(name, value));
+          cookiesToSet.forEach(({ name, value, options }) =>
+            request.cookies.set(name, value),
+          );
           response = NextResponse.next({
             request,
           });
-          cookiesToSet.forEach(({ name, value, options }) => response.cookies.set(name, value, options));
+          cookiesToSet.forEach(({ name, value, options }) =>
+            response.cookies.set(name, value, options),
+          );
         },
       },
-    }
+    },
   );
 
   // Refresh session if expired
@@ -36,23 +40,25 @@ export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Public routes
-  const publicRoutes = ['/', '/about', '/login'];
+  const publicRoutes = ["/", "/about", "/login"];
   const isPublicRoute = publicRoutes.includes(pathname);
 
   // Protected routes
-  const protectedRoutes = ['/dashboard', '/admin'];
-  const isProtectedRoute = protectedRoutes.some((route) => pathname.startsWith(route));
+  const protectedRoutes = ["/dashboard", "/admin"];
+  const isProtectedRoute = protectedRoutes.some((route) =>
+    pathname.startsWith(route),
+  );
 
   // Handle unauthenticated users
   if (!user && isProtectedRoute) {
-    const redirectUrl = new URL('/login', request.url);
-    redirectUrl.searchParams.set('redirect', pathname);
+    const redirectUrl = new URL("/login", request.url);
+    redirectUrl.searchParams.set("redirect", pathname);
     return NextResponse.redirect(redirectUrl);
   }
 
   // Handle authenticated users trying to access login
-  if (user && pathname === '/login') {
-    return NextResponse.redirect(new URL('/dashboard', request.url));
+  if (user && pathname === "/login") {
+    return NextResponse.redirect(new URL("/dashboard", request.url));
   }
 
   return response;
@@ -67,6 +73,6 @@ export const config = {
      * - favicon.ico (favicon file)
      * - public folder
      */
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
 };

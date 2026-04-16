@@ -69,7 +69,7 @@
 
 /* Custom bullet for UL */
 .blog-content ul li::before {
-  content: '●';
+  content: "●";
   color: #d4ff00;
   position: absolute;
   left: 0;

@@ -63,7 +63,11 @@ Added a safety check to ensure `endsAt` is always a valid Date object:
 ```javascript
 // Ensure endsAt is a Date object
 if (!(endsAt instanceof Date) || isNaN(endsAt.getTime())) {
-  return createErrorResponse('Invalid end date calculation', 500, 'Failed to calculate poll end date');
+  return createErrorResponse(
+    "Invalid end date calculation",
+    500,
+    "Failed to calculate poll end date",
+  );
 }
 ```
 

@@ -1,33 +1,33 @@
-'use client';
+"use client";
 
-import RichTextEditor from '@/components/editor/rich-text-editor';
-import { MainLayout } from '@/components/layout/main-layout';
-import { BlogPreviewModal } from '@/components/preview/blog-preview-modal';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
-import { Textarea } from '@/components/ui/textarea';
-import { useAuth } from '@/context/AuthContext';
-import { ArrowLeft, Loader2, Save } from 'lucide-react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import RichTextEditor from "@/components/editor/rich-text-editor";
+import { MainLayout } from "@/components/layout/main-layout";
+import { BlogPreviewModal } from "@/components/preview/blog-preview-modal";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { Textarea } from "@/components/ui/textarea";
+import { useAuth } from "@/context/AuthContext";
+import { ArrowLeft, Loader2, Save } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 export default function CreateBlogPage() {
   const router = useRouter();
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
-    title: '',
-    slug: '',
-    excerpt: '',
-    coverImage: '',
-    tags: '',
-    content: '',
+    title: "",
+    slug: "",
+    excerpt: "",
+    coverImage: "",
+    tags: "",
+    content: "",
     isPasswordProtected: false,
-    accessPassword: '',
+    accessPassword: "",
   });
 
   const handleChange = (e) => {
@@ -51,29 +51,29 @@ export default function CreateBlogPage() {
       const payload = {
         ...formData,
         tags: formData.tags
-          .split(',')
+          .split(",")
           .map((tag) => tag.trim())
           .filter(Boolean),
-        author: user?.email?.split('@')[0] || 'Admin', // Fallback author
+        author: user?.email?.split("@")[0] || "Admin", // Fallback author
       };
 
-      const res = await fetch('/api/blogs', {
-        method: 'POST',
+      const res = await fetch("/api/blogs", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(payload),
       });
 
       if (!res.ok) {
-        throw new Error('Failed to create blog');
+        throw new Error("Failed to create blog");
       }
 
-      router.push('/admin/blogs');
+      router.push("/admin/blogs");
       router.refresh();
     } catch (error) {
-      console.error('Error creating blog:', error);
-      alert('Failed to create blog post');
+      console.error("Error creating blog:", error);
+      alert("Failed to create blog post");
     } finally {
       setLoading(false);
     }
@@ -84,7 +84,10 @@ export default function CreateBlogPage() {
       <div className="px-6 space-y-6 w-full max-w-none">
         <div className="flex justify-between items-center">
           <Link href="/admin/blogs">
-            <Button variant="ghost" className="pl-0 text-gray-400 hover:text-teal-400">
+            <Button
+              variant="ghost"
+              className="pl-0 text-gray-400 hover:text-teal-400"
+            >
               <ArrowLeft className="mr-2 w-4 h-4" />
               CANCEL
             </Button>
@@ -96,7 +99,11 @@ export default function CreateBlogPage() {
               disabled={loading || !formData.title || !formData.content}
               className="font-semibold text-black bg-teal-500 hover:bg-teal-600"
             >
-              {loading ? <Loader2 className="mr-2 w-4 h-4 animate-spin" /> : <Save className="mr-2 w-4 h-4" />}
+              {loading ? (
+                <Loader2 className="mr-2 w-4 h-4 animate-spin" />
+              ) : (
+                <Save className="mr-2 w-4 h-4" />
+              )}
               PUBLISH ENTRY
             </Button>
           </div>
@@ -119,7 +126,10 @@ export default function CreateBlogPage() {
 
                 <div className="space-y-2">
                   <Label className="text-gray-400">CONTENT</Label>
-                  <RichTextEditor content={formData.content} onChange={handleContentChange} />
+                  <RichTextEditor
+                    content={formData.content}
+                    onChange={handleContentChange}
+                  />
                 </div>
               </CardContent>
             </Card>
@@ -167,7 +177,11 @@ export default function CreateBlogPage() {
 
                 {formData.coverImage && (
                   <div className="overflow-hidden rounded-lg border border-border aspect-video">
-                    <img src={formData.coverImage} alt="Preview" className="object-cover w-full h-full" />
+                    <img
+                      src={formData.coverImage}
+                      alt="Preview"
+                      className="object-cover w-full h-full"
+                    />
                   </div>
                 )}
 
@@ -189,7 +203,10 @@ export default function CreateBlogPage() {
                       checked={formData.isPasswordProtected}
                       onCheckedChange={handleSwitchChange}
                     />
-                    <Label htmlFor="password-protection" className="text-gray-300 cursor-pointer">
+                    <Label
+                      htmlFor="password-protection"
+                      className="text-gray-300 cursor-pointer"
+                    >
                       Password Protected
                     </Label>
                   </div>

@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import '@/app/admin/blogs/[id]/preview/preview.css';
-import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
-import { Calendar, Eye, User } from 'lucide-react';
+import "@/app/admin/blogs/[id]/preview/preview.css";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { Calendar, Eye, User } from "lucide-react";
 
 export function BlogPreviewModal({ blog }) {
   if (!blog) return null;
@@ -11,7 +11,10 @@ export function BlogPreviewModal({ blog }) {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="outline" className="text-teal-400 border-teal-500/30 hover:bg-teal-500/10">
+        <Button
+          variant="outline"
+          className="text-teal-400 border-teal-500/30 hover:bg-teal-500/10"
+        >
           <Eye className="mr-2 w-4 h-4" />
           PREVIEW MODAL
         </Button>
@@ -34,27 +37,32 @@ export function BlogPreviewModal({ blog }) {
                   <div className="flex flex-wrap gap-4 items-center mb-6 font-mono text-xs tracking-wider uppercase text-white/40">
                     <span className="flex gap-2 items-center">
                       <Calendar size={14} />
-                      {new Date(blog.publishedAt || new Date()).toLocaleDateString('en-US', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric',
+                      {new Date(
+                        blog.publishedAt || new Date(),
+                      ).toLocaleDateString("en-US", {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
                       })}
                     </span>
                     <span className="w-1 h-1 rounded-full bg-white/20" />
                     <span className="flex gap-2 items-center text-primary">
                       <User size={14} />
-                      {blog.author || 'SPORE FALL'}
+                      {blog.author || "SPORE FALL"}
                     </span>
                   </div>
 
                   <h1 className="mb-8 text-3xl font-bold leading-tight text-white md:text-5xl lg:text-6xl glitch-text">
-                    {blog.title || 'Untitled Blog Post'}
+                    {blog.title || "Untitled Blog Post"}
                   </h1>
 
                   {/* Tags */}
                   {blog.tags && (
                     <div className="flex flex-wrap gap-2">
-                      {(typeof blog.tags === 'string' ? blog.tags.split(',') : blog.tags).map((tag) => (
+                      {(typeof blog.tags === "string"
+                        ? blog.tags.split(",")
+                        : blog.tags
+                      ).map((tag) => (
                         <span
                           key={tag}
                           className="px-3 py-1 font-mono text-xs tracking-widest uppercase rounded border transition-colors bg-white/5 border-white/10 text-white/60 hover:border-primary/30 hover:text-primary"
@@ -95,9 +103,12 @@ export function BlogPreviewModal({ blog }) {
                 {/* Footer */}
                 <div className="pt-12 mt-20 border-t border-white/10">
                   <div className="p-8 text-center rounded-xl border bg-white/5 border-white/10">
-                    <h3 className="mb-4 text-xl font-bold text-primary">Join the Discussion</h3>
+                    <h3 className="mb-4 text-xl font-bold text-primary">
+                      Join the Discussion
+                    </h3>
                     <p className="mb-6 text-white/60 font-body">
-                      Share your thoughts on the Spore protocol and connect with other survivors.
+                      Share your thoughts on the Spore protocol and connect with
+                      other survivors.
                     </p>
                   </div>
                 </div>

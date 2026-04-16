@@ -80,10 +80,30 @@
     }
   ],
   "referrals": [
-    { "source": "CYBERPUNK.NET", "visits": "1.2k", "change": "+5%", "changeType": "positive" },
-    { "source": "GOOGLE.COM", "visits": "840", "change": "-2%", "changeType": "negative" },
-    { "source": "REDDIT.COM/R/SPORE", "visits": "520", "change": "+15%", "changeType": "positive" },
-    { "source": "DIRECT", "visits": "2.4k", "change": "+8%", "changeType": "positive" }
+    {
+      "source": "CYBERPUNK.NET",
+      "visits": "1.2k",
+      "change": "+5%",
+      "changeType": "positive"
+    },
+    {
+      "source": "GOOGLE.COM",
+      "visits": "840",
+      "change": "-2%",
+      "changeType": "negative"
+    },
+    {
+      "source": "REDDIT.COM/R/SPORE",
+      "visits": "520",
+      "change": "+15%",
+      "changeType": "positive"
+    },
+    {
+      "source": "DIRECT",
+      "visits": "2.4k",
+      "change": "+8%",
+      "changeType": "positive"
+    }
   ],
   "sourceDistribution": [
     { "label": "DIRECT", "value": 45, "color": "#3b82f6" },

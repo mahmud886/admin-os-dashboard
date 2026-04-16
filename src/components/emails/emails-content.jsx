@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { EpisodesTableShimmer } from '@/components/shimmer/episodes-table-shimmer';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { EpisodesTableShimmer } from "@/components/shimmer/episodes-table-shimmer";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -10,11 +10,11 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { useToast } from '@/components/ui/toast';
-import { useAuth } from '@/hooks/useAuth';
-import { Download, Mail, Trash2 } from 'lucide-react';
-import { useEffect, useState } from 'react';
+} from "@/components/ui/dialog";
+import { useToast } from "@/components/ui/toast";
+import { useAuth } from "@/hooks/useAuth";
+import { Download, Mail, Trash2 } from "lucide-react";
+import { useEffect, useState } from "react";
 
 export function EmailsContent() {
   const [subscribers, setSubscribers] = useState([]);
@@ -30,7 +30,7 @@ export function EmailsContent() {
     let cancelled = false;
     async function load() {
       try {
-        const res = await fetch('/api/secret-drops', { cache: 'no-store' });
+        const res = await fetch("/api/secret-drops", { cache: "no-store" });
         if (!res.ok) {
           throw new Error(`Failed to load data (${res.status})`);
         }
@@ -39,19 +39,21 @@ export function EmailsContent() {
         const mapped =
           secretDrops.map((d) => ({
             id: d.id,
-            name: d.name || '',
-            email: d.email || '',
-            status: 'PENDING',
-            segment: 'SECRET_DROP',
-            firstSignal: d.created_at ? new Date(d.created_at).toISOString() : '',
-            message: d.message || '',
+            name: d.name || "",
+            email: d.email || "",
+            status: "PENDING",
+            segment: "SECRET_DROP",
+            firstSignal: d.created_at
+              ? new Date(d.created_at).toISOString()
+              : "",
+            message: d.message || "",
             auth: false,
           })) || [];
         if (!cancelled) {
           setSubscribers(mapped);
         }
       } catch (e) {
-        if (!cancelled) setError(e.message || 'Network error');
+        if (!cancelled) setError(e.message || "Network error");
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -65,19 +67,27 @@ export function EmailsContent() {
   async function handleDelete(id) {
     try {
       setDeletingId(id);
-      const res = await fetch(`/api/secret-drops/${id}`, { method: 'DELETE' });
+      const res = await fetch(`/api/secret-drops/${id}`, { method: "DELETE" });
       if (!res.ok) {
         const msg = `Delete failed (${res.status})`;
         setError(msg);
-        addToast({ title: 'Delete Failed', description: msg, variant: 'error' });
+        addToast({
+          title: "Delete Failed",
+          description: msg,
+          variant: "error",
+        });
         return;
       }
       setSubscribers((prev) => prev.filter((s) => s.id !== id));
-      addToast({ title: 'Deleted', description: 'Secret drop removed', variant: 'success' });
+      addToast({
+        title: "Deleted",
+        description: "Secret drop removed",
+        variant: "success",
+      });
     } catch (e) {
-      const msg = e.message || 'Network error';
+      const msg = e.message || "Network error";
       setError(msg);
-      addToast({ title: 'Delete Error', description: msg, variant: 'error' });
+      addToast({ title: "Delete Error", description: msg, variant: "error" });
     } finally {
       setDeletingId(null);
       setConfirmOpen(false);
@@ -92,13 +102,17 @@ export function EmailsContent() {
 
   function handleExportCSV() {
     if (!subscribers.length) {
-      addToast({ title: 'No data', description: 'No subscribers to export', variant: 'warning' });
+      addToast({
+        title: "No data",
+        description: "No subscribers to export",
+        variant: "warning",
+      });
       return;
     }
 
-    const headers = ['Name', 'Email', 'Segment', 'First Signal', 'Message'];
+    const headers = ["Name", "Email", "Segment", "First Signal", "Message"];
     const csvContent = [
-      headers.join(','),
+      headers.join(","),
       ...subscribers.map((s) => {
         const row = [
           `"${s.name.replace(/"/g, '""')}"`,
@@ -107,20 +121,27 @@ export function EmailsContent() {
           `"${s.firstSignal.replace(/"/g, '""')}"`,
           `"${s.message.replace(/"/g, '""')}"`,
         ];
-        return row.join(',');
+        return row.join(",");
       }),
-    ].join('\n');
+    ].join("\n");
 
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.setAttribute('href', url);
-    link.setAttribute('download', `subscribers_export_${new Date().toISOString().split('T')[0]}.csv`);
-    link.style.visibility = 'hidden';
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute(
+      "download",
+      `subscribers_export_${new Date().toISOString().split("T")[0]}.csv`,
+    );
+    link.style.visibility = "hidden";
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    addToast({ title: 'Exported', description: 'Subscribers list exported to CSV', variant: 'success' });
+    addToast({
+      title: "Exported",
+      description: "Subscribers list exported to CSV",
+      variant: "success",
+    });
   }
 
   const totalSubscribers = subscribers.length.toLocaleString();
@@ -132,28 +153,42 @@ export function EmailsContent() {
     return d >= weekAgo;
   }).length;
   const activeThisWeek = `+${activeThisWeekCount}`;
-  const unsubscribeRate = '—';
+  const unsubscribeRate = "—";
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-teal-400 uppercase sm:text-3xl lg:text-4xl">Email list</h1>
-      {error && <div className="p-3 text-red-300 rounded-md border border-red-500/50 bg-red-900/30">{error}</div>}
+      <h1 className="text-2xl font-bold text-teal-400 uppercase sm:text-3xl lg:text-4xl">
+        Email list
+      </h1>
+      {error && (
+        <div className="p-3 text-red-300 rounded-md border border-red-500/50 bg-red-900/30">
+          {error}
+        </div>
+      )}
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <Card className="bg-[#111111] border-border">
           <CardHeader>
-            <CardTitle className="text-sm font-medium text-gray-400">TOTAL SUBSCRIBERS</CardTitle>
+            <CardTitle className="text-sm font-medium text-gray-400">
+              TOTAL SUBSCRIBERS
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-4xl font-bold text-teal-400">{totalSubscribers}</div>
+            <div className="text-4xl font-bold text-teal-400">
+              {totalSubscribers}
+            </div>
           </CardContent>
         </Card>
         <Card className="bg-[#111111] border-border">
           <CardHeader>
-            <CardTitle className="text-sm font-medium text-gray-400">ACTIVE THIS WEEK</CardTitle>
+            <CardTitle className="text-sm font-medium text-gray-400">
+              ACTIVE THIS WEEK
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-4xl font-bold text-teal-400">{activeThisWeek}</div>
+            <div className="text-4xl font-bold text-teal-400">
+              {activeThisWeek}
+            </div>
           </CardContent>
         </Card>
         {/* <Card className="bg-[#111111] border-border">
@@ -183,13 +218,27 @@ export function EmailsContent() {
             <table className="w-full">
               <thead>
                 <tr className="border-b border-border">
-                  <th className="p-4 text-sm font-medium text-left text-gray-400">SL</th>
-                  <th className="p-4 text-sm font-medium text-left text-gray-400">NAME</th>
-                  <th className="p-4 text-sm font-medium text-left text-gray-400">EMAIL</th>
-                  <th className="p-4 text-sm font-medium text-left text-gray-400">MESSAGE</th>
-                  <th className="p-4 text-sm font-medium text-left text-gray-400">SEGMENT</th>
-                  <th className="p-4 text-sm font-medium text-left text-gray-400">FIRST SIGNAL</th>
-                  <th className="p-4 text-sm font-medium text-left text-gray-400">ACTIONS</th>
+                  <th className="p-4 text-sm font-medium text-left text-gray-400">
+                    SL
+                  </th>
+                  <th className="p-4 text-sm font-medium text-left text-gray-400">
+                    NAME
+                  </th>
+                  <th className="p-4 text-sm font-medium text-left text-gray-400">
+                    EMAIL
+                  </th>
+                  <th className="p-4 text-sm font-medium text-left text-gray-400">
+                    MESSAGE
+                  </th>
+                  <th className="p-4 text-sm font-medium text-left text-gray-400">
+                    SEGMENT
+                  </th>
+                  <th className="p-4 text-sm font-medium text-left text-gray-400">
+                    FIRST SIGNAL
+                  </th>
+                  <th className="p-4 text-sm font-medium text-left text-gray-400">
+                    ACTIONS
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -203,21 +252,36 @@ export function EmailsContent() {
                   </tr>
                 ) : (
                   subscribers.map((subscriber, index) => (
-                    <tr key={index} className="border-b border-border hover:bg-accent/5">
+                    <tr
+                      key={index}
+                      className="border-b border-border hover:bg-accent/5"
+                    >
                       <td className="p-4 text-gray-400">{index + 1}</td>
                       <td className="p-4">
-                        <span className="font-medium text-teal-400">{subscriber.name}</span>
+                        <span className="font-medium text-teal-400">
+                          {subscriber.name}
+                        </span>
                       </td>
                       <td className="p-4">
                         <div className="flex gap-2 items-center">
                           <Mail className="w-4 h-4 text-gray-400" />
-                          <span className="font-medium text-teal-400">{subscriber.email}</span>
+                          <span className="font-medium text-teal-400">
+                            {subscriber.email}
+                          </span>
                         </div>
                       </td>
-                      <td className="p-4 text-gray-400">{subscriber.message}</td>
-                      <td className="p-4 text-gray-400">{subscriber.segment}</td>
                       <td className="p-4 text-gray-400">
-                        {subscriber.firstSignal ? subscriber.firstSignal.replace('T', ' ').slice(0, 16) : ''}
+                        {subscriber.message}
+                      </td>
+                      <td className="p-4 text-gray-400">
+                        {subscriber.segment}
+                      </td>
+                      <td className="p-4 text-gray-400">
+                        {subscriber.firstSignal
+                          ? subscriber.firstSignal
+                              .replace("T", " ")
+                              .slice(0, 16)
+                          : ""}
                       </td>
                       <td className="p-4">
                         <Button
@@ -245,7 +309,7 @@ export function EmailsContent() {
             <DialogDescription>
               {pendingDelete
                 ? `Are you sure you want to delete ${pendingDelete.email}? This action cannot be undone.`
-                : 'Are you sure you want to delete this entry? This action cannot be undone.'}
+                : "Are you sure you want to delete this entry? This action cannot be undone."}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -257,7 +321,7 @@ export function EmailsContent() {
               onClick={() => handleDelete(pendingDelete?.id)}
               disabled={!pendingDelete || deletingId === pendingDelete?.id}
             >
-              {deletingId === pendingDelete?.id ? 'Deleting...' : 'Delete'}
+              {deletingId === pendingDelete?.id ? "Deleting..." : "Delete"}
             </Button>
           </DialogFooter>
         </DialogContent>

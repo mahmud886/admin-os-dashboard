@@ -1,13 +1,13 @@
-'use client';
+"use client";
 
-import { Video } from '@/components/editor/video-extension';
-import { Button } from '@/components/ui/button';
-import Image from '@tiptap/extension-image';
-import Link from '@tiptap/extension-link';
-import Placeholder from '@tiptap/extension-placeholder';
-import Youtube from '@tiptap/extension-youtube';
-import { EditorContent, useEditor } from '@tiptap/react';
-import StarterKit from '@tiptap/starter-kit';
+import { Video } from "@/components/editor/video-extension";
+import { Button } from "@/components/ui/button";
+import Image from "@tiptap/extension-image";
+import Link from "@tiptap/extension-link";
+import Placeholder from "@tiptap/extension-placeholder";
+import Youtube from "@tiptap/extension-youtube";
+import { EditorContent, useEditor } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
 import {
   Bold,
   Heading1,
@@ -22,7 +22,7 @@ import {
   Undo,
   Video as VideoIcon,
   Youtube as YoutubeIcon,
-} from 'lucide-react';
+} from "lucide-react";
 
 const MenuBar = ({ editor }) => {
   if (!editor) {
@@ -30,30 +30,30 @@ const MenuBar = ({ editor }) => {
   }
 
   const addImage = () => {
-    const url = window.prompt('URL');
+    const url = window.prompt("URL");
     if (url) {
       editor.chain().focus().setImage({ src: url }).run();
     }
   };
 
   const setLink = () => {
-    const previousUrl = editor.getAttributes('link').href;
-    const url = window.prompt('URL', previousUrl);
+    const previousUrl = editor.getAttributes("link").href;
+    const url = window.prompt("URL", previousUrl);
 
     if (url === null) {
       return;
     }
 
-    if (url === '') {
-      editor.chain().focus().extendMarkRange('link').unsetLink().run();
+    if (url === "") {
+      editor.chain().focus().extendMarkRange("link").unsetLink().run();
       return;
     }
 
-    editor.chain().focus().extendMarkRange('link').setLink({ href: url }).run();
+    editor.chain().focus().extendMarkRange("link").setLink({ href: url }).run();
   };
 
   const addYoutubeVideo = () => {
-    const url = window.prompt('Enter YouTube URL');
+    const url = window.prompt("Enter YouTube URL");
 
     if (url) {
       editor.commands.setYoutubeVideo({
@@ -65,7 +65,7 @@ const MenuBar = ({ editor }) => {
   };
 
   const addVideo = () => {
-    const url = window.prompt('Enter Video URL');
+    const url = window.prompt("Enter Video URL");
 
     if (url) {
       editor.commands.setVideo({ src: url });
@@ -78,7 +78,11 @@ const MenuBar = ({ editor }) => {
         variant="ghost"
         size="sm"
         onClick={() => editor.chain().focus().toggleBold().run()}
-        className={editor.isActive('bold') ? 'bg-teal-500/20 text-teal-400' : 'text-gray-400'}
+        className={
+          editor.isActive("bold")
+            ? "bg-teal-500/20 text-teal-400"
+            : "text-gray-400"
+        }
       >
         <Bold className="w-4 h-4" />
       </Button>
@@ -86,7 +90,11 @@ const MenuBar = ({ editor }) => {
         variant="ghost"
         size="sm"
         onClick={() => editor.chain().focus().toggleItalic().run()}
-        className={editor.isActive('italic') ? 'bg-teal-500/20 text-teal-400' : 'text-gray-400'}
+        className={
+          editor.isActive("italic")
+            ? "bg-teal-500/20 text-teal-400"
+            : "text-gray-400"
+        }
       >
         <Italic className="w-4 h-4" />
       </Button>
@@ -94,7 +102,11 @@ const MenuBar = ({ editor }) => {
         variant="ghost"
         size="sm"
         onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
-        className={editor.isActive('heading', { level: 1 }) ? 'bg-teal-500/20 text-teal-400' : 'text-gray-400'}
+        className={
+          editor.isActive("heading", { level: 1 })
+            ? "bg-teal-500/20 text-teal-400"
+            : "text-gray-400"
+        }
       >
         <Heading1 className="w-4 h-4" />
       </Button>
@@ -102,7 +114,11 @@ const MenuBar = ({ editor }) => {
         variant="ghost"
         size="sm"
         onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
-        className={editor.isActive('heading', { level: 2 }) ? 'bg-teal-500/20 text-teal-400' : 'text-gray-400'}
+        className={
+          editor.isActive("heading", { level: 2 })
+            ? "bg-teal-500/20 text-teal-400"
+            : "text-gray-400"
+        }
       >
         <Heading2 className="w-4 h-4" />
       </Button>
@@ -110,7 +126,11 @@ const MenuBar = ({ editor }) => {
         variant="ghost"
         size="sm"
         onClick={() => editor.chain().focus().toggleBulletList().run()}
-        className={editor.isActive('bulletList') ? 'bg-teal-500/20 text-teal-400' : 'text-gray-400'}
+        className={
+          editor.isActive("bulletList")
+            ? "bg-teal-500/20 text-teal-400"
+            : "text-gray-400"
+        }
       >
         <List className="w-4 h-4" />
       </Button>
@@ -118,7 +138,11 @@ const MenuBar = ({ editor }) => {
         variant="ghost"
         size="sm"
         onClick={() => editor.chain().focus().toggleOrderedList().run()}
-        className={editor.isActive('orderedList') ? 'bg-teal-500/20 text-teal-400' : 'text-gray-400'}
+        className={
+          editor.isActive("orderedList")
+            ? "bg-teal-500/20 text-teal-400"
+            : "text-gray-400"
+        }
       >
         <ListOrdered className="w-4 h-4" />
       </Button>
@@ -126,7 +150,11 @@ const MenuBar = ({ editor }) => {
         variant="ghost"
         size="sm"
         onClick={() => editor.chain().focus().toggleBlockquote().run()}
-        className={editor.isActive('blockquote') ? 'bg-teal-500/20 text-teal-400' : 'text-gray-400'}
+        className={
+          editor.isActive("blockquote")
+            ? "bg-teal-500/20 text-teal-400"
+            : "text-gray-400"
+        }
       >
         <Quote className="w-4 h-4" />
       </Button>
@@ -134,23 +162,52 @@ const MenuBar = ({ editor }) => {
         variant="ghost"
         size="sm"
         onClick={setLink}
-        className={editor.isActive('link') ? 'bg-teal-500/20 text-teal-400' : 'text-gray-400'}
+        className={
+          editor.isActive("link")
+            ? "bg-teal-500/20 text-teal-400"
+            : "text-gray-400"
+        }
       >
         <LinkIcon className="w-4 h-4" />
       </Button>
-      <Button variant="ghost" size="sm" onClick={addImage} className="text-gray-400">
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={addImage}
+        className="text-gray-400"
+      >
         <ImageIcon className="w-4 h-4" />
       </Button>
-      <Button variant="ghost" size="sm" onClick={addYoutubeVideo} className="text-gray-400">
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={addYoutubeVideo}
+        className="text-gray-400"
+      >
         <YoutubeIcon className="w-4 h-4" />
       </Button>
-      <Button variant="ghost" size="sm" onClick={addVideo} className="text-gray-400">
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={addVideo}
+        className="text-gray-400"
+      >
         <VideoIcon className="w-4 h-4" />
       </Button>
-      <Button variant="ghost" size="sm" onClick={() => editor.chain().focus().undo().run()} className="text-gray-400">
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={() => editor.chain().focus().undo().run()}
+        className="text-gray-400"
+      >
         <Undo className="w-4 h-4" />
       </Button>
-      <Button variant="ghost" size="sm" onClick={() => editor.chain().focus().redo().run()} className="text-gray-400">
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={() => editor.chain().focus().redo().run()}
+        className="text-gray-400"
+      >
         <Redo className="w-4 h-4" />
       </Button>
     </div>
@@ -171,7 +228,7 @@ export default function RichTextEditor({ content, onChange, editable = true }) {
       }),
       Video,
       Placeholder.configure({
-        placeholder: 'Write something amazing...',
+        placeholder: "Write something amazing...",
       }),
     ],
     content: content,
@@ -182,7 +239,8 @@ export default function RichTextEditor({ content, onChange, editable = true }) {
     },
     editorProps: {
       attributes: {
-        className: 'prose prose-invert max-w-none focus:outline-none min-h-[200px] p-4 text-gray-300',
+        className:
+          "prose prose-invert max-w-none focus:outline-none min-h-[200px] p-4 text-gray-300",
       },
     },
   });

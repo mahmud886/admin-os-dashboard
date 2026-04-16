@@ -1,47 +1,52 @@
-'use client';
+"use client";
 
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { useAuth } from '@/hooks/useAuth';
-import { Lock, User } from 'lucide-react';
-import Image from 'next/image';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { Suspense, useEffect, useState } from 'react';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useAuth } from "@/hooks/useAuth";
+import { Lock, User } from "lucide-react";
+import Image from "next/image";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
 
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { signIn, isAuthenticated, loading: authLoading, configError } = useAuth();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const {
+    signIn,
+    isAuthenticated,
+    loading: authLoading,
+    configError,
+  } = useAuth();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   // Redirect if already authenticated
   useEffect(() => {
     if (!authLoading && isAuthenticated) {
-      const redirect = searchParams.get('redirect') || '/dashboard';
+      const redirect = searchParams.get("redirect") || "/dashboard";
       router.push(redirect);
     }
   }, [isAuthenticated, authLoading, router, searchParams]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
+    setError("");
     setIsLoading(true);
 
     try {
       const result = await signIn(email.trim(), password);
 
       if (result.success) {
-        const redirect = searchParams.get('redirect') || '/dashboard';
+        const redirect = searchParams.get("redirect") || "/dashboard";
         router.push(redirect);
       } else {
-        setError(result.error || 'Invalid credentials. Access denied.');
+        setError(result.error || "Invalid credentials. Access denied.");
       }
     } catch (err) {
-      setError(err.message || 'An error occurred. Please try again.');
+      setError(err.message || "An error occurred. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -72,13 +77,17 @@ function LoginForm() {
               priority
             />
           </div>
-          <h1 className="mb-2 text-3xl font-bold text-teal-400">SPORE FALL ADMIN CONSOLE</h1>
+          <h1 className="mb-2 text-3xl font-bold text-teal-400">
+            SPORE FALL ADMIN CONSOLE
+          </h1>
           <p className="text-sm text-gray-400">Admin Console Access</p>
         </div>
 
         {/* Login Card */}
         <div className="bg-[#111111] border border-border rounded-lg p-8 shadow-lg">
-          <h2 className="mb-6 text-2xl font-semibold text-center text-gray-200">AUTHENTICATION REQUIRED</h2>
+          <h2 className="mb-6 text-2xl font-semibold text-center text-gray-200">
+            AUTHENTICATION REQUIRED
+          </h2>
 
           {/* Configuration Error */}
           {configError && (
@@ -86,8 +95,11 @@ function LoginForm() {
               <div className="font-semibold mb-2">Configuration Error:</div>
               <div>{configError}</div>
               <div className="mt-3 text-xs text-red-300">
-                Please check your <code className="bg-black/30 px-1 py-0.5 rounded">.env.local</code> file and ensure
-                all required environment variables are set.
+                Please check your{" "}
+                <code className="bg-black/30 px-1 py-0.5 rounded">
+                  .env.local
+                </code>{" "}
+                file and ensure all required environment variables are set.
               </div>
             </div>
           )}
@@ -95,7 +107,10 @@ function LoginForm() {
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Email/Username Field */}
             <div className="space-y-2">
-              <Label htmlFor="email" className="flex items-center gap-2 text-gray-300">
+              <Label
+                htmlFor="email"
+                className="flex items-center gap-2 text-gray-300"
+              >
                 <User className="w-4 h-4" />
                 USERNAME / EMAIL
               </Label>
@@ -112,7 +127,10 @@ function LoginForm() {
 
             {/* Password Field */}
             <div className="space-y-2">
-              <Label htmlFor="password" className="flex items-center gap-2 text-gray-300">
+              <Label
+                htmlFor="password"
+                className="flex items-center gap-2 text-gray-300"
+              >
                 <Lock className="w-4 h-4" />
                 PASSWORD
               </Label>
@@ -129,18 +147,24 @@ function LoginForm() {
 
             {/* Error Message */}
             {error && (
-              <div className="p-3 text-sm text-red-400 bg-red-950/30 border border-red-500/50 rounded-md">{error}</div>
+              <div className="p-3 text-sm text-red-400 bg-red-950/30 border border-red-500/50 rounded-md">
+                {error}
+              </div>
             )}
 
             {/* Submit Button */}
-            <Button type="submit" className="w-full text-base font-semibold h-11" disabled={isLoading || !!configError}>
+            <Button
+              type="submit"
+              className="w-full text-base font-semibold h-11"
+              disabled={isLoading || !!configError}
+            >
               {isLoading ? (
                 <>
                   <div className="w-4 h-4 border-2 border-teal-400 rounded-full border-t-transparent animate-spin"></div>
                   AUTHENTICATING...
                 </>
               ) : (
-                'SECURE LOGIN'
+                "SECURE LOGIN"
               )}
             </Button>
           </form>
@@ -155,7 +179,9 @@ function LoginForm() {
 
         {/* Footer */}
         <div className="mt-6 text-center">
-          <p className="text-xs text-gray-600">© 2026 SPORE FALL. All rights reserved.</p>
+          <p className="text-xs text-gray-600">
+            © 2026 SPORE FALL. All rights reserved.
+          </p>
         </div>
       </div>
     </div>
