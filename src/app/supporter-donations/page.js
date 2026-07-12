@@ -2,11 +2,22 @@
 
 import { MainLayout } from "@/components/layout/main-layout";
 import { SupporterDonationsTableShimmer } from "@/components/shimmer/supporter-donations-table-shimmer";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/components/ui/toast";
 import { tierPrices } from "@/data/payments";
-import { Download } from "lucide-react";
+import { Download, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 
 export default function SupporterDonationsPage() {
@@ -19,6 +30,8 @@ export default function SupporterDonationsPage() {
   });
   const [loading, setLoading] = useState(true);
   const [total, setTotal] = useState(0);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [donationToDelete, setDonationToDelete] = useState(null);
   const { addToast } = useToast();
 
   useEffect(() => {
@@ -45,9 +58,90 @@ export default function SupporterDonationsPage() {
     }
   };
 
+  const handleDeleteClick = (donation) => {
+    setDonationToDelete(donation);
+    setDeleteDialogOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!donationToDelete) return;
+
+    try {
+      const response = await fetch(
+        `/api/supporter-donations/${donationToDelete.id}`,
+        {
+          method: "DELETE",
+        },
+      );
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || "Failed to delete donation");
+      }
+
+      addToast({
+        title: "Success",
+        description: "Donation deleted successfully.",
+      });
+      await fetchDonations();
+    } catch (err) {
+      console.error("Error deleting donation:", err);
+      addToast({
+        title: "Error",
+        description: err.message || "Failed to delete donation.",
+        variant: "destructive",
+      });
+    } finally {
+      setDeleteDialogOpen(false);
+      setDonationToDelete(null);
+    }
+  };
+
   const getType = (tierId) => {
     if (tierId === "support-universe") return "DONATION";
     return "TIER";
+  };
+
+  const getStatusColor = (status) => {
+    switch (status) {
+      case "paid":
+      case "succeeded":
+      case "completed":
+        return "border-green-500 bg-green-500/10 text-green-400";
+      case "pending":
+      case "processing":
+        return "border-yellow-500 bg-yellow-500/10 text-yellow-400";
+      case "cancelled":
+      case "refunded":
+        return "border-red-500 bg-red-500/10 text-red-400";
+      default:
+        return "border-gray-500 bg-gray-500/10 text-gray-400";
+    }
+  };
+
+  const getModeClass = (livemode) => {
+    if (livemode === true)
+      return "border-green-500 bg-green-500/10 text-green-400";
+    if (livemode === false)
+      return "border-yellow-500 bg-yellow-500/10 text-yellow-400";
+    return "border-gray-500 bg-gray-500/10 text-gray-400";
+  };
+
+  const getModeLabel = (livemode) => {
+    if (livemode === true) return "LIVE";
+    if (livemode === false) return "TEST";
+    return "—";
+  };
+
+  const formatDate = (dateString) => {
+    if (!dateString) return "—";
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
   };
 
   const handleExportCSV = () => {
@@ -69,6 +163,7 @@ export default function SupporterDonationsPage() {
       "Type",
       "Tier Name",
       "Status",
+      "Mode",
       "Created At",
     ];
 
@@ -84,6 +179,7 @@ export default function SupporterDonationsPage() {
           `"${getType(d.tier_id)}"`,
           `"${(d.tier_name || "").replace(/"/g, '""')}"`,
           `"${d.status || ""}"`,
+          `"${getModeLabel(d.metadata?.livemode)}"`,
           `"${d.created_at ? new Date(d.created_at).toISOString() : ""}"`,
         ];
         return row.join(",");
@@ -181,33 +277,27 @@ export default function SupporterDonationsPage() {
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-border">
-                    <th className="p-4 text-sm font-medium text-left text-gray-400">
-                      SL
+                  <tr className="border-b border-border bg-[#0a0a0a]/50">
+                    <th className="p-4 text-xs font-medium tracking-wider text-left text-gray-400 uppercase">
+                      Supporter
                     </th>
-                    <th className="p-4 text-sm font-medium text-left text-gray-400">
-                      NAME
+                    <th className="p-4 text-xs font-medium tracking-wider text-left text-gray-400 uppercase">
+                      Tier
                     </th>
-                    <th className="p-4 text-sm font-medium text-left text-gray-400">
-                      EMAIL
+                    <th className="p-4 text-xs font-medium tracking-wider text-left text-gray-400 uppercase">
+                      Amount
                     </th>
-                    <th className="p-4 text-sm font-medium text-left text-gray-400">
-                      ADDRESS
+                    <th className="p-4 text-xs font-medium tracking-wider text-left text-gray-400 uppercase">
+                      Status
                     </th>
-                    <th className="p-4 text-sm font-medium text-left text-gray-400">
-                      AMOUNT
+                    <th className="p-4 text-xs font-medium tracking-wider text-left text-gray-400 uppercase">
+                      Mode
                     </th>
-                    <th className="p-4 text-sm font-medium text-left text-gray-400">
-                      TYPE
+                    <th className="p-4 text-xs font-medium tracking-wider text-left text-gray-400 uppercase">
+                      Date
                     </th>
-                    <th className="p-4 text-sm font-medium text-left text-gray-400">
-                      TIER
-                    </th>
-                    <th className="p-4 text-sm font-medium text-left text-gray-400">
-                      STATUS
-                    </th>
-                    <th className="p-4 text-sm font-medium text-left text-gray-400">
-                      CREATED
+                    <th className="p-4 text-xs font-medium tracking-wider text-right text-gray-400 uppercase">
+                      Actions
                     </th>
                   </tr>
                 </thead>
@@ -216,50 +306,76 @@ export default function SupporterDonationsPage() {
                     <SupporterDonationsTableShimmer />
                   ) : donations.length === 0 ? (
                     <tr>
-                      <td colSpan="9" className="p-8 text-center text-gray-400">
+                      <td colSpan="7" className="p-8 text-center text-gray-400">
                         No donations found
                       </td>
                     </tr>
                   ) : (
-                    donations.map((p, i) => (
-                      <tr key={p.id} className="hover:bg-accent/5">
-                        <td className="p-4 text-gray-400">{i + 1}</td>
-                        <td className="p-4 font-medium text-teal-400">
-                          {p.supporter_name || "Anonymous"}
-                        </td>
-                        <td className="p-4 text-gray-300">
-                          {p.supporter_email}
-                        </td>
-                        <td
-                          className="p-4 max-w-xs text-gray-300 truncate"
-                          title={p.mailing_address}
-                        >
-                          {p.mailing_address || "—"}
-                        </td>
-                        <td className="p-4 font-semibold text-teal-400">
-                          {p.amount
-                            ? `${p.amount} ${p.currency?.toUpperCase() || "USD"}`
-                            : "—"}
-                        </td>
-                        <td className="p-4 text-gray-300">
-                          {getType(p.tier_id)}
-                        </td>
-                        <td className="p-4 text-gray-300">{p.tier_name}</td>
+                    donations.map((p) => (
+                      <tr
+                        key={p.id}
+                        className="transition-colors hover:bg-accent/5"
+                      >
                         <td className="p-4">
-                          <span
-                            className={
-                              p.status === "paid" || p.status === "succeeded"
-                                ? "px-2 py-1 rounded border border-green-500/50 bg-green-500/20 text-green-400 text-xs"
-                                : "px-2 py-1 rounded border border-yellow-500/50 bg-yellow-500/20 text-yellow-400 text-xs"
-                            }
-                          >
-                            {p.status}
-                          </span>
+                          <div className="text-sm font-medium text-white">
+                            {p.supporter_name || "Anonymous"}
+                          </div>
+                          <div className="text-xs text-gray-500">
+                            {p.supporter_email}
+                          </div>
+                          {p.mailing_address && (
+                            <div
+                              className="mt-0.5 max-w-[220px] truncate text-xs text-gray-600"
+                              title={p.mailing_address}
+                            >
+                              {p.mailing_address}
+                            </div>
+                          )}
                         </td>
-                        <td className="p-4 text-gray-300">
-                          {p.created_at
-                            ? new Date(p.created_at).toLocaleString()
+                        <td className="p-4">
+                          <div className="text-sm text-white">
+                            {p.tier_name || "—"}
+                          </div>
+                          <Badge
+                            variant="outline"
+                            className="mt-1 text-[10px] border-teal-500/30 bg-teal-500/5 text-teal-400"
+                          >
+                            {getType(p.tier_id)}
+                          </Badge>
+                        </td>
+                        <td className="p-4 text-sm font-medium text-white">
+                          {p.amount
+                            ? `${p.amount} ${(p.currency || "USD").toUpperCase()}`
                             : "—"}
+                        </td>
+                        <td className="p-4">
+                          <Badge
+                            variant="outline"
+                            className={getStatusColor(p.status)}
+                          >
+                            {p.status?.toUpperCase()}
+                          </Badge>
+                        </td>
+                        <td className="p-4">
+                          <Badge
+                            variant="outline"
+                            className={getModeClass(p.metadata?.livemode)}
+                          >
+                            {getModeLabel(p.metadata?.livemode)}
+                          </Badge>
+                        </td>
+                        <td className="p-4 text-sm text-gray-400">
+                          {formatDate(p.created_at)}
+                        </td>
+                        <td className="p-4 text-right">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="p-0 w-8 h-8"
+                            onClick={() => handleDeleteClick(p)}
+                          >
+                            <Trash2 className="w-4 h-4 text-red-400" />
+                          </Button>
                         </td>
                       </tr>
                     ))
@@ -270,6 +386,33 @@ export default function SupporterDonationsPage() {
           </CardContent>
         </Card>
       </div>
+
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent className="bg-[#111111] border-border text-white">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription className="text-gray-400">
+              This action cannot be undone. This will permanently delete the
+              donation from{" "}
+              <span className="font-mono text-teal-400">
+                {donationToDelete?.supporter_name || "Anonymous"}
+              </span>
+              .
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="text-white bg-transparent border-border hover:bg-white/10 hover:text-white">
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              className="text-white bg-red-600 border-none hover:bg-red-700"
+              onClick={confirmDelete}
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </MainLayout>
   );
 }
