@@ -37,36 +37,25 @@ export async function GET(request) {
       );
     }
 
-    // specific stats
-    const { count: archivistCount } = await supabase
-      .from("supporter_donations")
-      .select("*", { count: "exact", head: true })
-      .eq("tier_id", "archivist");
+    // Dynamic stats from donation_tiers table
+    const { data: tiers } = await supabase
+      .from("donation_tiers")
+      .select("tier_id")
+      .order("sort_order", { ascending: true });
 
-    const { count: emblemCount } = await supabase
-      .from("supporter_donations")
-      .select("*", { count: "exact", head: true })
-      .eq("tier_id", "emblem");
-
-    const { count: patronCount } = await supabase
-      .from("supporter_donations")
-      .select("*", { count: "exact", head: true })
-      .eq("tier_id", "patron");
-
-    const { count: donationCount } = await supabase
-      .from("supporter_donations")
-      .select("*", { count: "exact", head: true })
-      .eq("tier_id", "support-universe");
+    const stats = {};
+    for (const tier of tiers || []) {
+      const { count: tierCount } = await supabase
+        .from("supporter_donations")
+        .select("*", { count: "exact", head: true })
+        .eq("tier_id", tier.tier_id);
+      stats[tier.tier_id] = tierCount || 0;
+    }
 
     return createResponse({
       donations: data || [],
       total: count || 0,
-      stats: {
-        archivist: archivistCount || 0,
-        emblem: emblemCount || 0,
-        patron: patronCount || 0,
-        donation: donationCount || 0,
-      },
+      stats,
       limit,
       offset,
     });
