@@ -45,6 +45,20 @@ import {
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
+const getModeClass = (livemode) => {
+  if (livemode === true)
+    return "border-green-500 bg-green-500/10 text-green-400";
+  if (livemode === false)
+    return "border-yellow-500 bg-yellow-500/10 text-yellow-400";
+  return "border-gray-500 bg-gray-500/10 text-gray-400";
+};
+
+const getModeLabel = (livemode) => {
+  if (livemode === true) return "LIVE";
+  if (livemode === false) return "TEST";
+  return "—";
+};
+
 const getStatusColor = (status) => {
   switch (status) {
     case "paid":
@@ -236,6 +250,7 @@ export default function OrdersPage() {
       "Customer Email",
       "Status",
       "Payment Status",
+      "Mode",
       "Total",
       "Currency",
       "Date",
@@ -250,6 +265,7 @@ export default function OrdersPage() {
           `"${(order.ecommerce_customers?.email || "").replace(/"/g, '""')}"`,
           `"${(order.status || "").replace(/"/g, '""')}"`,
           `"${(order.payment_status || "").replace(/"/g, '""')}"`,
+          `"${getModeLabel(order.metadata?.livemode)}"`,
           `"${calculateTotal(order)}"`,
           `"${(order.currency || "USD").toUpperCase()}"`,
           `"${order.created_at ? new Date(order.created_at).toISOString() : ""}"`,
@@ -429,8 +445,16 @@ export default function OrdersPage() {
                             key={order.id}
                             className="transition-colors hover:bg-accent/5"
                           >
-                            <td className="p-4 font-mono text-sm text-teal-400">
-                              {order.order_number}
+                            <td className="p-4">
+                              <div className="font-mono text-sm text-teal-400">
+                                {order.order_number}
+                              </div>
+                              <Badge
+                                variant="outline"
+                                className={`mt-1 text-[10px] ${getModeClass(order.metadata?.livemode)}`}
+                              >
+                                {getModeLabel(order.metadata?.livemode)}
+                              </Badge>
                             </td>
                             <td className="p-4">
                               <div className="text-sm font-medium text-white">
@@ -675,6 +699,17 @@ export default function OrdersPage() {
                       className={getStatusColor(selectedOrder.payment_status)}
                     >
                       {selectedOrder.payment_status.toUpperCase()}
+                    </Badge>
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <span className="text-xs text-gray-500 uppercase">
+                      Mode
+                    </span>
+                    <Badge
+                      variant="outline"
+                      className={getModeClass(selectedOrder.metadata?.livemode)}
+                    >
+                      {getModeLabel(selectedOrder.metadata?.livemode)}
                     </Badge>
                   </div>
                   <div className="flex flex-col gap-1 ml-auto text-right">
