@@ -36,6 +36,7 @@ import { useToast } from "@/components/ui/toast";
 import {
   Download,
   Eye,
+  FileText,
   Package,
   Search,
   ShoppingCart,
@@ -231,28 +232,30 @@ export default function OrdersPage() {
     }
 
     const headers = [
-      "Order ID",
-      "Customer Name",
-      "Customer Email",
+      "Order Reference",
+      "Name",
+      "Address",
+      "Order Placed",
+      "Email",
+      "Amount",
       "Status",
-      "Payment Status",
-      "Total",
-      "Currency",
-      "Date",
     ];
 
     const csvContent = [
       headers.join(","),
       ...orders.map((order) => {
+        const addr = order.shipping_address || order.ecommerce_customers?.address || {};
+        const addressStr = [addr.line1, addr.city, addr.state, addr.postal_code, addr.country]
+          .filter(Boolean)
+          .join(", ");
         const row = [
-          `"${(order.order_number || "").replace(/"/g, '""')}"`,
+          `"${(order.order_number || "—").replace(/"/g, '""')}"`,
           `"${(order.ecommerce_customers?.name || "Guest").replace(/"/g, '""')}"`,
+          `"${addressStr.replace(/"/g, '""')}"`,
+          `"${order.created_at ? new Date(order.created_at).toLocaleString("en-US") : ""}"`,
           `"${(order.ecommerce_customers?.email || "").replace(/"/g, '""')}"`,
-          `"${(order.status || "").replace(/"/g, '""')}"`,
-          `"${(order.payment_status || "").replace(/"/g, '""')}"`,
-          `"${calculateTotal(order)}"`,
-          `"${(order.currency || "USD").toUpperCase()}"`,
-          `"${order.created_at ? new Date(order.created_at).toISOString() : ""}"`,
+          `"$${calculateTotal(order)} ${(order.currency || "USD").toUpperCase()}"`,
+          `"${(order.status || "").toUpperCase()}"`,
         ];
         return row.join(",");
       }),
@@ -328,6 +331,71 @@ export default function OrdersPage() {
       description: "Customers list exported to CSV",
       variant: "success",
     });
+  };
+
+  const handlePrintInvoice = (order) => {
+    const customer = order.ecommerce_customers || {};
+    const addr = order.shipping_address || customer.address || {};
+    const addressStr = [addr.line1, addr.city, addr.state, addr.postal_code, addr.country].filter(Boolean).join(", ");
+    const date = order.created_at ? new Date(order.created_at).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }) : "—";
+    const items = order.ecommerce_order_items || [];
+    const total = formatCurrency(calculateTotal(order), order.currency);
+    const itemRows = items.map(item =>
+      `<tr><td>${item.product_name || "Item"}</td><td style="text-align:center">${item.quantity||1}</td><td style="text-align:right">$${parseFloat(item.unit_amount||0).toFixed(2)}</td><td style="text-align:right">$${parseFloat(item.total_amount||0).toFixed(2)}</td></tr>`
+    ).join("") || `<tr><td colspan="4" style="color:#888">—</td></tr>`;
+
+    const html = `<!DOCTYPE html><html><head><meta charset="UTF-8">
+<title>Invoice ${order.order_number || ""}</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:Arial,sans-serif;color:#111;padding:48px;max-width:640px;margin:0 auto}
+  .top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:32px}
+  .brand{font-size:22px;font-weight:900;letter-spacing:0.25em}
+  .brand span{color:#555;font-size:11px;display:block;font-weight:400;letter-spacing:0.15em;margin-top:2px}
+  .inv-label{text-align:right}
+  .inv-label h2{font-size:20px;font-weight:700;letter-spacing:0.1em}
+  .inv-label p{font-size:12px;color:#555;margin-top:4px;font-family:monospace}
+  hr{border:none;border-top:1px solid #ddd;margin:20px 0}
+  .section{margin-bottom:20px}
+  .section h3{font-size:10px;letter-spacing:0.2em;color:#888;text-transform:uppercase;margin-bottom:8px}
+  .section p{font-size:13px;line-height:1.7;color:#333}
+  table{width:100%;border-collapse:collapse;margin:20px 0}
+  th{font-size:10px;letter-spacing:0.15em;color:#888;text-transform:uppercase;text-align:left;padding:8px 0;border-bottom:1px solid #ddd}
+  th:not(:first-child){text-align:right}
+  td{padding:10px 0;font-size:13px;border-bottom:1px solid #f0f0f0;vertical-align:top}
+  td:not(:first-child){text-align:right}
+  .total-row td{font-weight:700;font-size:15px;border-top:2px solid #111;border-bottom:none;padding-top:14px}
+  .status{display:inline-block;padding:3px 10px;border-radius:99px;font-size:11px;font-weight:700;letter-spacing:0.1em;background:${order.status==="paid"||order.status==="completed"?"#dcfce7":"#fef9c3"};color:${order.status==="paid"||order.status==="completed"?"#15803d":"#92400e"}}
+  .footer{margin-top:40px;font-size:10px;color:#aaa;text-align:center;letter-spacing:0.1em}
+  @media print{body{padding:24px}}
+</style></head><body>
+<div class="top">
+  <div class="brand">SPORE FALL<span>A Sci-Fi Micro-Drama</span></div>
+  <div class="inv-label"><h2>INVOICE</h2><p>${order.order_number || "—"}</p></div>
+</div>
+<hr>
+<div class="section"><h3>Bill To</h3>
+  <p><strong>${customer.name || "Guest"}</strong></p>
+  ${customer.email ? `<p>${customer.email}</p>` : ""}
+  ${customer.phone ? `<p>${customer.phone}</p>` : ""}
+  ${addressStr ? `<p>${addressStr}</p>` : ""}
+</div>
+<div class="section"><h3>Invoice Date</h3><p>${date}</p></div>
+<hr>
+<table>
+  <thead><tr><th>Item</th><th style="text-align:center">Qty</th><th style="text-align:right">Unit</th><th style="text-align:right">Total</th></tr></thead>
+  <tbody>
+    ${itemRows}
+    <tr class="total-row"><td colspan="3">Total</td><td style="text-align:right">${total}</td></tr>
+  </tbody>
+</table>
+<p>Status: <span class="status">${(order.status||"").toUpperCase()}</span></p>
+<div class="footer">Thank you for your order &mdash; sporefall.com</div>
+<script>window.onload=function(){window.print();}</script>
+</body></html>`;
+    const w = window.open("", "_blank");
+    w.document.write(html);
+    w.document.close();
   };
 
   return (
@@ -469,7 +537,16 @@ export default function OrdersPage() {
                               {formatDate(order.created_at)}
                             </td>
                             <td className="p-4 text-right">
-                              <div className="flex gap-2 justify-end">
+                              <div className="flex gap-1 justify-end">
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="p-0 w-8 h-8"
+                                  title="Download Invoice"
+                                  onClick={() => handlePrintInvoice(order)}
+                                >
+                                  <FileText className="w-4 h-4 text-teal-400" />
+                                </Button>
                                 <Button
                                   variant="ghost"
                                   size="sm"
