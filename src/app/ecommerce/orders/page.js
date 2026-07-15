@@ -244,8 +244,15 @@ export default function OrdersPage() {
     const csvContent = [
       headers.join(","),
       ...orders.map((order) => {
-        const addr = order.shipping_address || order.ecommerce_customers?.address || {};
-        const addressStr = [addr.line1, addr.city, addr.state, addr.postal_code, addr.country]
+        const addr =
+          order.shipping_address || order.ecommerce_customers?.address || {};
+        const addressStr = [
+          addr.line1,
+          addr.city,
+          addr.state,
+          addr.postal_code,
+          addr.country,
+        ]
           .filter(Boolean)
           .join(", ");
         const row = [
@@ -336,13 +343,31 @@ export default function OrdersPage() {
   const handlePrintInvoice = (order) => {
     const customer = order.ecommerce_customers || {};
     const addr = order.shipping_address || customer.address || {};
-    const addressStr = [addr.line1, addr.city, addr.state, addr.postal_code, addr.country].filter(Boolean).join(", ");
-    const date = order.created_at ? new Date(order.created_at).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }) : "—";
+    const addressStr = [
+      addr.line1,
+      addr.city,
+      addr.state,
+      addr.postal_code,
+      addr.country,
+    ]
+      .filter(Boolean)
+      .join(", ");
+    const date = order.created_at
+      ? new Date(order.created_at).toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        })
+      : "—";
     const items = order.ecommerce_order_items || [];
     const total = formatCurrency(calculateTotal(order), order.currency);
-    const itemRows = items.map(item =>
-      `<tr><td>${item.product_name || "Item"}</td><td style="text-align:center">${item.quantity||1}</td><td style="text-align:right">$${parseFloat(item.unit_amount||0).toFixed(2)}</td><td style="text-align:right">$${parseFloat(item.total_amount||0).toFixed(2)}</td></tr>`
-    ).join("") || `<tr><td colspan="4" style="color:#888">—</td></tr>`;
+    const itemRows =
+      items
+        .map(
+          (item) =>
+            `<tr><td>${item.product_name || "Item"}</td><td style="text-align:center">${item.quantity || 1}</td><td style="text-align:right">$${parseFloat(item.unit_amount || 0).toFixed(2)}</td><td style="text-align:right">$${parseFloat(item.total_amount || 0).toFixed(2)}</td></tr>`,
+        )
+        .join("") || `<tr><td colspan="4" style="color:#888">—</td></tr>`;
 
     const html = `<!DOCTYPE html><html><head><meta charset="UTF-8">
 <title>Invoice ${order.order_number || ""}</title>
@@ -365,7 +390,7 @@ export default function OrdersPage() {
   td{padding:10px 0;font-size:13px;border-bottom:1px solid #f0f0f0;vertical-align:top}
   td:not(:first-child){text-align:right}
   .total-row td{font-weight:700;font-size:15px;border-top:2px solid #111;border-bottom:none;padding-top:14px}
-  .status{display:inline-block;padding:3px 10px;border-radius:99px;font-size:11px;font-weight:700;letter-spacing:0.1em;background:${order.status==="paid"||order.status==="completed"?"#dcfce7":"#fef9c3"};color:${order.status==="paid"||order.status==="completed"?"#15803d":"#92400e"}}
+  .status{display:inline-block;padding:3px 10px;border-radius:99px;font-size:11px;font-weight:700;letter-spacing:0.1em;background:${order.status === "paid" || order.status === "completed" ? "#dcfce7" : "#fef9c3"};color:${order.status === "paid" || order.status === "completed" ? "#15803d" : "#92400e"}}
   .footer{margin-top:40px;font-size:10px;color:#aaa;text-align:center;letter-spacing:0.1em}
   @media print{body{padding:24px}}
 </style></head><body>
@@ -389,7 +414,7 @@ export default function OrdersPage() {
     <tr class="total-row"><td colspan="3">Total</td><td style="text-align:right">${total}</td></tr>
   </tbody>
 </table>
-<p>Status: <span class="status">${(order.status||"").toUpperCase()}</span></p>
+<p>Status: <span class="status">${(order.status || "").toUpperCase()}</span></p>
 <div class="footer">Thank you for your order &mdash; sporefall.com</div>
 <script>window.onload=function(){window.print();}</script>
 </body></html>`;

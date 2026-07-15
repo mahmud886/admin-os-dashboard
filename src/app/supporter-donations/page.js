@@ -195,7 +195,13 @@ export default function SupporterDonationsPage() {
   };
 
   const handlePrintInvoice = (d) => {
-    const date = d.created_at ? new Date(d.created_at).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }) : "—";
+    const date = d.created_at
+      ? new Date(d.created_at).toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        })
+      : "—";
     const html = `<!DOCTYPE html><html><head><meta charset="UTF-8">
 <title>Invoice ${d.donation_number || ""}</title>
 <style>
@@ -215,7 +221,7 @@ export default function SupporterDonationsPage() {
   th{font-size:10px;letter-spacing:0.15em;color:#888;text-transform:uppercase;text-align:left;padding:8px 0;border-bottom:1px solid #ddd}
   td{padding:10px 0;font-size:13px;border-bottom:1px solid #f0f0f0;vertical-align:top}
   .total-row td{font-weight:700;font-size:15px;border-top:2px solid #111;border-bottom:none;padding-top:14px}
-  .status{display:inline-block;padding:3px 10px;border-radius:99px;font-size:11px;font-weight:700;letter-spacing:0.1em;background:${d.status==="paid"?"#dcfce7":"#fef9c3"};color:${d.status==="paid"?"#15803d":"#92400e"}}
+  .status{display:inline-block;padding:3px 10px;border-radius:99px;font-size:11px;font-weight:700;letter-spacing:0.1em;background:${d.status === "paid" ? "#dcfce7" : "#fef9c3"};color:${d.status === "paid" ? "#15803d" : "#92400e"}}
   .footer{margin-top:40px;font-size:10px;color:#aaa;text-align:center;letter-spacing:0.1em}
   @media print{body{padding:24px}}
 </style></head><body>
@@ -234,11 +240,11 @@ export default function SupporterDonationsPage() {
 <table>
   <thead><tr><th>Description</th><th style="text-align:right">Amount</th></tr></thead>
   <tbody>
-    <tr><td>${d.tier_name || "Contribution"}</td><td style="text-align:right">$${d.amount} ${(d.currency||"USD").toUpperCase()}</td></tr>
-    <tr class="total-row"><td>Total</td><td style="text-align:right">$${d.amount} ${(d.currency||"USD").toUpperCase()}</td></tr>
+    <tr><td>${d.tier_name || "Contribution"}</td><td style="text-align:right">$${d.amount} ${(d.currency || "USD").toUpperCase()}</td></tr>
+    <tr class="total-row"><td>Total</td><td style="text-align:right">$${d.amount} ${(d.currency || "USD").toUpperCase()}</td></tr>
   </tbody>
 </table>
-<p>Status: <span class="status">${(d.status||"").toUpperCase()}</span></p>
+<p>Status: <span class="status">${(d.status || "").toUpperCase()}</span></p>
 <div class="footer">Thank you for supporting Spore Fall &mdash; sporefall.com</div>
 <script>window.onload=function(){window.print();}</script>
 </body></html>`;
