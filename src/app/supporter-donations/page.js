@@ -16,18 +16,13 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/components/ui/toast";
-import { tierPrices } from "@/data/payments";
-import { Download, Trash2 } from "lucide-react";
+import { Download, FileText, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 
 export default function SupporterDonationsPage() {
   const [donations, setDonations] = useState([]);
-  const [stats, setStats] = useState({
-    archivist: 0,
-    emblem: 0,
-    patron: 0,
-    donation: 0,
-  });
+  const [tiers, setTiers] = useState([]);
+  const [stats, setStats] = useState({});
   const [loading, setLoading] = useState(true);
   const [total, setTotal] = useState(0);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -35,22 +30,25 @@ export default function SupporterDonationsPage() {
   const { addToast } = useToast();
 
   useEffect(() => {
-    fetchDonations();
+    fetchAll();
   }, []);
 
-  const fetchDonations = async () => {
+  const fetchAll = async () => {
     try {
       setLoading(true);
-      const response = await fetch("/api/supporter-donations?limit=100"); // Fetch 100 for now
-      const data = await response.json();
+      const [donationsRes, tiersRes] = await Promise.all([
+        fetch("/api/supporter-donations?limit=100"),
+        fetch("/api/donation-tiers"),
+      ]);
+      const donationsData = await donationsRes.json();
+      const tiersData = await tiersRes.json();
 
-      if (data.donations) {
-        setDonations(data.donations);
-        setTotal(data.total);
-        if (data.stats) {
-          setStats(data.stats);
-        }
+      if (donationsData.donations) {
+        setDonations(donationsData.donations);
+        setTotal(donationsData.total);
+        if (donationsData.stats) setStats(donationsData.stats);
       }
+      if (Array.isArray(tiersData)) setTiers(tiersData);
     } catch (error) {
       console.error("Failed to fetch donations:", error);
     } finally {
@@ -65,27 +63,21 @@ export default function SupporterDonationsPage() {
 
   const confirmDelete = async () => {
     if (!donationToDelete) return;
-
     try {
       const response = await fetch(
         `/api/supporter-donations/${donationToDelete.id}`,
-        {
-          method: "DELETE",
-        },
+        { method: "DELETE" },
       );
-
       if (!response.ok) {
         const data = await response.json();
         throw new Error(data.error || "Failed to delete donation");
       }
-
       addToast({
         title: "Success",
         description: "Donation deleted successfully.",
       });
-      await fetchDonations();
+      await fetchAll();
     } catch (err) {
-      console.error("Error deleting donation:", err);
       addToast({
         title: "Error",
         description: err.message || "Failed to delete donation.",
@@ -95,11 +87,6 @@ export default function SupporterDonationsPage() {
       setDeleteDialogOpen(false);
       setDonationToDelete(null);
     }
-  };
-
-  const getType = (tierId) => {
-    if (tierId === "support-universe") return "DONATION";
-    return "TIER";
   };
 
   const getStatusColor = (status) => {
@@ -144,6 +131,12 @@ export default function SupporterDonationsPage() {
     });
   };
 
+  const getType = (tierId) => {
+    const tier = tiers.find((t) => t.tierId === tierId || t.tier_id === tierId);
+    if (tier) return tier.isCustomAmount ? "DONATION" : "TIER";
+    return tierId === "support-universe" ? "DONATION" : "TIER";
+  };
+
   const handleExportCSV = () => {
     if (!donations.length) {
       addToast({
@@ -155,32 +148,28 @@ export default function SupporterDonationsPage() {
     }
 
     const headers = [
-      "Supporter Name",
+      "Order Reference",
+      "Name",
+      "Address",
+      "Order Placed",
       "Email",
-      "Mailing Address",
       "Amount",
-      "Currency",
-      "Type",
-      "Tier Name",
+      "Tier",
       "Status",
-      "Mode",
-      "Created At",
     ];
 
     const csvContent = [
       headers.join(","),
       ...donations.map((d) => {
         const row = [
+          `"${(d.donation_number || "—").replace(/"/g, '""')}"`,
           `"${(d.supporter_name || "Anonymous").replace(/"/g, '""')}"`,
-          `"${(d.supporter_email || "").replace(/"/g, '""')}"`,
           `"${(d.mailing_address || "").replace(/"/g, '""')}"`,
-          `"${d.amount || 0}"`,
-          `"${(d.currency || "USD").toUpperCase()}"`,
-          `"${getType(d.tier_id)}"`,
+          `"${d.created_at ? new Date(d.created_at).toLocaleString("en-US") : ""}"`,
+          `"${(d.supporter_email || "").replace(/"/g, '""')}"`,
+          `"$${d.amount || 0} ${(d.currency || "USD").toUpperCase()}"`,
           `"${(d.tier_name || "").replace(/"/g, '""')}"`,
-          `"${d.status || ""}"`,
-          `"${getModeLabel(d.metadata?.livemode)}"`,
-          `"${d.created_at ? new Date(d.created_at).toISOString() : ""}"`,
+          `"${(d.status || "").toUpperCase()}"`,
         ];
         return row.join(",");
       }),
@@ -200,9 +189,62 @@ export default function SupporterDonationsPage() {
     document.body.removeChild(link);
     addToast({
       title: "Exported",
-      description: "Donations list exported to CSV",
+      description: "Donations exported to CSV",
       variant: "success",
     });
+  };
+
+  const handlePrintInvoice = (d) => {
+    const date = d.created_at ? new Date(d.created_at).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }) : "—";
+    const html = `<!DOCTYPE html><html><head><meta charset="UTF-8">
+<title>Invoice ${d.donation_number || ""}</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:Arial,sans-serif;color:#111;padding:48px;max-width:640px;margin:0 auto}
+  .top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:32px}
+  .brand{font-size:22px;font-weight:900;letter-spacing:0.25em}
+  .brand span{color:#555;font-size:11px;display:block;font-weight:400;letter-spacing:0.15em;margin-top:2px}
+  .inv-label{text-align:right}
+  .inv-label h2{font-size:20px;font-weight:700;letter-spacing:0.1em}
+  .inv-label p{font-size:12px;color:#555;margin-top:4px;font-family:monospace}
+  hr{border:none;border-top:1px solid #ddd;margin:20px 0}
+  .section{margin-bottom:20px}
+  .section h3{font-size:10px;letter-spacing:0.2em;color:#888;text-transform:uppercase;margin-bottom:8px}
+  .section p{font-size:13px;line-height:1.7;color:#333}
+  table{width:100%;border-collapse:collapse;margin:20px 0}
+  th{font-size:10px;letter-spacing:0.15em;color:#888;text-transform:uppercase;text-align:left;padding:8px 0;border-bottom:1px solid #ddd}
+  td{padding:10px 0;font-size:13px;border-bottom:1px solid #f0f0f0;vertical-align:top}
+  .total-row td{font-weight:700;font-size:15px;border-top:2px solid #111;border-bottom:none;padding-top:14px}
+  .status{display:inline-block;padding:3px 10px;border-radius:99px;font-size:11px;font-weight:700;letter-spacing:0.1em;background:${d.status==="paid"?"#dcfce7":"#fef9c3"};color:${d.status==="paid"?"#15803d":"#92400e"}}
+  .footer{margin-top:40px;font-size:10px;color:#aaa;text-align:center;letter-spacing:0.1em}
+  @media print{body{padding:24px}}
+</style></head><body>
+<div class="top">
+  <div class="brand">SPORE FALL<span>A Sci-Fi Micro-Drama</span></div>
+  <div class="inv-label"><h2>INVOICE</h2><p>${d.donation_number || "—"}</p></div>
+</div>
+<hr>
+<div class="section"><h3>Bill To</h3>
+  <p><strong>${d.supporter_name || "Anonymous"}</strong></p>
+  ${d.supporter_email ? `<p>${d.supporter_email}</p>` : ""}
+  ${d.mailing_address ? `<p>${d.mailing_address}</p>` : ""}
+</div>
+<div class="section"><h3>Invoice Date</h3><p>${date}</p></div>
+<hr>
+<table>
+  <thead><tr><th>Description</th><th style="text-align:right">Amount</th></tr></thead>
+  <tbody>
+    <tr><td>${d.tier_name || "Contribution"}</td><td style="text-align:right">$${d.amount} ${(d.currency||"USD").toUpperCase()}</td></tr>
+    <tr class="total-row"><td>Total</td><td style="text-align:right">$${d.amount} ${(d.currency||"USD").toUpperCase()}</td></tr>
+  </tbody>
+</table>
+<p>Status: <span class="status">${(d.status||"").toUpperCase()}</span></p>
+<div class="footer">Thank you for supporting Spore Fall &mdash; sporefall.com</div>
+<script>window.onload=function(){window.print();}</script>
+</body></html>`;
+    const w = window.open("", "_blank");
+    w.document.write(html);
+    w.document.close();
   };
 
   return (
@@ -213,7 +255,7 @@ export default function SupporterDonationsPage() {
             SUPPORTER DONATIONS
           </h1>
           <div className="flex gap-2">
-            <Button variant="outline" onClick={fetchDonations}>
+            <Button variant="outline" onClick={fetchAll}>
               REFRESH DATA
             </Button>
             <Button onClick={handleExportCSV}>
@@ -223,48 +265,43 @@ export default function SupporterDonationsPage() {
           </div>
         </div>
 
+        {/* Dynamic stats cards */}
         <Card className="bg-[#111111] border-border">
           <CardContent className="p-6">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              <div className="p-4 rounded border border-teal-400/50 bg-teal-900/20">
-                <div className="font-semibold text-teal-400">THE ARCHIVIST</div>
-                <div className="text-sm text-gray-300">
-                  $ {tierPrices["THE ARCHIVIST"].USD}
-                </div>
-                <div className="text-xs text-gray-400">
-                  USERS: {stats.archivist}
-                </div>
-              </div>
-              <div className="p-4 rounded border border-teal-400/50 bg-teal-900/20">
-                <div className="font-semibold text-teal-400">THE EMBLEM</div>
-                <div className="text-sm text-gray-300">
-                  $ {tierPrices["THE EMBLEM"].USD}
-                </div>
-                <div className="text-xs text-gray-400">
-                  USERS: {stats.emblem}
-                </div>
-              </div>
-              <div className="p-4 rounded border border-teal-400/50 bg-teal-900/20">
-                <div className="font-semibold text-teal-400">THE PATRON</div>
-                <div className="text-sm text-gray-300">
-                  $ {tierPrices["THE PATRON"].USD}
-                </div>
-                <div className="text-xs text-gray-400">
-                  USERS: {stats.patron}
-                </div>
-              </div>
-              <div className="flex flex-col gap-2 p-4 rounded border border-yellow-400/50 bg-yellow-900/20">
-                <div className="font-semibold text-yellow-400">
-                  SUPPORT THE UNIVERSE
-                </div>
-                <div className="text-sm text-gray-300">DONATE ANY AMOUNT</div>
-                <div className="flex justify-between items-center">
-                  <div className="text-xs text-gray-400">
-                    USERS: {stats.donation}
-                  </div>
-                  <Button size="sm">DONATE</Button>
-                </div>
-              </div>
+              {tiers.length === 0
+                ? [1, 2, 3, 4].map((i) => (
+                    <div
+                      key={i}
+                      className="h-20 rounded border border-border bg-[#1a1a1a] animate-pulse"
+                    />
+                  ))
+                : tiers.map((tier) => (
+                    <div
+                      key={tier.id || tier.tierId}
+                      className={`p-4 rounded border ${
+                        tier.isCustomAmount
+                          ? "border-yellow-400/50 bg-yellow-900/20"
+                          : "border-teal-400/50 bg-teal-900/20"
+                      }`}
+                    >
+                      <div
+                        className={`font-semibold ${tier.isCustomAmount ? "text-yellow-400" : "text-teal-400"}`}
+                      >
+                        {tier.label}
+                      </div>
+                      <div className="text-sm text-gray-300">
+                        {tier.isCustomAmount
+                          ? "DONATE ANY AMOUNT"
+                          : tier.price
+                            ? `$ ${tier.price}`
+                            : "—"}
+                      </div>
+                      <div className="text-xs text-gray-400">
+                        SUPPORTERS: {stats[tier.tierId || tier.tier_id] || 0}
+                      </div>
+                    </div>
+                  ))}
             </div>
             <div className="mt-4 text-sm text-gray-400">
               TOTAL DONATIONS: {total}
@@ -272,12 +309,16 @@ export default function SupporterDonationsPage() {
           </CardContent>
         </Card>
 
+        {/* Donations table */}
         <Card className="bg-[#111111] border-border">
           <CardContent className="p-0">
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-border bg-[#0a0a0a]/50">
+                    <th className="p-4 text-xs font-medium tracking-wider text-left text-gray-400 uppercase">
+                      Ref
+                    </th>
                     <th className="p-4 text-xs font-medium tracking-wider text-left text-gray-400 uppercase">
                       Supporter
                     </th>
@@ -306,7 +347,7 @@ export default function SupporterDonationsPage() {
                     <SupporterDonationsTableShimmer />
                   ) : donations.length === 0 ? (
                     <tr>
-                      <td colSpan="7" className="p-8 text-center text-gray-400">
+                      <td colSpan="8" className="p-8 text-center text-gray-400">
                         No donations found
                       </td>
                     </tr>
@@ -317,6 +358,11 @@ export default function SupporterDonationsPage() {
                         className="transition-colors hover:bg-accent/5"
                       >
                         <td className="p-4">
+                          <span className="font-mono text-xs text-gray-500">
+                            {p.donation_number || "—"}
+                          </span>
+                        </td>
+                        <td className="p-4">
                           <div className="text-sm font-medium text-white">
                             {p.supporter_name || "Anonymous"}
                           </div>
@@ -325,7 +371,7 @@ export default function SupporterDonationsPage() {
                           </div>
                           {p.mailing_address && (
                             <div
-                              className="mt-0.5 max-w-[220px] truncate text-xs text-gray-600"
+                              className="mt-0.5 max-w-[200px] truncate text-xs text-gray-600"
                               title={p.mailing_address}
                             >
                               {p.mailing_address}
@@ -368,14 +414,25 @@ export default function SupporterDonationsPage() {
                           {formatDate(p.created_at)}
                         </td>
                         <td className="p-4 text-right">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="p-0 w-8 h-8"
-                            onClick={() => handleDeleteClick(p)}
-                          >
-                            <Trash2 className="w-4 h-4 text-red-400" />
-                          </Button>
+                          <div className="flex gap-1 justify-end">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="p-0 w-8 h-8"
+                              title="Download Invoice"
+                              onClick={() => handlePrintInvoice(p)}
+                            >
+                              <FileText className="w-4 h-4 text-teal-400" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="p-0 w-8 h-8"
+                              onClick={() => handleDeleteClick(p)}
+                            >
+                              <Trash2 className="w-4 h-4 text-red-400" />
+                            </Button>
+                          </div>
                         </td>
                       </tr>
                     ))
@@ -392,11 +449,15 @@ export default function SupporterDonationsPage() {
           <AlertDialogHeader>
             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
             <AlertDialogDescription className="text-gray-400">
-              This action cannot be undone. This will permanently delete the
-              donation from{" "}
+              This will permanently delete the donation from{" "}
               <span className="font-mono text-teal-400">
                 {donationToDelete?.supporter_name || "Anonymous"}
               </span>
+              {donationToDelete?.donation_number && (
+                <span className="ml-1 text-gray-500">
+                  ({donationToDelete.donation_number})
+                </span>
+              )}
               .
             </AlertDialogDescription>
           </AlertDialogHeader>
