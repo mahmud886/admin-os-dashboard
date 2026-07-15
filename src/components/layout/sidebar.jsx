@@ -12,6 +12,7 @@ import {
   LayoutDashboard,
   Menu,
   Newspaper,
+  Package,
   PlusCircle,
   Radio,
   ShoppingCart,
@@ -40,8 +41,8 @@ const navigation = [
   { name: "BLOGS MANAGEMENT", href: "/admin/blogs", icon: Newspaper },
   { name: "MEDIA NEWS", href: "/admin/media-news", icon: Radio },
   { name: "ECOMMERCE", href: "/ecommerce/orders", icon: ShoppingCart },
+  { name: "PRODUCT STORE", href: "/products", icon: Package },
   // { name: 'CONTENT MANAGER', href: '/content', icon: FileText },
-  // { name: 'PRODUCT STORE', href: '/products', icon: Package },
 ];
 
 export function Sidebar() {
