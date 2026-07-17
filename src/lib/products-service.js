@@ -17,6 +17,7 @@ function mapToModel(record) {
     stockQuantity: record.stock_quantity,
     format: record.format,
     includes: record.includes,
+    sku: record.sku || null,
     shippingNote: record.shipping_note,
     sortOrder: record.sort_order,
     metadata: record.metadata || {},
@@ -40,6 +41,7 @@ function mapToDB(model) {
     sort_order: model.sortOrder || 0,
     format: model.format || null,
     includes: model.includes || null,
+    sku: model.sku || null,
     shipping_note: model.shippingNote || null,
     metadata: model.metadata || {},
   };

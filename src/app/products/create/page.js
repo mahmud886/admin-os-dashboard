@@ -25,6 +25,7 @@ export default function CreateProductPage() {
     description: "",
     format: "",
     includes: "",
+    sku: "",
     shippingNote: "",
     stockQuantity: "",
     isLimited: false,
@@ -193,6 +194,16 @@ export default function CreateProductPage() {
                     required
                   />
                 </div>
+                <div className="space-y-2">
+                  <Label className="text-teal-400">SKU</Label>
+                  <Input
+                    name="sku"
+                    value={formData.sku}
+                    onChange={handleChange}
+                    placeholder="e.g. SF-TOTE-001"
+                    className="bg-[#0a0a0a] border-border"
+                  />
+                </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label className="text-teal-400">PRICE (USD) *</Label>
@@ -259,14 +270,17 @@ export default function CreateProductPage() {
                   </p>
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-teal-400">SHIPPING NOTE</Label>
-                  <Input
+                  <Label className="text-teal-400">SHIPPING</Label>
+                  <select
                     name="shippingNote"
                     value={formData.shippingNote}
                     onChange={handleChange}
-                    placeholder="Ships within 2–3 weeks. Bangladesh & worldwide."
-                    className="bg-[#0a0a0a] border-border"
-                  />
+                    className="w-full h-10 px-3 rounded-md bg-[#0a0a0a] border border-border text-sm text-white"
+                  >
+                    <option value="">— Select —</option>
+                    <option value="Only Singapore">Only Singapore</option>
+                    <option value="International">International</option>
+                  </select>
                 </div>
               </CardContent>
             </Card>
