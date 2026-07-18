@@ -4,15 +4,28 @@ import { MainLayout } from "@/components/layout/main-layout";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Plus, Pencil, Trash2, Eye, EyeOff } from "lucide-react";
+import {
+  Plus,
+  Pencil,
+  Trash2,
+  Eye,
+  EyeOff,
+  ChevronUp,
+  ChevronDown,
+  GripVertical,
+} from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export default function ProductsPage() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState(null);
+  const [reordering, setReordering] = useState(null);
+  const [dragIndex, setDragIndex] = useState(null);
+  const [dropIndex, setDropIndex] = useState(null);
+  const dragNode = useRef(null);
 
   useEffect(() => {
     fetchProducts();
@@ -22,13 +35,85 @@ export default function ProductsPage() {
     try {
       const res = await fetch("/api/products");
       const data = await res.json();
-      setProducts(Array.isArray(data) ? data : []);
+      setProducts(
+        Array.isArray(data) ? data.map((p, i) => ({ ...p, sortOrder: i })) : [],
+      );
     } catch (error) {
       console.error("Failed to fetch products:", error);
     } finally {
       setLoading(false);
     }
   }
+
+  // ── Drag-and-drop handlers ──────────────────────────────────────────────
+
+  function handleDragStart(e, index) {
+    dragNode.current = e.currentTarget;
+    setDragIndex(index);
+    // Small delay so the drag image renders before the card fades
+    setTimeout(() => setDragIndex(index), 0);
+    e.dataTransfer.effectAllowed = "move";
+  }
+
+  function handleDragOver(e, index) {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+    if (index !== dropIndex) setDropIndex(index);
+  }
+
+  function handleDrop(e, index) {
+    e.preventDefault();
+    if (dragIndex !== null && dragIndex !== index) {
+      applyReorder(dragIndex, index);
+    }
+    setDragIndex(null);
+    setDropIndex(null);
+  }
+
+  function handleDragEnd() {
+    setDragIndex(null);
+    setDropIndex(null);
+  }
+
+  // ── Shared reorder logic (used by drag-drop and arrow buttons) ──────────
+
+  async function applyReorder(fromIndex, toIndex) {
+    const updated = [...products];
+    const [moved] = updated.splice(fromIndex, 1);
+    updated.splice(toIndex, 0, moved);
+    const withOrders = updated.map((p, i) => ({ ...p, sortOrder: i }));
+    setProducts(withOrders);
+
+    // Only save products whose sort_order actually changed
+    const changed = withOrders.filter(
+      (p) => products.find((o) => o.id === p.id)?.sortOrder !== p.sortOrder,
+    );
+
+    setReordering("saving");
+    try {
+      await Promise.all(
+        changed.map((p) =>
+          fetch(`/api/products/${p.id}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ ...p }),
+          }),
+        ),
+      );
+    } catch {
+      fetchProducts();
+    } finally {
+      setReordering(null);
+    }
+  }
+
+  async function moveProduct(index, direction) {
+    const target = direction === "up" ? index - 1 : index + 1;
+    if (target < 0 || target >= products.length) return;
+    await applyReorder(index, target);
+  }
+
+  // ── Delete ──────────────────────────────────────────────────────────────
 
   async function handleDelete(id, name) {
     if (!confirm(`Delete "${name}"? This cannot be undone.`)) return;
@@ -51,15 +136,27 @@ export default function ProductsPage() {
     <MainLayout breadcrumb="SYSTEM CONSOLE / PRODUCT STORE">
       <div className="space-y-6">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-teal-400">
-            STORE MANIFEST
-          </h1>
-          <Link href="/products/create">
-            <Button className="w-full sm:w-auto bg-teal-500 hover:bg-teal-600 text-black font-semibold">
-              <Plus className="h-4 w-4 mr-2" />
-              FORGE NEW ARTIFACT
-            </Button>
-          </Link>
+          <div>
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-teal-400">
+              STORE MANIFEST
+            </h1>
+            <p className="text-[11px] text-gray-500 mt-1">
+              Drag cards to reorder, or use the ↑ ↓ arrows
+            </p>
+          </div>
+          <div className="flex items-center gap-3">
+            {reordering === "saving" && (
+              <span className="text-[11px] text-teal-400 font-mono animate-pulse">
+                Saving order...
+              </span>
+            )}
+            <Link href="/products/create">
+              <Button className="w-full sm:w-auto bg-teal-500 hover:bg-teal-600 text-black font-semibold">
+                <Plus className="h-4 w-4 mr-2" />
+                FORGE NEW ARTIFACT
+              </Button>
+            </Link>
+          </div>
         </div>
 
         {loading ? (
@@ -86,11 +183,27 @@ export default function ProductsPage() {
           </Card>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-            {products.map((product) => (
+            {products.map((product, index) => (
               <Card
                 key={product.id}
-                className="bg-[#111111] border-border overflow-hidden group hover:border-teal-500/40 transition-colors"
+                draggable
+                onDragStart={(e) => handleDragStart(e, index)}
+                onDragOver={(e) => handleDragOver(e, index)}
+                onDrop={(e) => handleDrop(e, index)}
+                onDragEnd={handleDragEnd}
+                className={`bg-[#111111] border-border overflow-hidden transition-all duration-150
+                  ${dragIndex === index ? "opacity-40 scale-[0.98]" : ""}
+                  ${dropIndex === index && dragIndex !== index ? "border-teal-400 shadow-[0_0_0_2px_rgba(45,212,191,0.4)]" : "hover:border-teal-500/40"}
+                `}
               >
+                {/* Drag handle strip */}
+                <div className="flex items-center justify-between px-3 pt-2 pb-1 border-b border-border/40 cursor-grab active:cursor-grabbing">
+                  <span className="text-[9px] font-mono text-gray-600 uppercase tracking-widest">
+                    #{index + 1}
+                  </span>
+                  <GripVertical className="w-4 h-4 text-gray-600 hover:text-teal-400 transition-colors" />
+                </div>
+
                 <div className="flex gap-4 p-4">
                   {/* Thumbnail */}
                   <div className="w-20 h-20 rounded-lg overflow-hidden bg-[#1a1a1a] flex-shrink-0 border border-border">
@@ -163,6 +276,22 @@ export default function ProductsPage() {
 
                 {/* Actions */}
                 <div className="flex border-t border-border">
+                  <button
+                    onClick={() => moveProduct(index, "up")}
+                    disabled={index === 0 || !!reordering}
+                    title="Move up"
+                    className="flex items-center justify-center py-2.5 px-3 text-gray-400 hover:text-teal-400 hover:bg-teal-400/5 transition-colors disabled:opacity-20 disabled:cursor-not-allowed border-r border-border"
+                  >
+                    <ChevronUp className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => moveProduct(index, "down")}
+                    disabled={index === products.length - 1 || !!reordering}
+                    title="Move down"
+                    className="flex items-center justify-center py-2.5 px-3 text-gray-400 hover:text-teal-400 hover:bg-teal-400/5 transition-colors disabled:opacity-20 disabled:cursor-not-allowed border-r border-border"
+                  >
+                    <ChevronDown className="w-4 h-4" />
+                  </button>
                   <Link
                     href={`/products/${product.id}/edit`}
                     className="flex-1 flex items-center justify-center gap-2 py-2.5 text-xs text-gray-400 hover:text-teal-400 hover:bg-teal-400/5 transition-colors"

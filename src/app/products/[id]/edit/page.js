@@ -404,6 +404,23 @@ export default function EditProductPage() {
                 </div>
                 <div className="flex items-center justify-between py-2 border-t border-border">
                   <div>
+                    <Label className="text-red-400">SOLD OUT</Label>
+                    <p className="text-[10px] text-gray-500 mt-0.5">
+                      Show SOLD OUT badge and disable add to cart
+                    </p>
+                  </div>
+                  <Switch
+                    checked={formData.availabilityStatus === "out_of_stock"}
+                    onCheckedChange={(v) =>
+                      setFormData((p) => ({
+                        ...p,
+                        availabilityStatus: v ? "out_of_stock" : "active",
+                      }))
+                    }
+                  />
+                </div>
+                <div className="flex items-center justify-between py-2 border-t border-border">
+                  <div>
                     <Label className="text-teal-400">PUBLISHED</Label>
                     <p className="text-[10px] text-gray-500 mt-0.5">
                       Visible on the public site
