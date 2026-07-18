@@ -7,7 +7,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, Loader2, Plus, Save, Trash2 } from "lucide-react";
+import {
+  ArrowLeft,
+  ImageIcon,
+  Loader2,
+  Plus,
+  Save,
+  Trash2,
+  X,
+} from "lucide-react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -20,6 +28,7 @@ export default function EditDonationTierPage() {
   const [loading, setLoading] = useState(false);
   const [fetchLoading, setFetchLoading] = useState(true);
   const [formData, setFormData] = useState(null);
+  const [imageUploading, setImageUploading] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -47,6 +56,7 @@ export default function EditDonationTierPage() {
           isSubscription: data.isSubscription || false,
           hasDigitalDownload: data.hasDigitalDownload || false,
           digitalFilePath: data.digitalFilePath || "",
+          imageUrl: data.imageUrl || "",
         });
       })
       .catch(() => alert("Failed to load tier"))
@@ -74,6 +84,29 @@ export default function EditDonationTierPage() {
       ...prev,
       bulletPoints: prev.bulletPoints.filter((_, i) => i !== idx),
     }));
+
+  const handleImageUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setImageUploading(true);
+    try {
+      const form = new FormData();
+      form.append("file", file);
+      form.append("tierId", formData.tierId || "unknown");
+      const res = await fetch("/api/donation-tiers/upload-image", {
+        method: "POST",
+        body: form,
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Upload failed");
+      set("imageUrl", data.url);
+    } catch (err) {
+      alert(err.message || "Image upload failed");
+    } finally {
+      setImageUploading(false);
+      e.target.value = "";
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -419,6 +452,71 @@ export default function EditDonationTierPage() {
                       Supabase Storage bucket.
                     </p>
                   </div>
+                )}
+              </CardContent>
+            </Card>
+
+            <Card className="bg-[#111111] border-border">
+              <CardContent className="p-6 space-y-4">
+                <h2 className="text-sm font-medium tracking-wider text-teal-400 uppercase">
+                  Tier Image
+                </h2>
+                {formData.imageUrl ? (
+                  <div className="relative group">
+                    <img
+                      src={formData.imageUrl}
+                      alt="Tier"
+                      className="w-full h-40 object-cover rounded border border-border"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => set("imageUrl", "")}
+                      className="absolute top-2 right-2 bg-black/70 hover:bg-red-900/80 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-center h-32 rounded border border-dashed border-border bg-[#0a0a0a]">
+                    <ImageIcon className="w-8 h-8 text-gray-700" />
+                  </div>
+                )}
+                <label className="block">
+                  <span className="sr-only">Upload image</span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    disabled={imageUploading}
+                    className="hidden"
+                    id="tier-image-upload"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    disabled={imageUploading}
+                    className="w-full text-teal-400 border-teal-500/30 hover:bg-teal-900/20"
+                    onClick={() =>
+                      document.getElementById("tier-image-upload").click()
+                    }
+                  >
+                    {imageUploading ? (
+                      <Loader2 className="mr-2 w-3 h-3 animate-spin" />
+                    ) : (
+                      <ImageIcon className="mr-2 w-3 h-3" />
+                    )}
+                    {imageUploading
+                      ? "UPLOADING..."
+                      : formData.imageUrl
+                        ? "REPLACE IMAGE"
+                        : "UPLOAD IMAGE"}
+                  </Button>
+                </label>
+                {formData.imageUrl && (
+                  <p className="text-xs text-gray-600 break-all font-mono">
+                    {formData.imageUrl}
+                  </p>
                 )}
               </CardContent>
             </Card>

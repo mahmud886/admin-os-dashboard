@@ -494,6 +494,9 @@ export default function OrdersPage() {
                           Payment
                         </th>
                         <th className="p-4 text-xs font-medium tracking-wider text-left text-gray-400 uppercase">
+                          SKU
+                        </th>
+                        <th className="p-4 text-xs font-medium tracking-wider text-left text-gray-400 uppercase">
                           Total
                         </th>
                         <th className="p-4 text-xs font-medium tracking-wider text-left text-gray-400 uppercase">
@@ -510,7 +513,7 @@ export default function OrdersPage() {
                       ) : orders.length === 0 ? (
                         <tr>
                           <td
-                            colSpan="7"
+                            colSpan="8"
                             className="p-8 text-center text-gray-400"
                           >
                             No orders found matching the criteria.
@@ -545,12 +548,46 @@ export default function OrdersPage() {
                               </Badge>
                             </td>
                             <td className="p-4">
-                              <Badge
-                                variant="outline"
-                                className={getStatusColor(order.payment_status)}
-                              >
-                                {order.payment_status.toUpperCase()}
-                              </Badge>
+                              {order.metadata?.livemode === false ? (
+                                <Badge
+                                  variant="outline"
+                                  className="border-orange-500 bg-orange-500/10 text-orange-400"
+                                >
+                                  TEST
+                                </Badge>
+                              ) : (
+                                <Badge
+                                  variant="outline"
+                                  className={getStatusColor(
+                                    order.payment_status,
+                                  )}
+                                >
+                                  {order.payment_status?.toUpperCase()}
+                                </Badge>
+                              )}
+                            </td>
+                            <td className="p-4">
+                              {(() => {
+                                const skus = (order.ecommerce_order_items || [])
+                                  .map((i) => i.sku)
+                                  .filter(Boolean);
+                                return skus.length > 0 ? (
+                                  <div className="flex flex-col gap-1">
+                                    {skus.map((sku, idx) => (
+                                      <span
+                                        key={idx}
+                                        className="text-xs font-mono text-teal-400"
+                                      >
+                                        {sku}
+                                      </span>
+                                    ))}
+                                  </div>
+                                ) : (
+                                  <span className="text-xs text-gray-600">
+                                    —
+                                  </span>
+                                );
+                              })()}
                             </td>
                             <td className="p-4 text-sm font-medium text-white">
                               {formatCurrency(
@@ -772,12 +809,21 @@ export default function OrdersPage() {
                     <span className="text-xs text-gray-500 uppercase">
                       Payment
                     </span>
-                    <Badge
-                      variant="outline"
-                      className={getStatusColor(selectedOrder.payment_status)}
-                    >
-                      {selectedOrder.payment_status.toUpperCase()}
-                    </Badge>
+                    {selectedOrder.metadata?.livemode === false ? (
+                      <Badge
+                        variant="outline"
+                        className="border-orange-500 bg-orange-500/10 text-orange-400"
+                      >
+                        TEST
+                      </Badge>
+                    ) : (
+                      <Badge
+                        variant="outline"
+                        className={getStatusColor(selectedOrder.payment_status)}
+                      >
+                        {selectedOrder.payment_status?.toUpperCase()}
+                      </Badge>
+                    )}
                   </div>
                   <div className="flex flex-col gap-1 ml-auto text-right">
                     <div className="text-xs text-gray-500">
@@ -915,6 +961,11 @@ export default function OrdersPage() {
                                   <div className="font-medium text-white">
                                     {item.product_name}
                                   </div>
+                                  {item.sku && (
+                                    <div className="text-xs font-mono text-teal-500">
+                                      SKU: {item.sku}
+                                    </div>
+                                  )}
                                   {item.variant_id && (
                                     <div className="text-xs text-gray-500">
                                       Variant: {item.variant_id}

@@ -24,6 +24,7 @@ function mapToModel(record) {
     isSubscription: record.is_subscription || false,
     hasDigitalDownload: record.has_digital_download || false,
     digitalFilePath: record.digital_file_path || null,
+    imageUrl: record.image_url || null,
     createdAt: record.created_at,
     updatedAt: record.updated_at,
   };
@@ -51,6 +52,7 @@ function mapToDB(model) {
     is_subscription: model.isSubscription || false,
     has_digital_download: model.hasDigitalDownload || false,
     digital_file_path: model.digitalFilePath || null,
+    image_url: model.imageUrl || null,
   };
 }
 
