@@ -15,6 +15,7 @@ import {
   Package,
   PlusCircle,
   Radio,
+  Settings,
   ShoppingCart,
   Users,
   X,
@@ -42,6 +43,7 @@ const navigation = [
   { name: "MEDIA NEWS", href: "/admin/media-news", icon: Radio },
   { name: "ECOMMERCE", href: "/ecommerce/orders", icon: ShoppingCart },
   { name: "PRODUCT STORE", href: "/products", icon: Package },
+  { name: "STORE SETTINGS", href: "/settings", icon: Settings },
   // { name: 'CONTENT MANAGER', href: '/content', icon: FileText },
 ];
 

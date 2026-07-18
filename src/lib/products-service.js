@@ -18,6 +18,7 @@ function mapToModel(record) {
     format: record.format,
     includes: record.includes,
     sku: record.sku || null,
+    currency: record.currency || "SGD",
     shippingNote: record.shipping_note,
     sortOrder: record.sort_order,
     metadata: record.metadata || {},
@@ -42,6 +43,7 @@ function mapToDB(model) {
     format: model.format || null,
     includes: model.includes || null,
     sku: model.sku || null,
+    currency: "SGD",
     shipping_note: model.shippingNote || null,
     metadata: model.metadata || {},
   };

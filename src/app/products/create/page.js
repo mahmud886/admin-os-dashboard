@@ -204,36 +204,34 @@ export default function CreateProductPage() {
                     className="bg-[#0a0a0a] border-border"
                   />
                 </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label className="text-teal-400">PRICE (USD) *</Label>
-                    <Input
-                      name="price"
-                      type="number"
-                      step="0.01"
-                      min="0"
-                      value={formData.price}
-                      onChange={handleChange}
-                      placeholder="0.00"
-                      className="bg-[#0a0a0a] border-border"
-                      required
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label className="text-teal-400">CATEGORY</Label>
-                    <select
-                      name="category"
-                      value={formData.category}
-                      onChange={handleChange}
-                      className="w-full h-10 px-3 rounded-md bg-[#0a0a0a] border border-border text-sm text-white"
-                    >
-                      {CATEGORIES.map((c) => (
-                        <option key={c} value={c}>
-                          {c}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+                <div className="space-y-2">
+                  <Label className="text-teal-400">PRICE (SGD) *</Label>
+                  <Input
+                    name="price"
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    value={formData.price}
+                    onChange={handleChange}
+                    placeholder="0.00"
+                    className="bg-[#0a0a0a] border-border"
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-teal-400">CATEGORY</Label>
+                  <select
+                    name="category"
+                    value={formData.category}
+                    onChange={handleChange}
+                    className="w-full h-10 px-3 rounded-md bg-[#0a0a0a] border border-border text-sm text-white"
+                  >
+                    {CATEGORIES.map((c) => (
+                      <option key={c} value={c}>
+                        {c}
+                      </option>
+                    ))}
+                  </select>
                 </div>
                 <div className="space-y-2">
                   <Label className="text-teal-400">DESCRIPTION</Label>
