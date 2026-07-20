@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase-server";
+import { createClient as createServiceRoleClient } from "@supabase/supabase-js";
 import {
   getAuthenticatedUser,
   createResponse,
@@ -33,7 +34,7 @@ export async function GET() {
 }
 
 export async function PUT(request) {
-  const user = await getAuthenticatedUser();
+  const { user } = await getAuthenticatedUser();
   if (!user) return createErrorResponse("Unauthorized", 401);
 
   const { store_currency, shop_mode } = await request.json();
@@ -44,7 +45,14 @@ export async function PUT(request) {
     return createErrorResponse("Invalid shop mode", 400);
   }
 
-  const supabase = await createClient();
+  // Authorization is enforced above via the cookie-based session; the actual
+  // write uses the service-role client so it isn't blocked by the
+  // authenticated-role RLS policies on site_settings (same pattern as
+  // donation-tiers/upload-image and episodes/verify-password).
+  const supabase = createServiceRoleClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL,
+    process.env.SUPABASE_SERVICE_ROLE_KEY,
+  );
   const { error } = await supabase.from("site_settings").upsert({
     id: "default",
     store_currency,
