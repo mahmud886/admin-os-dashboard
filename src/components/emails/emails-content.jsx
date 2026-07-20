@@ -30,27 +30,51 @@ export function EmailsContent() {
     let cancelled = false;
     async function load() {
       try {
-        const res = await fetch("/api/secret-drops", { cache: "no-store" });
-        if (!res.ok) {
-          throw new Error(`Failed to load data (${res.status})`);
+        const [secretDropsRes, modalSubsRes] = await Promise.all([
+          fetch("/api/secret-drops", { cache: "no-store" }),
+          fetch("/api/modal-submissions", { cache: "no-store" }),
+        ]);
+        if (!secretDropsRes.ok) {
+          throw new Error(`Failed to load data (${secretDropsRes.status})`);
         }
-        const json = await res.json();
+        const json = await secretDropsRes.json();
         const secretDrops = json.secret_drops || [];
-        const mapped =
-          secretDrops.map((d) => ({
-            id: d.id,
-            name: d.name || "",
-            email: d.email || "",
+        const mappedSecretDrops = secretDrops.map((d) => ({
+          id: d.id,
+          source: "secret_drop",
+          name: d.name || "",
+          email: d.email || "",
+          status: "PENDING",
+          segment: "SECRET_DROP",
+          firstSignal: d.created_at
+            ? new Date(d.created_at).toISOString()
+            : "",
+          message: d.message || "",
+          auth: false,
+        }));
+
+        let mappedModalSubs = [];
+        if (modalSubsRes.ok) {
+          const modalJson = await modalSubsRes.json();
+          mappedModalSubs = (modalJson.submissions || []).map((s) => ({
+            id: s.id,
+            source: "modal",
+            name: s.data?.name || "",
+            email: s.data?.email || "",
             status: "PENDING",
-            segment: "SECRET_DROP",
-            firstSignal: d.created_at
-              ? new Date(d.created_at).toISOString()
-              : "",
-            message: d.message || "",
+            segment: s.modalName || "MODAL CAMPAIGN",
+            firstSignal: s.createdAt || "",
+            message: s.data?.message || "",
             auth: false,
-          })) || [];
+          }));
+        }
+
+        const merged = [...mappedSecretDrops, ...mappedModalSubs].sort(
+          (a, b) => new Date(b.firstSignal) - new Date(a.firstSignal),
+        );
+
         if (!cancelled) {
-          setSubscribers(mapped);
+          setSubscribers(merged);
         }
       } catch (e) {
         if (!cancelled) setError(e.message || "Network error");
@@ -64,10 +88,12 @@ export function EmailsContent() {
     };
   }, []);
 
-  async function handleDelete(id) {
+  async function handleDelete(id, source) {
     try {
       setDeletingId(id);
-      const res = await fetch(`/api/secret-drops/${id}`, { method: "DELETE" });
+      const endpoint =
+        source === "modal" ? `/api/modal-submissions/${id}` : `/api/secret-drops/${id}`;
+      const res = await fetch(endpoint, { method: "DELETE" });
       if (!res.ok) {
         const msg = `Delete failed (${res.status})`;
         setError(msg);
@@ -318,7 +344,7 @@ export function EmailsContent() {
             </Button>
             <Button
               variant="destructive"
-              onClick={() => handleDelete(pendingDelete?.id)}
+              onClick={() => handleDelete(pendingDelete?.id, pendingDelete?.source)}
               disabled={!pendingDelete || deletingId === pendingDelete?.id}
             >
               {deletingId === pendingDelete?.id ? "Deleting..." : "Delete"}
