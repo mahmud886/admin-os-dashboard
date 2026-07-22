@@ -46,9 +46,7 @@ export function EmailsContent() {
           email: d.email || "",
           status: "PENDING",
           segment: "SECRET_DROP",
-          firstSignal: d.created_at
-            ? new Date(d.created_at).toISOString()
-            : "",
+          firstSignal: d.created_at ? new Date(d.created_at).toISOString() : "",
           message: d.message || "",
           auth: false,
         }));
@@ -59,7 +57,9 @@ export function EmailsContent() {
           mappedModalSubs = (modalJson.submissions || []).map((s) => ({
             id: s.id,
             source: "modal",
-            name: s.data?.name || "",
+            // Fallback to "field" — some older modals were built with a
+            // mistyped input name and stored the visitor's name under that key.
+            name: s.data?.name || s.data?.field || "",
             email: s.data?.email || "",
             status: "PENDING",
             segment: s.modalName || "MODAL CAMPAIGN",
@@ -92,7 +92,9 @@ export function EmailsContent() {
     try {
       setDeletingId(id);
       const endpoint =
-        source === "modal" ? `/api/modal-submissions/${id}` : `/api/secret-drops/${id}`;
+        source === "modal"
+          ? `/api/modal-submissions/${id}`
+          : `/api/secret-drops/${id}`;
       const res = await fetch(endpoint, { method: "DELETE" });
       if (!res.ok) {
         const msg = `Delete failed (${res.status})`;
@@ -344,7 +346,9 @@ export function EmailsContent() {
             </Button>
             <Button
               variant="destructive"
-              onClick={() => handleDelete(pendingDelete?.id, pendingDelete?.source)}
+              onClick={() =>
+                handleDelete(pendingDelete?.id, pendingDelete?.source)
+              }
               disabled={!pendingDelete || deletingId === pendingDelete?.id}
             >
               {deletingId === pendingDelete?.id ? "Deleting..." : "Delete"}

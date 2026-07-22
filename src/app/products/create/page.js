@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, Loader2, Save, Upload, X } from "lucide-react";
+import { ArrowLeft, Loader2, Save, Trash2, Upload, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -34,12 +34,14 @@ export default function CreateProductPage() {
     sortOrder: 0,
     imageUrl: "",
     images: [],
+    variants: [],
   });
 
   const [primaryPreview, setPrimaryPreview] = useState(null);
   const [additionalPreviews, setAdditionalPreviews] = useState([]);
   const [uploadingPrimary, setUploadingPrimary] = useState(false);
   const [uploadingAdditional, setUploadingAdditional] = useState(false);
+  const [uploadingVariantId, setUploadingVariantId] = useState(null);
   const primaryRef = useRef(null);
   const additionalRef = useRef(null);
 
@@ -107,6 +109,48 @@ export default function CreateProductPage() {
     }));
   }
 
+  function addVariant() {
+    setFormData((prev) => ({
+      ...prev,
+      variants: [
+        ...prev.variants,
+        { id: crypto.randomUUID(), color: "", image: "", stockQuantity: "" },
+      ],
+    }));
+  }
+
+  function removeVariant(id) {
+    setFormData((prev) => ({
+      ...prev,
+      variants: prev.variants.filter((v) => v.id !== id),
+    }));
+  }
+
+  function updateVariant(id, field, value) {
+    setFormData((prev) => ({
+      ...prev,
+      variants: prev.variants.map((v) =>
+        v.id === id ? { ...v, [field]: value } : v,
+      ),
+    }));
+  }
+
+  async function handleVariantUpload(id, e) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    updateVariant(id, "image", URL.createObjectURL(file));
+    setUploadingVariantId(id);
+    try {
+      const url = await uploadImage(file);
+      updateVariant(id, "image", url);
+    } catch (err) {
+      alert(err.message);
+      updateVariant(id, "image", "");
+    } finally {
+      setUploadingVariantId(null);
+    }
+  }
+
   async function handleSubmit(e) {
     e.preventDefault();
     if (!formData.name.trim() || !formData.price) {
@@ -122,6 +166,17 @@ export default function CreateProductPage() {
           ? parseInt(formData.stockQuantity)
           : null,
         sortOrder: parseInt(formData.sortOrder) || 0,
+        variants: formData.variants
+          .filter((v) => v.color.trim() !== "")
+          .map((v) => ({
+            id: v.id,
+            color: v.color.trim(),
+            image: v.image || null,
+            stockQuantity:
+              v.stockQuantity !== "" && v.stockQuantity != null
+                ? parseInt(v.stockQuantity)
+                : null,
+          })),
       };
       const res = await fetch("/api/products", {
         method: "POST",
@@ -499,6 +554,96 @@ export default function CreateProductPage() {
                   onChange={handleAdditionalUpload}
                   className="hidden"
                 />
+              </CardContent>
+            </Card>
+
+            <Card className="bg-[#111111] border-border">
+              <CardHeader>
+                <CardTitle className="text-teal-400 text-sm">
+                  VARIANTS (COLOR OPTIONS)
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {formData.variants.length === 0 && (
+                  <p className="text-xs text-gray-500">
+                    No color variants yet — this product will show as a single
+                    option on the frontend.
+                  </p>
+                )}
+                {formData.variants.map((v) => (
+                  <div
+                    key={v.id}
+                    className="p-3 rounded-lg border border-border bg-[#0a0a0a] space-y-3"
+                  >
+                    <div className="flex items-center justify-between">
+                      <Label className="text-teal-400 text-xs">COLOR</Label>
+                      <button
+                        type="button"
+                        onClick={() => removeVariant(v.id)}
+                        className="text-gray-500 hover:text-red-400"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                    <Input
+                      value={v.color}
+                      onChange={(e) =>
+                        updateVariant(v.id, "color", e.target.value)
+                      }
+                      placeholder="e.g. Red"
+                      className="bg-[#111111] border-border"
+                    />
+                    <div className="flex gap-3 items-center">
+                      <label className="relative w-16 h-16 rounded-lg border border-border overflow-hidden cursor-pointer flex-shrink-0 bg-[#111111] flex items-center justify-center">
+                        {v.image ? (
+                          <>
+                            <Image
+                              src={v.image}
+                              alt={v.color || "variant"}
+                              fill
+                              className="object-cover"
+                            />
+                            {uploadingVariantId === v.id && (
+                              <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
+                                <Loader2 className="w-4 h-4 animate-spin text-teal-400" />
+                              </div>
+                            )}
+                          </>
+                        ) : (
+                          <Upload className="w-4 h-4 text-gray-600" />
+                        )}
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={(e) => handleVariantUpload(v.id, e)}
+                        />
+                      </label>
+                      <div className="flex-1 space-y-1">
+                        <Label className="text-teal-400 text-xs">
+                          STOCK QTY (optional)
+                        </Label>
+                        <Input
+                          type="number"
+                          min="0"
+                          value={v.stockQuantity}
+                          onChange={(e) =>
+                            updateVariant(v.id, "stockQuantity", e.target.value)
+                          }
+                          placeholder="Leave blank = not tracked"
+                          className="bg-[#111111] border-border"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                <button
+                  type="button"
+                  onClick={addVariant}
+                  className="w-full py-2 text-xs font-semibold text-teal-400 border border-dashed border-teal-500/40 rounded-lg hover:bg-teal-500/5 transition-colors"
+                >
+                  + ADD VARIANT
+                </button>
               </CardContent>
             </Card>
           </div>

@@ -20,7 +20,11 @@ export async function GET() {
     if (error.code === "42P01") {
       return createResponse({ submissions: [] });
     }
-    return createErrorResponse("Failed to fetch modal submissions", 500, error.message);
+    return createErrorResponse(
+      "Failed to fetch modal submissions",
+      500,
+      error.message,
+    );
   }
 
   return createResponse({ submissions: data || [] });
