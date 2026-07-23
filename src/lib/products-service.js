@@ -1,4 +1,17 @@
 import { createClient } from "@/lib/supabase-server";
+import { createClient as createServiceRoleClient } from "@supabase/supabase-js";
+
+// Writes use the service-role client so they aren't intermittently blocked
+// by the authenticated-role RLS policy on custom_products depending on the
+// caller's session/token state — same pattern as settings/route.js,
+// donation-tiers/upload-image, and episodes/verify-password. Route handlers
+// still gate access via getAuthenticatedUser() before calling these.
+function serviceRoleClient() {
+  return createServiceRoleClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL,
+    process.env.SUPABASE_SERVICE_ROLE_KEY,
+  );
+}
 
 function mapToModel(record) {
   if (!record) return null;
@@ -91,10 +104,23 @@ export const productsService = {
   },
 
   create: async (productData) => {
-    const supabase = await createClient();
-    if (!productData.slug) {
-      productData.slug = generateSlug(productData.name);
+    const supabase = serviceRoleClient();
+    const baseSlug = productData.slug || generateSlug(productData.name);
+
+    // Slug has a UNIQUE constraint — auto-suffix on collision instead of
+    // letting a duplicate product name hard-fail the save.
+    let slug = baseSlug;
+    for (let attempt = 2; ; attempt++) {
+      const { data: existing } = await supabase
+        .from("custom_products")
+        .select("id")
+        .eq("slug", slug)
+        .maybeSingle();
+      if (!existing) break;
+      slug = `${baseSlug}-${attempt}`;
     }
+    productData.slug = slug;
+
     const dbData = mapToDB(productData);
     const { data, error } = await supabase
       .from("custom_products")
@@ -107,7 +133,7 @@ export const productsService = {
   },
 
   update: async (id, productData) => {
-    const supabase = await createClient();
+    const supabase = serviceRoleClient();
     const dbData = mapToDB(productData);
     dbData.updated_at = new Date().toISOString();
 
@@ -123,7 +149,7 @@ export const productsService = {
   },
 
   delete: async (id) => {
-    const supabase = await createClient();
+    const supabase = serviceRoleClient();
     const { error } = await supabase
       .from("custom_products")
       .delete()

@@ -12,6 +12,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
+import { readApiError } from "@/lib/utils";
 
 const CATEGORIES = ["Physical", "Digital", "Bundle", "Apparel", "Accessories"];
 
@@ -58,8 +59,7 @@ export default function CreateProductPage() {
       body: fd,
     });
     if (!res.ok) {
-      const err = await res.json();
-      throw new Error(err.error || "Upload failed");
+      throw new Error(await readApiError(res, "Upload failed"));
     }
     const { url } = await res.json();
     return url;
@@ -184,8 +184,7 @@ export default function CreateProductPage() {
         body: JSON.stringify(payload),
       });
       if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.error || "Failed to create product");
+        throw new Error(await readApiError(res, "Failed to create product"));
       }
       router.push("/products");
     } catch (err) {
@@ -478,7 +477,7 @@ export default function CreateProductPage() {
                       Click to upload primary image
                     </p>
                     <p className="text-[10px] text-gray-600">
-                      JPEG, PNG, WebP · Max 5MB
+                      JPEG, PNG, WebP · Max 1MB
                     </p>
                   </div>
                 )}
@@ -509,6 +508,9 @@ export default function CreateProductPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
+                <p className="text-[10px] text-gray-600 -mt-2">
+                  JPEG, PNG, WebP · Max 1MB each
+                </p>
                 <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
                   {additionalPreviews.map((src, i) => (
                     <div

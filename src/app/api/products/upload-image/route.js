@@ -22,9 +22,12 @@ export async function POST(request) {
     );
   }
 
-  const MAX_SIZE = 5 * 1024 * 1024;
+  // Kept well under Vercel's ~4.5MB serverless request body limit so
+  // oversized files are rejected here with a clear message instead of the
+  // platform returning a plain-text 413 that the client can't parse as JSON.
+  const MAX_SIZE = 1 * 1024 * 1024;
   if (file.size > MAX_SIZE) {
-    return createErrorResponse("File too large. Max 5MB.", 400);
+    return createErrorResponse("File too large. Max 1MB.", 400);
   }
 
   const supabase = await createClient();
