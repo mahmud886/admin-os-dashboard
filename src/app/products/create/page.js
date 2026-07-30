@@ -36,6 +36,7 @@ export default function CreateProductPage() {
     imageUrl: "",
     images: [],
     variants: [],
+    sizes: [],
   });
 
   const [primaryPreview, setPrimaryPreview] = useState(null);
@@ -151,6 +152,27 @@ export default function CreateProductPage() {
     }
   }
 
+  function addSize() {
+    setFormData((prev) => ({
+      ...prev,
+      sizes: [...prev.sizes, ""],
+    }));
+  }
+
+  function removeSize(index) {
+    setFormData((prev) => ({
+      ...prev,
+      sizes: prev.sizes.filter((_, i) => i !== index),
+    }));
+  }
+
+  function updateSize(index, value) {
+    setFormData((prev) => ({
+      ...prev,
+      sizes: prev.sizes.map((s, i) => (i === index ? value : s)),
+    }));
+  }
+
   async function handleSubmit(e) {
     e.preventDefault();
     if (!formData.name.trim() || !formData.price) {
@@ -177,6 +199,7 @@ export default function CreateProductPage() {
                 ? parseInt(v.stockQuantity)
                 : null,
           })),
+        sizes: formData.sizes.filter((s) => s.trim() !== ""),
       };
       const res = await fetch("/api/products", {
         method: "POST",
@@ -230,6 +253,44 @@ export default function CreateProductPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Left — Core Info */}
           <div className="space-y-6">
+            <Card className="bg-[#111111] border-border">
+              <CardHeader>
+                <CardTitle className="text-teal-400 text-sm">SIZES</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {formData.sizes.length === 0 && (
+                  <p className="text-xs text-gray-500">
+                    No sizes added yet — size selection won&apos;t show on
+                    frontend.
+                  </p>
+                )}
+                {formData.sizes.map((size, i) => (
+                  <div key={i} className="flex items-center gap-2">
+                    <Input
+                      value={size}
+                      onChange={(e) => updateSize(i, e.target.value)}
+                      placeholder="e.g. S, M, L, XL"
+                      className="bg-[#0a0a0a] border-border flex-1"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => removeSize(i)}
+                      className="text-gray-500 hover:text-red-400"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                ))}
+                <button
+                  type="button"
+                  onClick={addSize}
+                  className="w-full py-2 text-xs font-semibold text-teal-400 border border-dashed border-teal-500/40 rounded-lg hover:bg-teal-500/5 transition-colors"
+                >
+                  + ADD SIZE
+                </button>
+              </CardContent>
+            </Card>
+
             <Card className="bg-[#111111] border-border">
               <CardHeader>
                 <CardTitle className="text-teal-400 text-sm">
@@ -337,7 +398,6 @@ export default function CreateProductPage() {
               </CardContent>
             </Card>
 
-            {/* Stock & Status */}
             <Card className="bg-[#111111] border-border">
               <CardHeader>
                 <CardTitle className="text-teal-400 text-sm">

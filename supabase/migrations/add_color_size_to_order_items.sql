@@ -1,0 +1,3 @@
+ALTER TABLE ecommerce_order_items
+  ADD COLUMN IF NOT EXISTS color TEXT,
+  ADD COLUMN IF NOT EXISTS size TEXT;

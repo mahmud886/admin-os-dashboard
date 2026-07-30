@@ -62,6 +62,7 @@ export default function EditProductPage() {
             image: v.image || "",
             stockQuantity: v.stockQuantity ?? "",
           })),
+          sizes: product.sizes || [],
         });
         if (product.imageUrl) setPrimaryPreview(product.imageUrl);
         if (product.images?.length) setAdditionalPreviews(product.images);
@@ -175,6 +176,27 @@ export default function EditProductPage() {
     }
   }
 
+  function addSize() {
+    setFormData((prev) => ({
+      ...prev,
+      sizes: [...prev.sizes, ""],
+    }));
+  }
+
+  function removeSize(index) {
+    setFormData((prev) => ({
+      ...prev,
+      sizes: prev.sizes.filter((_, i) => i !== index),
+    }));
+  }
+
+  function updateSize(index, value) {
+    setFormData((prev) => ({
+      ...prev,
+      sizes: prev.sizes.map((s, i) => (i === index ? value : s)),
+    }));
+  }
+
   async function handleSubmit(e) {
     e.preventDefault();
     if (!formData.name.trim() || !formData.price) {
@@ -202,6 +224,7 @@ export default function EditProductPage() {
                 ? parseInt(v.stockQuantity)
                 : null,
           })),
+        sizes: formData.sizes.filter((s) => s.trim() !== ""),
       };
       const res = await fetch(`/api/products/${id}`, {
         method: "PUT",
@@ -220,37 +243,24 @@ export default function EditProductPage() {
   }
 
   async function handleDelete() {
-    if (!confirm("Permanently delete this artifact? This cannot be undone."))
-      return;
+    if (!confirm("Are you sure you want to delete this product?")) return;
     setDeleting(true);
     try {
       const res = await fetch(`/api/products/${id}`, { method: "DELETE" });
-      if (res.ok) {
-        router.push("/products");
-      } else {
-        alert("Failed to delete product.");
-      }
-    } catch {
-      alert("Failed to delete product.");
-    } finally {
+      if (!res.ok) throw new Error("Failed to delete");
+      router.push("/products");
+    } catch (err) {
+      alert(err.message);
       setDeleting(false);
     }
   }
 
-  if (loading || !formData) {
-    return (
-      <MainLayout breadcrumb="SYSTEM CONSOLE / PRODUCT STORE / EDIT">
-        <div className="flex items-center justify-center h-64">
-          <Loader2 className="w-8 h-8 animate-spin text-teal-400" />
-        </div>
-      </MainLayout>
-    );
-  }
+  if (loading || !formData) return <MainLayout breadcrumb="Loading..." />;
 
   return (
     <MainLayout breadcrumb="SYSTEM CONSOLE / PRODUCT STORE / EDIT">
       <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <Link href="/products">
               <Button
@@ -264,20 +274,19 @@ export default function EditProductPage() {
             </Link>
             <h1 className="text-2xl font-bold text-teal-400">EDIT ARTIFACT</h1>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex gap-2">
             <Button
               type="button"
-              variant="outline"
-              onClick={handleDelete}
+              variant="destructive"
               disabled={deleting}
-              className="border-red-500/30 text-red-400 hover:bg-red-500/10"
+              onClick={handleDelete}
             >
               {deleting ? (
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
               ) : (
                 <Trash2 className="w-4 h-4 mr-2" />
               )}
-              {deleting ? "DELETING..." : "DELETE"}
+              DELETE
             </Button>
             <Button
               type="submit"
@@ -289,14 +298,51 @@ export default function EditProductPage() {
               ) : (
                 <Save className="w-4 h-4 mr-2" />
               )}
-              {saving ? "SAVING..." : "SAVE CHANGES"}
+              {saving ? "SAVING..." : "SAVE ARTIFACT"}
             </Button>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Left — Core Info */}
+        <div className="grid grid-cols-2 gap-6">
           <div className="space-y-6">
+            <Card className="bg-[#111111] border-border">
+              <CardHeader>
+                <CardTitle className="text-teal-400 text-sm">SIZES</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {formData.sizes.length === 0 && (
+                  <p className="text-xs text-gray-500">
+                    No sizes added yet — size selection won&apos;t show on
+                    frontend.
+                  </p>
+                )}
+                {formData.sizes.map((size, i) => (
+                  <div key={i} className="flex items-center gap-2">
+                    <Input
+                      value={size}
+                      onChange={(e) => updateSize(i, e.target.value)}
+                      placeholder="e.g. S, M, L, XL"
+                      className="bg-[#0a0a0a] border-border flex-1"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => removeSize(i)}
+                      className="text-gray-500 hover:text-red-400"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                ))}
+                <button
+                  type="button"
+                  onClick={addSize}
+                  className="w-full py-2 text-xs font-semibold text-teal-400 border border-dashed border-teal-500/40 rounded-lg hover:bg-teal-500/5 transition-colors"
+                >
+                  + ADD SIZE
+                </button>
+              </CardContent>
+            </Card>
+
             <Card className="bg-[#111111] border-border">
               <CardHeader>
                 <CardTitle className="text-teal-400 text-sm">
@@ -429,7 +475,6 @@ export default function EditProductPage() {
                     <Input
                       name="sortOrder"
                       type="number"
-                      min="0"
                       value={formData.sortOrder}
                       onChange={handleChange}
                       className="bg-[#0a0a0a] border-border"
@@ -448,56 +493,46 @@ export default function EditProductPage() {
                     <option value="out_of_stock">Out of Stock</option>
                   </select>
                 </div>
-                <div className="flex items-center justify-between py-2">
-                  <div>
+
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
                     <Label className="text-teal-400">LIMITED EDITION</Label>
-                    <p className="text-[10px] text-gray-500 mt-0.5">
-                      Show LIMITED badge on the product
-                    </p>
+                    <Switch
+                      checked={formData.isLimited}
+                      onCheckedChange={(checked) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          isLimited: checked,
+                        }))
+                      }
+                    />
                   </div>
-                  <Switch
-                    checked={formData.isLimited}
-                    onCheckedChange={(v) =>
-                      setFormData((p) => ({ ...p, isLimited: v }))
-                    }
-                  />
+                  <p className="text-[10px] text-gray-500">
+                    Show LIMITED badge on the product
+                  </p>
                 </div>
-                <div className="flex items-center justify-between py-2 border-t border-border">
-                  <div>
-                    <Label className="text-red-400">SOLD OUT</Label>
-                    <p className="text-[10px] text-gray-500 mt-0.5">
-                      Show SOLD OUT badge and disable add to cart
-                    </p>
-                  </div>
-                  <Switch
-                    checked={formData.availabilityStatus === "out_of_stock"}
-                    onCheckedChange={(v) =>
-                      setFormData((p) => ({
-                        ...p,
-                        availabilityStatus: v ? "out_of_stock" : "active",
-                      }))
-                    }
-                  />
-                </div>
-                <div className="flex items-center justify-between py-2 border-t border-border">
-                  <div>
+
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
                     <Label className="text-teal-400">PUBLISHED</Label>
-                    <p className="text-[10px] text-gray-500 mt-0.5">
-                      Visible on the public site
-                    </p>
+                    <Switch
+                      checked={formData.isPublished}
+                      onCheckedChange={(checked) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          isPublished: checked,
+                        }))
+                      }
+                    />
                   </div>
-                  <Switch
-                    checked={formData.isPublished}
-                    onCheckedChange={(v) =>
-                      setFormData((p) => ({ ...p, isPublished: v }))
-                    }
-                  />
+                  <p className="text-[10px] text-gray-500">
+                    Visible on the public site
+                  </p>
                 </div>
               </CardContent>
             </Card>
           </div>
 
-          {/* Right — Images */}
           <div className="space-y-6">
             <Card className="bg-[#111111] border-border">
               <CardHeader>
@@ -506,64 +541,45 @@ export default function EditProductPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                {primaryPreview ? (
+                {primaryPreview && (
                   <div className="relative w-full aspect-square rounded-lg overflow-hidden border border-border">
                     <Image
                       src={primaryPreview}
-                      alt="Primary"
+                      alt={formData.name}
                       fill
                       className="object-cover"
                     />
-                    {uploadingPrimary && (
-                      <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
-                        <Loader2 className="w-6 h-6 animate-spin text-teal-400" />
-                      </div>
-                    )}
-                    {!uploadingPrimary && (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setPrimaryPreview(null);
-                          setFormData((p) => ({ ...p, imageUrl: "" }));
-                          if (primaryRef.current) primaryRef.current.value = "";
-                        }}
-                        className="absolute top-2 right-2 w-7 h-7 bg-black/70 rounded-full flex items-center justify-center text-white hover:text-red-400"
-                      >
-                        <X className="w-4 h-4" />
-                      </button>
-                    )}
-                  </div>
-                ) : (
-                  <div
-                    onClick={() => primaryRef.current?.click()}
-                    className="w-full aspect-square rounded-lg border-2 border-dashed border-border bg-[#0a0a0a] flex flex-col items-center justify-center gap-3 cursor-pointer hover:border-teal-500/50 transition-colors"
-                  >
-                    <Upload className="w-8 h-8 text-gray-600" />
-                    <p className="text-xs text-gray-500">
-                      Click to upload primary image
-                    </p>
-                    <p className="text-[10px] text-gray-600">
-                      JPEG, PNG, WebP · Max 1MB
-                    </p>
                   </div>
                 )}
-                <input
-                  ref={primaryRef}
-                  type="file"
-                  accept="image/*"
-                  onChange={handlePrimaryUpload}
-                  className="hidden"
-                />
-                {!primaryPreview && (
-                  <Button
+                <label className="block">
+                  <input
+                    ref={primaryRef}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handlePrimaryUpload}
+                  />
+                  <button
                     type="button"
-                    variant="outline"
-                    className="w-full bg-[#0a0a0a] border-border text-gray-400"
                     onClick={() => primaryRef.current?.click()}
+                    disabled={uploadingPrimary}
+                    className="w-full py-8 rounded-lg border-2 border-dashed border-border bg-[#0a0a0a] flex flex-col items-center justify-center gap-2 cursor-pointer hover:border-teal-500/50 transition-colors disabled:opacity-50"
                   >
-                    <Upload className="w-4 h-4 mr-2" /> SELECT IMAGE
-                  </Button>
-                )}
+                    {uploadingPrimary ? (
+                      <Loader2 className="w-5 h-5 animate-spin text-teal-400" />
+                    ) : (
+                      <>
+                        <Upload className="w-5 h-5 text-gray-600" />
+                        <p className="text-[10px] text-gray-500">
+                          Click to upload primary image
+                        </p>
+                        <p className="text-[9px] text-gray-600">
+                          JPEG, PNG, WebP · Max 1MB
+                        </p>
+                      </>
+                    )}
+                  </button>
+                </label>
               </CardContent>
             </Card>
 

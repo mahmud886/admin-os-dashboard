@@ -363,10 +363,13 @@ export default function OrdersPage() {
     const total = formatCurrency(calculateTotal(order), order.currency);
     const itemRows =
       items
-        .map(
-          (item) =>
-            `<tr><td>${item.product_name || "Item"}</td><td style="text-align:center">${item.quantity || 1}</td><td style="text-align:right">$${parseFloat(item.unit_amount || 0).toFixed(2)}</td><td style="text-align:right">$${parseFloat(item.total_amount || 0).toFixed(2)}</td></tr>`,
-        )
+        .map((item) => {
+          const variant = [item.color, item.size].filter(Boolean).join(" / ");
+          const label = variant
+            ? `${item.product_name || "Item"} <span style="color:#888">(${variant})</span>`
+            : item.product_name || "Item";
+          return `<tr><td>${label}</td><td style="text-align:center">${item.quantity || 1}</td><td style="text-align:right">$${parseFloat(item.unit_amount || 0).toFixed(2)}</td><td style="text-align:right">$${parseFloat(item.total_amount || 0).toFixed(2)}</td></tr>`;
+        })
         .join("") || `<tr><td colspan="4" style="color:#888">—</td></tr>`;
 
     const html = `<!DOCTYPE html><html><head><meta charset="UTF-8">
@@ -497,6 +500,12 @@ export default function OrdersPage() {
                           SKU
                         </th>
                         <th className="p-4 text-xs font-medium tracking-wider text-left text-gray-400 uppercase">
+                          Color
+                        </th>
+                        <th className="p-4 text-xs font-medium tracking-wider text-left text-gray-400 uppercase">
+                          Size
+                        </th>
+                        <th className="p-4 text-xs font-medium tracking-wider text-left text-gray-400 uppercase">
                           Total
                         </th>
                         <th className="p-4 text-xs font-medium tracking-wider text-left text-gray-400 uppercase">
@@ -513,7 +522,7 @@ export default function OrdersPage() {
                       ) : orders.length === 0 ? (
                         <tr>
                           <td
-                            colSpan="8"
+                            colSpan="10"
                             className="p-8 text-center text-gray-400"
                           >
                             No orders found matching the criteria.
@@ -579,6 +588,56 @@ export default function OrdersPage() {
                                         className="text-xs font-mono text-teal-400"
                                       >
                                         {sku}
+                                      </span>
+                                    ))}
+                                  </div>
+                                ) : (
+                                  <span className="text-xs text-gray-600">
+                                    —
+                                  </span>
+                                );
+                              })()}
+                            </td>
+                            <td className="p-4">
+                              {(() => {
+                                const colors = (
+                                  order.ecommerce_order_items || []
+                                )
+                                  .map((i) => i.color)
+                                  .filter(Boolean);
+                                return colors.length > 0 ? (
+                                  <div className="flex flex-col gap-1">
+                                    {colors.map((color, idx) => (
+                                      <span
+                                        key={idx}
+                                        className="text-xs text-white"
+                                      >
+                                        {color}
+                                      </span>
+                                    ))}
+                                  </div>
+                                ) : (
+                                  <span className="text-xs text-gray-600">
+                                    —
+                                  </span>
+                                );
+                              })()}
+                            </td>
+                            <td className="p-4">
+                              {(() => {
+                                const sizes = (
+                                  order.ecommerce_order_items || []
+                                )
+                                  .map((i) => i.size)
+                                  .filter(Boolean);
+                                return sizes.length > 0 ? (
+                                  <div className="flex flex-col gap-1">
+                                    {sizes.map((size, idx) => (
+                                      <span
+                                        key={idx}
+                                        className="text-xs text-white"
+                                      >
+                                        {size}
                                       </span>
                                     ))}
                                   </div>
@@ -923,6 +982,8 @@ export default function OrdersPage() {
                       <thead className="bg-[#0a0a0a]">
                         <tr className="text-xs text-left text-gray-500 uppercase">
                           <th className="p-3 font-medium">Product</th>
+                          <th className="p-3 font-medium">Color</th>
+                          <th className="p-3 font-medium">Size</th>
                           <th className="p-3 font-medium text-right">Price</th>
                           <th className="p-3 font-medium text-right">Qty</th>
                           <th className="p-3 font-medium text-right">Total</th>
@@ -973,6 +1034,16 @@ export default function OrdersPage() {
                                   )}
                                 </div>
                               </div>
+                            </td>
+                            <td className="p-3 text-white">
+                              {item.color || (
+                                <span className="text-gray-600">—</span>
+                              )}
+                            </td>
+                            <td className="p-3 text-white">
+                              {item.size || (
+                                <span className="text-gray-600">—</span>
+                              )}
                             </td>
                             <td className="p-3 text-right text-gray-400">
                               {formatCurrency(
