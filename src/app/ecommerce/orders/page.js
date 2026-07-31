@@ -232,41 +232,57 @@ export default function OrdersPage() {
     }
 
     const headers = [
-      "Order Reference",
-      "Name",
-      "Address",
-      "Order Placed",
+      "Order ID",
+      "Order Date",
+      "SKU",
+      "Color",
+      "Size",
+      "Qty",
+      "Customer",
       "Email",
-      "Amount",
-      "Status",
+      "Mailing Address",
     ];
 
-    const csvContent = [
-      headers.join(","),
-      ...orders.map((order) => {
-        const addr =
-          order.shipping_address || order.ecommerce_customers?.address || {};
-        const addressStr = [
-          addr.line1,
-          addr.city,
-          addr.state,
-          addr.postal_code,
-          addr.country,
-        ]
-          .filter(Boolean)
-          .join(", ");
-        const row = [
-          `"${(order.order_number || "—").replace(/"/g, '""')}"`,
-          `"${(order.ecommerce_customers?.name || "Guest").replace(/"/g, '""')}"`,
-          `"${addressStr.replace(/"/g, '""')}"`,
-          `"${order.created_at ? new Date(order.created_at).toLocaleString("en-US") : ""}"`,
-          `"${(order.ecommerce_customers?.email || "").replace(/"/g, '""')}"`,
-          `"$${calculateTotal(order)} ${(order.currency || "USD").toUpperCase()}"`,
-          `"${(order.status || "").toUpperCase()}"`,
-        ];
-        return row.join(",");
-      }),
-    ].join("\n");
+    const esc = (val) => `"${String(val ?? "").replace(/"/g, '""')}"`;
+
+    const rows = orders.flatMap((order) => {
+      const addr =
+        order.shipping_address || order.ecommerce_customers?.address || {};
+      const addressStr = [
+        addr.line1,
+        addr.city,
+        addr.state,
+        addr.postal_code,
+        addr.country,
+      ]
+        .filter(Boolean)
+        .join(", ");
+      const orderDate = order.created_at
+        ? new Date(order.created_at).toLocaleDateString("en-GB", {
+            day: "2-digit",
+            month: "long",
+            year: "numeric",
+          })
+        : "";
+      const items = order.ecommerce_order_items || [];
+      const itemRows = items.length > 0 ? items : [{}];
+
+      return itemRows.map((item) =>
+        [
+          esc(order.order_number || "—"),
+          esc(orderDate),
+          esc(item.sku),
+          esc(item.color),
+          esc(item.size),
+          esc(item.quantity),
+          esc(order.ecommerce_customers?.name || "Guest"),
+          esc(order.ecommerce_customers?.email || ""),
+          esc(addressStr),
+        ].join(","),
+      );
+    });
+
+    const csvContent = [headers.join(","), ...rows].join("\n");
 
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
