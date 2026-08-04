@@ -12,6 +12,23 @@ import { createClient } from "@/lib/supabase-server";
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
+// Supabase/PostgREST silently caps any unbounded .select() at 1000 rows.
+// This pages through with .range() until exhausted, so callers get the
+// TRUE full result set instead of a silently-truncated sample.
+async function fetchAllRows(buildQuery, pageSize = 1000) {
+  const rows = [];
+  let offset = 0;
+  for (;;) {
+    const { data, error } = await buildQuery().range(offset, offset + pageSize - 1);
+    if (error) throw error;
+    if (!data || data.length === 0) break;
+    rows.push(...data);
+    if (data.length < pageSize) break;
+    offset += pageSize;
+  }
+  return rows;
+}
+
 export async function GET(request) {
   try {
     const supabase = await createClient();
@@ -96,43 +113,65 @@ export async function GET(request) {
       }
     }
 
+    // Exact all-time counts — total_visits/total_shares must reflect the
+    // real table size, not a row-capped sample.
+    let exactTotalVisits = null;
+    let exactTotalShares = null;
+
     // If table exists, fetch data
     if (tableName && dateField) {
       try {
-        // Get ALL shares for platform stats, UTM sources, and referrers (all-time data)
-        // We fetch more fields to support visitor tracking
-        // Order by date descending to ensure we get the latest data for active users
-        // Limit to 2000 to get a reasonable amount of history (Supabase default is 1000)
-        const { data: allSharesData, error: allSharesError } = await supabase
-          .from(tableName)
-          .select("*")
-          .order(dateField, { ascending: false })
-          .limit(2000);
+        const [{ count: visitsCount }, { count: sharesCount }] = await Promise.all([
+          supabase
+            .from(tableName)
+            .select("*", { count: "exact", head: true })
+            .eq("platform", "page_view"),
+          supabase
+            .from(tableName)
+            .select("*", { count: "exact", head: true })
+            .neq("platform", "page_view"),
+        ]);
+        exactTotalVisits = visitsCount;
+        exactTotalShares = sharesCount;
+      } catch (e) {
+        console.warn("Exact count query failed:", e.message);
+      }
 
-        // Get shares within timeframe for daily shares and recent shares count
-        const { data: timeframeSharesData, error: timeframeSharesError } =
-          await supabase
+      try {
+        // Full all-time dataset (platform + user_agent + date only, to keep
+        // the payload light) — paginated in parallel since we already know
+        // the row count, so this never silently truncates like a single
+        // unbounded/hard-limited query would.
+        const totalRowCount = (exactTotalVisits ?? 0) + (exactTotalShares ?? 0);
+        const pageSize = 1000;
+        const pageCount = Math.max(1, Math.ceil(totalRowCount / pageSize));
+        const pages = await Promise.all(
+          Array.from({ length: pageCount }, (_, i) =>
+            supabase
+              .from(tableName)
+              .select(`platform, user_agent, ${dateField}`)
+              .range(i * pageSize, i * pageSize + pageSize - 1),
+          ),
+        );
+        for (const { data, error } of pages) {
+          if (error) {
+            if (error.code !== "42P01") console.error("Error fetching all shares page:", error.message);
+            continue;
+          }
+          if (data) allShares.push(...data);
+        }
+
+        // Full dataset within the selected timeframe (needed for daily
+        // shares, UTM sources, referrers) — paginated so a busy window
+        // (e.g. >1000 events in 7 days) isn't silently truncated either.
+        recentShares = await fetchAllRows(() =>
+          supabase
             .from(tableName)
             .select("*")
             .gte(dateField, startDate.toISOString())
             .lte(dateField, endDate.toISOString())
-            .order(dateField, { ascending: false });
-
-        if (allSharesError && allSharesError.code !== "42P01") {
-          // 42P01 is "relation does not exist" - ignore if table doesn't exist
-          console.error("Error fetching all shares:", allSharesError.message);
-        } else if (!allSharesError) {
-          allShares = allSharesData || [];
-        }
-
-        if (timeframeSharesError && timeframeSharesError.code !== "42P01") {
-          console.error(
-            "Error fetching timeframe shares:",
-            timeframeSharesError.message,
-          );
-        } else if (!timeframeSharesError) {
-          recentShares = timeframeSharesData || [];
-        }
+            .order(dateField, { ascending: false }),
+        );
       } catch (tableError) {
         // Table might not exist yet
         if (tableError.code !== "42P01") {
@@ -152,16 +191,18 @@ export async function GET(request) {
     const pageViews = allShares.filter((s) => s.platform === "page_view");
     const socialShares = allShares.filter((s) => s.platform !== "page_view");
 
-    // Update total shares to only count actual shares, not page views
-    totalShares = socialShares.length;
+    // Update total shares to only count actual shares, not page views —
+    // prefer the exact DB-side count over the capped sample's length.
+    totalShares = exactTotalShares ?? socialShares.length;
 
     // Update recent shares count (filtered)
     recentSharesCount = recentShares.filter(
       (s) => s.platform !== "page_view",
     ).length;
 
-    // Calculate Visitor Stats
-    const totalVisits = pageViews.length;
+    // Calculate Visitor Stats — prefer the exact DB-side count over the
+    // capped sample's length (see comment above the count queries).
+    const totalVisits = exactTotalVisits ?? pageViews.length;
     const uniqueUAs = new Set(pageViews.map((s) => s.user_agent));
     const uniqueVisitors = uniqueUAs.size;
 
